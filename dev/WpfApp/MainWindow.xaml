@@ -6,14 +6,28 @@
         xmlns:local="clr-namespace:WpfApp"
         xmlns:gl="clr-namespace:OpenTK.Wpf;assembly=GLWpfControl"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800">
+        Title="MainWindow" Height="450" Width="1350">
     <Grid>
-        <gl:GLWpfControl x:Name="glControl"
+        <gl:GLWpfControl x:Name="glControlMagneticLine"
                          Loaded="GLControl_Loaded"
                          Ready="GLControl_Ready"
                          Render="GLControl_Render"
                          MouseDown="GLControl_MouseDown"
-                         MouseMove="GLControl_MouseMove"
+                         MouseMove="GLControl_MouseMove" Margin="0,0,900,0"
+                         />
+        <gl:GLWpfControl x:Name="glControlSkyMap"
+                         Loaded="GLControl_Loaded"
+                         Ready="GLControl_Ready"
+                         Render="GLControl_Render"
+                         MouseDown="GLControl_MouseDown"
+                         MouseMove="GLControl_MouseMove" Margin="450,0,450,0"
+                         />
+        <gl:GLWpfControl x:Name="glControlPulseProfile"
+                         Loaded="GLControl_Loaded"
+                         Ready="GLControl_Ready"
+                         Render="GLControl_Render"
+                         MouseDown="GLControl_MouseDown"
+                         MouseMove="GLControl_MouseMove" Margin="900,0,0,0"
                          />
     </Grid>
 </Window>

@@ -11,9 +11,11 @@ namespace WpfApp
     public partial class MainWindow : Window
     {
         [DllImport("CalcLib.dll")]
-        private static extern int GetVertices([Out] float[] buffer, int maxCount);
+        private static extern int GetMagneticLine([Out] float[]? buffer);
 
-        private float[] vertices = new float[9];
+        int vbo, vao, size;
+
+        private float[] magnetic_line;
 
         // カメラの球面座標 (角度と距離)
         private float yaw = 0f;         // 水平方向回転角
@@ -34,19 +36,39 @@ namespace WpfApp
                 RenderContinuously = true,
             };
 
-            // DLL から三角形の頂点を取得
-            GetVertices(vertices, vertices.Length);
-
             // 描画開始
-            glControl.Start(settings);
+            glControlMagneticLine.Start(settings);
         }
 
 
         private void GLControl_Loaded(object sender, RoutedEventArgs e)
         {
             // OpenGLの初期化
-            GL.ClearColor(0.2f, 0.3f, 0.3f, 1.0f);
-            GL.Enable(EnableCap.DepthTest);
+            //GL.ClearColor(0.2f, 0.3f, 0.3f, 1.0f);
+            GL.ClearColor(Color4.Black);
+            InitVBO();
+            //GL.Enable(EnableCap.DepthTest);
+        }
+
+        private void InitVBO()
+        {
+            // DLLから頂点生成
+            size = GetMagneticLine(null);
+            magnetic_line = new float[size];
+            GetMagneticLine(magnetic_line);
+
+            vao = GL.GenVertexArray();
+            GL.BindVertexArray(vao);
+
+            vbo = GL.GenBuffer();
+            GL.BindBuffer(BufferTarget.ArrayBuffer, vbo);
+            GL.BufferData(BufferTarget.ArrayBuffer, magnetic_line.Length * sizeof(float), magnetic_line, BufferUsageHint.DynamicDraw);
+
+            GL.EnableVertexAttribArray(0);
+            GL.VertexAttribPointer(0, 3, VertexAttribPointerType.Float, false, 3 * sizeof(float), 0);
+
+            GL.BindBuffer(BufferTarget.ArrayBuffer, 0);
+            GL.BindVertexArray(0);
         }
 
 
@@ -75,7 +97,7 @@ namespace WpfApp
             // 投影行列
             Matrix4 proj = Matrix4.CreatePerspectiveFieldOfView(
                 MathHelper.DegreesToRadians(60f),                               // 視野角（FOV: Field of View）
-                (float)glControl.ActualWidth / (float)glControl.ActualHeight,   // アスペクト比
+                (float)glControlMagneticLine.ActualWidth / (float)glControlMagneticLine.ActualHeight,   // アスペクト比
                 0.1f,   // 近クリップ面
                 100f    // 遠クリップ面
             );
@@ -102,20 +124,16 @@ namespace WpfApp
 
         private void DrawLineSegment()
         {
-            // 三角形を描画
-            GL.Begin(PrimitiveType.Triangles);
-            GL.Color4(Color4.Red);
-            for (int i = 0; i < vertices.Length; i += 3)
-            {
-                GL.Vertex3(vertices[i], vertices[i + 1], vertices[i + 2]);
-            }
-            GL.End();
+            GL.PointSize(1.0f);
+            GL.BindVertexArray(vao);
+            GL.DrawArrays(PrimitiveType.Points, 0, size);
+            GL.BindVertexArray(0);
         }
 
 
         private void GLControl_MouseDown(object sender, MouseButtonEventArgs e)
         {
-            lastMousePos = e.GetPosition(glControl);
+            lastMousePos = e.GetPosition(glControlMagneticLine);
         }
 
 
@@ -124,7 +142,7 @@ namespace WpfApp
             if (e.LeftButton == MouseButtonState.Pressed)
             {
                 // マウス移動量を計算
-                Point currentPos = e.GetPosition(glControl);
+                Point currentPos = e.GetPosition(glControlMagneticLine);
                 float dx = (float)(currentPos.X - lastMousePos.X);
                 float dy = (float)(currentPos.Y - lastMousePos.Y);
 

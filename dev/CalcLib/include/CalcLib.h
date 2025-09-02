@@ -7,5 +7,7 @@
 #endif
 
 extern "C" {
-    CALCLIB_API int GetVertices(float* buffer, int maxCount);
+    CALCLIB_API int GetMagneticLine(float* buffer);
+    CALCLIB_API int GetMagneticLineVerticesCount();
+    CALCLIB_API bool GetMagneticLineVertices(float* buffer);
 }

@@ -116,6 +116,7 @@
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -133,6 +134,7 @@
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -142,17 +144,45 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="include\CalcLib.h" />
+    <ClInclude Include="include\Data\MagneticLine.h" />
+    <ClInclude Include="include\Data\PolarCap.h" />
+    <ClInclude Include="include\Data\Pulsar.h" />
+    <ClInclude Include="include\Data\Pulse.h" />
+    <ClInclude Include="include\Data\SkyMap.h" />
     <ClInclude Include="include\framework.h" />
+    <ClInclude Include="include\Material\Colors.h" />
+    <ClInclude Include="include\Math\Constants.h" />
+    <ClInclude Include="include\Math\Matrix4x4.h" />
+    <ClInclude Include="include\Math\Quaternion.h" />
+    <ClInclude Include="include\Math\RungeKutta.h" />
+    <ClInclude Include="include\Math\Vector2D.h" />
+    <ClInclude Include="include\Math\Vector3D.h" />
+    <ClInclude Include="include\ModelGenerator.h" />
     <ClInclude Include="include\pch.h" />
+    <ClInclude Include="include\Primitive\Arrow.h" />
+    <ClInclude Include="include\Primitive\Camera.h" />
+    <ClInclude Include="include\Primitive\Cone.h" />
+    <ClInclude Include="include\Primitive\Cylinder.h" />
+    <ClInclude Include="include\Primitive\Light.h" />
+    <ClInclude Include="include\Primitive\Shape.h" />
+    <ClInclude Include="include\Primitive\Sphere.h" />
+    <ClInclude Include="include\Primitive\Vertex.h" />
+    <ClInclude Include="include\PulseCalculator.h" />
+    <ClInclude Include="include\Scene\Scene.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\CalcLib.cpp" />
+    <ClCompile Include="src\ModelGenerator.cpp" />
     <ClCompile Include="src\pch.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="src\PulseCalculator.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="cpp.hint" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
