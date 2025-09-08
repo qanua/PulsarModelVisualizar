@@ -40,14 +40,6 @@ private:
 		};
 
 
-		/** @brief ポーラーキャップ極種類の列挙 */
-		//enum class PolarCapPolarType
-		//{
-		//	NORTH = 0,
-		//	SOUTH = 1
-		//};
-
-
 		/** @brief 磁力線状態の列挙 */
 		enum class MagneticLineStatus
 		{

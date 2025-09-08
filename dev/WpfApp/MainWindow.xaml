@@ -6,28 +6,72 @@
         xmlns:local="clr-namespace:WpfApp"
         xmlns:gl="clr-namespace:OpenTK.Wpf;assembly=GLWpfControl"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="1350">
+        Title="MainWindow" Height="900" Width="900">
+    
+    <Window.Resources>
+        <Style x:Key="CommonGlControlStyle" TargetType="gl:GLWpfControl">
+            <EventSetter Event="MouseDown" Handler="GLControl_MouseDown"/>
+            <EventSetter Event="MouseMove" Handler="GLControl_MouseMove"/>
+            <EventSetter Event="MouseUp" Handler="GLControl_MouseUp"/>
+            <EventSetter Event="MouseWheel" Handler="GLControl_MouseWheel"/>
+        </Style>
+    </Window.Resources>
+
     <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+
+        <!-- Top Left -->
+        <!--<gl:GLWpfControl x:Name="glControlSkyMap"
+                         Style="{StaticResource CommonGlControlStyle}"
+                         Grid.Row="0" Grid.Column="0"
+                         Ready="GLControl_Ready"
+                         Render="GLControl_Render"/>-->
+
+        <!-- Top Right -->
         <gl:GLWpfControl x:Name="glControlMagneticLine"
-                         Loaded="GLControl_Loaded"
+                         Style="{StaticResource CommonGlControlStyle}"
+                         Grid.Row="0" Grid.Column="1"/>
+
+        <!-- Bottom Left -->
+        <!--<gl:GLWpfControl x:Name="glControlPulseProfile"
+                         Style="{StaticResource CommonGlControlStyle}"
+                         Grid.Row="1" Grid.Column="0"
                          Ready="GLControl_Ready"
-                         Render="GLControl_Render"
-                         MouseDown="GLControl_MouseDown"
-                         MouseMove="GLControl_MouseMove" Margin="0,0,900,0"
-                         />
-        <gl:GLWpfControl x:Name="glControlSkyMap"
-                         Loaded="GLControl_Loaded"
-                         Ready="GLControl_Ready"
-                         Render="GLControl_Render"
-                         MouseDown="GLControl_MouseDown"
-                         MouseMove="GLControl_MouseMove" Margin="450,0,450,0"
-                         />
-        <gl:GLWpfControl x:Name="glControlPulseProfile"
-                         Loaded="GLControl_Loaded"
-                         Ready="GLControl_Ready"
-                         Render="GLControl_Render"
-                         MouseDown="GLControl_MouseDown"
-                         MouseMove="GLControl_MouseMove" Margin="900,0,0,0"
-                         />
+                         Render="GLControl_Render"/>-->
+
+        <Grid Grid.Row="1" Grid.Column="1">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+
+            <!-- Bottom Right 2x2 -->
+            <gl:GLWpfControl x:Name="glControlPolarCapNorthOpened"
+                             Style="{StaticResource CommonGlControlStyle}"
+                             Grid.Row="0" Grid.Column="0"/>
+
+            <gl:GLWpfControl x:Name="glControlPolarCapNorthClosed"
+                             Style="{StaticResource CommonGlControlStyle}"
+                             Grid.Row="0" Grid.Column="1"/>
+
+            <gl:GLWpfControl x:Name="glControlPolarCapSouthOpened"
+                             Style="{StaticResource CommonGlControlStyle}"
+                             Grid.Row="1" Grid.Column="0"/>
+
+            <gl:GLWpfControl x:Name="glControlPolarCapSouthClosed"
+                             Style="{StaticResource CommonGlControlStyle}"
+                             Grid.Row="1" Grid.Column="1"/>
+        </Grid>
     </Grid>
 </Window>

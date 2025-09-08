@@ -21,13 +21,13 @@ namespace ModelGenerator {
 		PulseCalculator* m_pPulseCalculator;		// パルス計算機
 		CRITICAL_SECTION* m_pCriticalSection;		// クリティカルセクション
 
-		Scene* m_pPulsarModel;						// パルサーモデル
-		Scene* m_pPolarCapNorthBegin;				// ポーラーキャップ北始点
-		Scene* m_pPolarCapNorthEnd;					// ポーラーキャップ北終点
-		Scene* m_pPolarCapSouthBegin;				// ポーラーキャップ南始点
-		Scene* m_pPolarCapSouthEnd;					// ポーラーキャップ南終点
-		Scene* m_pSkyMap;							// スカイマップ
-		Scene* m_pPulseProfile;						// パルス波形
+		//Scene* m_pPulsarModel;						// パルサーモデル
+		//Scene* m_pPolarCapNorthBegin;				// ポーラーキャップ北始点
+		//Scene* m_pPolarCapNorthEnd;					// ポーラーキャップ北終点
+		//Scene* m_pPolarCapSouthBegin;				// ポーラーキャップ南始点
+		//Scene* m_pPolarCapSouthEnd;					// ポーラーキャップ南終点
+		//Scene* m_pSkyMap;							// スカイマップ
+		//Scene* m_pPulseProfile;						// パルス波形
 #pragma endregion
 
 
@@ -61,22 +61,23 @@ namespace ModelGenerator {
 	private:
 		// 設定・更新
 		void SetupPulsar();
-		void UpdateInclinationAngle();
 
 	private:
-		// シーン生成
-		inline Scene* GetScene(int type);
-		inline double GetPolarAngle(int type);
-
 		void CreateScene();
-		void CreatePulsarModel();
 		void CreatePolarCap();
 		void CreateSkyMap();
 		void CreatePulse();
 
+
 	public:
 		int GetMagneticLine(float* buffer);
-		int GetMagneticLineVerticesCount();
-		void GetMagneticLineVertices(float* buffer);
+		int GetPolarCapNorthOpened(float* buffer);
+		int GetPolarCapNorthClosed(float* buffer);
+		int GetPolarCapSouthOpened(float* buffer);
+		int GetPolarCapSouthClosed(float* buffer);
+
+
+	private:
+		int GetVertices(float* buffer, std::vector<Vector3Dd>& vertices);
 	};
 }

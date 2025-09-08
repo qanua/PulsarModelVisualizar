@@ -8,6 +8,8 @@
 
 extern "C" {
     CALCLIB_API int GetMagneticLine(float* buffer);
-    CALCLIB_API int GetMagneticLineVerticesCount();
-    CALCLIB_API bool GetMagneticLineVertices(float* buffer);
+    CALCLIB_API int GetPolarCapNorthOpened(float* buffer);
+    CALCLIB_API int GetPolarCapNorthClosed(float* buffer);
+    CALCLIB_API int GetPolarCapSouthOpened(float* buffer);
+    CALCLIB_API int GetPolarCapSouthClosed(float* buffer);
 }

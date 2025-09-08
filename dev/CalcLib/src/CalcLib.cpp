@@ -1,7 +1,7 @@
 ﻿// dllmain.cpp : DLL アプリケーションのエントリ ポイントを定義します。
 #include "pch.h"
 #include "CalcLib.h"
-#include "ModelGenerator.h"
+#include "CalcManager.h"
 
 #include <vector>
 #include <iostream>
@@ -24,37 +24,30 @@ BOOL APIENTRY DllMain( HMODULE hModule,
 
 int GetMagneticLine(float* buffer)
 {
-    int size(0);
-    try {
-        size = ModelGenerator::CalcManager::GetInstance().GetMagneticLine(buffer);
-    }
-    catch (const std::exception& e) {
-        std::cout << "exception: " << e.what() << std::endl;
-    }
-    return size;
+    return ModelGenerator::CalcManager::GetInstance()
+        .GetMagneticLine(buffer);
 }
 
-int GetMagneticLineVerticesCount()
+int GetPolarCapNorthOpened(float* buffer)
 {
-    bool size(0);
-    try {
-        size = ModelGenerator::CalcManager::GetInstance().GetMagneticLineVerticesCount();
-    }
-    catch (const std::exception& e) {
-        std::cout << "exception: " << e.what() << std::endl;
-    }
-    return size;
+    return ModelGenerator::CalcManager::GetInstance()
+        .GetPolarCapNorthOpened(buffer);
 }
 
-bool GetMagneticLineVertices(float* buffer)
-{   
-    bool result(false);
-    try {
-        ModelGenerator::CalcManager::GetInstance().GetMagneticLineVertices(buffer);
-        result = true;
-    }
-    catch (const std::exception& e) {
-        std::cout << "exception: " << e.what() << std::endl;
-    }
-    return result;
+int GetPolarCapNorthClosed(float* buffer)
+{
+    return ModelGenerator::CalcManager::GetInstance()
+        .GetPolarCapNorthClosed(buffer);
+}
+
+int GetPolarCapSouthOpened(float* buffer)
+{
+    return ModelGenerator::CalcManager::GetInstance()
+        .GetPolarCapSouthOpened(buffer);
+}
+
+int GetPolarCapSouthClosed(float* buffer)
+{
+    return ModelGenerator::CalcManager::GetInstance()
+        .GetPolarCapSouthClosed(buffer);
 }

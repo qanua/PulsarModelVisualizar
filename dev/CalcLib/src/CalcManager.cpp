@@ -1,29 +1,23 @@
 #pragma once
 
 #include "pch.h"
-#include "ModelGenerator.h"
+#include "CalcManager.h"
 
 namespace ModelGenerator {
-
-	using scene_t = Scene::Type;
-	using shape_t = Shape::Type;
-	using line_t = Shape::LineType;
-	using line_count_t = Vertex::CountType;
-	using line_vec_t = Vertex::VectorType;
 
 #pragma region 初期化 / 終了処理
 	// コンストラクタ
 	CalcManager::CalcManager()
 		: m_pPulsar(				   new Pulsar())
-		, m_pPulseCalculator( new PulseCalculator())
+		//, m_pPulseCalculator( new PulseCalculator())
 		, m_pCriticalSection(new CRITICAL_SECTION())
-		, m_pPulsarModel(				new Scene())
-		, m_pPolarCapNorthBegin(		new Scene())
-		, m_pPolarCapNorthEnd(			new Scene())
-		, m_pPolarCapSouthBegin(		new Scene())
-		, m_pPolarCapSouthEnd(			new Scene())
-		, m_pSkyMap(					new Scene())
-		, m_pPulseProfile(				new Scene())
+		//, m_pPulsarModel(				new Scene())
+		//, m_pPolarCapNorthBegin(		new Scene())
+		//, m_pPolarCapNorthEnd(			new Scene())
+		//, m_pPolarCapSouthBegin(		new Scene())
+		//, m_pPolarCapSouthEnd(			new Scene())
+		//, m_pSkyMap(					new Scene())
+		//, m_pPulseProfile(				new Scene())
 	{
 		// クリティカルセクションの初期化
 		::InitializeCriticalSection( m_pCriticalSection );
@@ -41,14 +35,14 @@ namespace ModelGenerator {
 	{
 		// リソースの開放
 		delete m_pPulsar;
-		delete m_pPulseCalculator;
-		delete m_pPulsarModel;
-		delete m_pPolarCapNorthBegin;
-		delete m_pPolarCapNorthEnd;
-		delete m_pPolarCapSouthBegin;
-		delete m_pPolarCapSouthEnd;
-		delete m_pSkyMap;
-		delete m_pPulseProfile;
+		//delete m_pPulseCalculator;
+		//delete m_pPulsarModel;
+		//delete m_pPolarCapNorthBegin;
+		//delete m_pPolarCapNorthEnd;
+		//delete m_pPolarCapSouthBegin;
+		//delete m_pPolarCapSouthEnd;
+		//delete m_pSkyMap;
+		//delete m_pPulseProfile;
 
 		// クリティカルセクションの破棄
 		::DeleteCriticalSection(m_pCriticalSection);
@@ -76,76 +70,58 @@ namespace ModelGenerator {
 	// シーン生成
 	void CalcManager::CreateScene() {
 		// パルス計算
-		m_pPulseCalculator->GetPulsarInfo(*m_pPulsar);
+		PulseCalculator calclator;
+		calclator.GetPulsarInfo(*m_pPulsar);
 
 		// 構成要素の生成
-		CreatePulsarModel();	// パルサーモデル
-		CreatePolarCap();		// ポーラーキャップ
-		CreateSkyMap();			// スカイマップ
-		CreatePulse();			// パルス
-	}
-
-
-	// パルサーモデルの生成
-	void CalcManager::CreatePulsarModel() {
-		// 磁力線の生成
-		Vertex* p_vertex(new Vertex(line_count_t::MULTIPLE, line_vec_t::XYZ, line_t::SOLID));
-
-		p_vertex->SetMainColor(0, 255, 0, 1.0);
-		p_vertex->SetWidth(0.5);
-
-		std::vector<std::vector<Vector3Dd>>* p_vec_vec_line(&p_vertex->GetMultipleLine3D());
-		m_pPulsar->GetMagneticLineVertex(*p_vec_vec_line);
-		p_vertex->SetMultipleLine3D(*p_vec_vec_line);
-
-		m_pPulsarModel->SetElement(p_vertex);
+		//CreatePolarCap();		// ポーラーキャップ
+		//CreateSkyMap();			// スカイマップ
+		//CreatePulse();			// パルス
 	}
 
 
 	// ポーラーキャップの生成
 	void CalcManager::CreatePolarCap() {
-		using polar_t = Scene::PolarCap;
+		//using polar_t = Scene::PolarCap;
 
-		for (int i = 0; i < 4; i++) {
-			std::vector<Vector3Dd>* vec_polar(nullptr);
-			Scene* p_scene(nullptr);
+		//for (int i = 0; i < 4; i++) {
+		//	std::vector<Vector3Dd>* vec_polar(nullptr);
+		//	Scene* p_scene(nullptr);
 
-			switch (i) {
-			case 0:
-				vec_polar = &(m_pPulsar->GetPolarCapNorthBeginVertex());
-				p_scene = m_pPolarCapNorthBegin;
-				break;
-			case 1:
-				vec_polar = &(m_pPulsar->GetPolarCapNorthEndVertex());
-				p_scene = m_pPolarCapNorthEnd;
-				break;
-			case 2:
-				vec_polar = &(m_pPulsar->GetPolarCapSouthBeginVertex());
-				p_scene = m_pPolarCapSouthBegin;
-				break;
-			case 3:
-				vec_polar = &(m_pPulsar->GetPolarCapSouthEndVertex());
-				p_scene = m_pPolarCapSouthEnd;
-				break;
-			}
+		//	switch (i) {
+		//	case 0:
+		//		vec_polar = &(m_pPulsar->GetPolarCapNorthBeginVertex());
+		//		p_scene = m_pPolarCapNorthBegin;
+		//		break;
+		//	case 1:
+		//		vec_polar = &(m_pPulsar->GetPolarCapNorthEndVertex());
+		//		p_scene = m_pPolarCapNorthEnd;
+		//		break;
+		//	case 2:
+		//		vec_polar = &(m_pPulsar->GetPolarCapSouthBeginVertex());
+		//		p_scene = m_pPolarCapSouthBegin;
+		//		break;
+		//	case 3:
+		//		vec_polar = &(m_pPulsar->GetPolarCapSouthEndVertex());
+		//		p_scene = m_pPolarCapSouthEnd;
+		//		break;
+		//	}
 
-			Shape* p_shape(nullptr);
-			for (int j = 0; j < (int)polar_t::COUNT; j++) {
-				switch (j) {
-				case(int)polar_t::MAGNETIC_LINE: {
-					Vertex* p_vertex(new Vertex(line_count_t::SINGLE, line_vec_t::XYZ, line_t::POINT));
+		//	Shape* p_shape(nullptr);
+		//	for (int j = 0; j < (int)polar_t::COUNT; j++) {
+		//		switch (j) {
+		//		case(int)polar_t::MAGNETIC_LINE: {
+		//			Vertex* p_vertex(new Vertex());
 
-					p_vertex->SetMainColor(0, 255, 0, 1.0);
-					p_vertex->SetWidth(2.0);
-					p_vertex->SetSingleLine3D(*vec_polar);
+		//			p_vertex->SetSingleLine3D(*vec_polar);
 
-					p_shape = p_vertex;
-				}
-				break;
-				}
-			}
-			p_scene->SetElement(p_shape);
-		}
+		//			p_shape = p_vertex;
+		//		}
+		//		break;
+		//		}
+		//	}
+		//	p_scene->SetElement(p_shape);
+		//}
 	}
 
 
@@ -220,14 +196,12 @@ namespace ModelGenerator {
 
 	int CalcManager::GetMagneticLine(float* buffer)
 	{
-		static std::vector<float> vertices;
-		std::vector<Shape*> vec_p_shape = m_pPulsarModel->GetElement();
-		Vertex* p_vertex((Vertex*)vec_p_shape[0]);
-		std::vector<std::vector<Vector3Dd>> vec_vec_vertex3d(p_vertex->GetMultipleLine3D());
+		std::vector<std::vector<Vector3Dd>>* p_vec_vec_line(new std::vector<std::vector<Vector3Dd>>);
+		m_pPulsar->GetMagneticLineVertex(*p_vec_vec_line);
 		int counter(0);
 
-		for (unsigned int i = 0; i < vec_vec_vertex3d.size(); i++) {
-			std::vector<Vector3Dd> vec_line(vec_vec_vertex3d[i]);
+		for (unsigned int i = 0; i < p_vec_vec_line->size(); i++) {
+			std::vector<Vector3Dd> vec_line((*p_vec_vec_line)[i]);
 
 			if (buffer) {
 				for (unsigned int j = 0; j < vec_line.size(); j++) {
@@ -243,15 +217,41 @@ namespace ModelGenerator {
 		return counter;
 	}
 
-	int CalcManager::GetMagneticLineVerticesCount()
+	int CalcManager::GetPolarCapNorthOpened(float* buffer)
 	{
-		// TODO
-		return 0;
+		return GetVertices(buffer, m_pPulsar->GetPolarCapNorthBeginVertex());
 	}
 
-	void CalcManager::GetMagneticLineVertices(float* buffer)
+	int CalcManager::GetPolarCapNorthClosed(float* buffer)
 	{
-		// TODO
+		return GetVertices(buffer, m_pPulsar->GetPolarCapNorthEndVertex());
+	}
+
+	int CalcManager::GetPolarCapSouthOpened(float* buffer)
+	{
+		return GetVertices(buffer, m_pPulsar->GetPolarCapSouthBeginVertex());
+	}
+
+	int CalcManager::GetPolarCapSouthClosed(float* buffer)
+	{
+		return GetVertices(buffer, m_pPulsar->GetPolarCapSouthEndVertex());
+	}
+
+	int CalcManager::GetVertices(float* buffer, std::vector<Vector3Dd>& vertices)
+	{
+		int counter(0);
+
+		if (buffer) {
+			for (unsigned int i = 0; i < vertices.size(); i++) {
+				buffer[counter++] = vertices[i].x;
+				buffer[counter++] = vertices[i].y;
+				buffer[counter++] = vertices[i].z;
+			}
+		}
+		else {
+			counter = vertices.size() * 3;
+		}
+		return counter;
 	}
 #pragma endregion
 }
