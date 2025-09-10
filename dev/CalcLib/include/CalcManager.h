@@ -76,8 +76,11 @@ namespace ModelGenerator {
 		int GetPolarCapSouthOpened(float* buffer);
 		int GetPolarCapSouthClosed(float* buffer);
 
-
 	private:
-		int GetVertices(float* buffer, std::vector<Vector3Dd>& vertices);
+		int GetVertices3Dd(float* buffer, std::vector<Vector3Dd>& vertices);
+
+	public:
+		int GetSkyMap(float* buffer);
+		int GetPulseProfile(float* buffer, bool normalize);
 	};
 }

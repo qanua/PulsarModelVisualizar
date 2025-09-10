@@ -51,3 +51,15 @@ int GetPolarCapSouthClosed(float* buffer)
     return ModelGenerator::CalcManager::GetInstance()
         .GetPolarCapSouthClosed(buffer);
 }
+
+int GetSkyMap(float* buffer)
+{
+    return ModelGenerator::CalcManager::GetInstance()
+        .GetSkyMap(buffer);
+}
+
+int GetPulseProfile(float* buffer, bool normalize)
+{
+    return ModelGenerator::CalcManager::GetInstance()
+        .GetPulseProfile(buffer, normalize);
+}

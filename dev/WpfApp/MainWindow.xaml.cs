@@ -1,12 +1,12 @@
 ﻿using OpenTK.Graphics.OpenGL;
 using OpenTK.Mathematics;
-//using OpenTK.Windowing.Common;
 using OpenTK.Wpf;
 using System;
 using System.Diagnostics;
 using System.Drawing;
 using System.Reflection;
 using System.Runtime.InteropServices;
+using System.Security.Policy;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
@@ -32,6 +32,12 @@ namespace WpfApp
         [DllImport("CalcLib.dll")]
         private static extern int GetPolarCapSouthClosed([Out] float[]? buffer);
 
+        [DllImport("CalcLib.dll")]
+        private static extern int GetSkyMap([Out] float[]? buffer);
+
+        [DllImport("CalcLib.dll")]
+        private static extern int GetPulseProfile([Out] float[]? buffer, bool normalize);
+
 
         private System.Windows.Point lastMousePos;
         private bool isDragging = false;
@@ -52,16 +58,16 @@ namespace WpfApp
             glControlPolarCapNorthClosed.Ready += () => ContextReady(glControlPolarCapNorthClosed, TimeSpan.Zero);
             glControlPolarCapSouthOpened.Ready += () => ContextReady(glControlPolarCapSouthOpened, TimeSpan.Zero);
             glControlPolarCapSouthClosed.Ready += () => ContextReady(glControlPolarCapSouthClosed, TimeSpan.Zero);
-            //glControlSkyMap.Ready += () => ContextReady(glControlSkyMap, TimeSpan.Zero);
-            //glControlPulseProfile.Ready += () => ContextReady(glControlPulseProfile, TimeSpan.Zero);
+            glControlSkyMap.Ready += () => ContextReady(glControlSkyMap, TimeSpan.Zero);
+            glControlPulseProfile.Ready += () => ContextReady(glControlPulseProfile, TimeSpan.Zero);
 
             glControlMagneticLine.Render += delta => RenderView(glControlMagneticLine, delta);
             glControlPolarCapNorthOpened.Render += delta => RenderView(glControlPolarCapNorthOpened, delta);
             glControlPolarCapNorthClosed.Render += delta => RenderView(glControlPolarCapNorthClosed, delta);
             glControlPolarCapSouthOpened.Render += delta => RenderView(glControlPolarCapSouthOpened, delta);
             glControlPolarCapSouthClosed.Render += delta => RenderView(glControlPolarCapSouthClosed, delta);
-            //glControlSkyMap.Render += delta => DrawLineSegmentglControlSkyMap, delta);
-            //glControlPulseProfile.Render += delta => DrawLineSegment(glControlPulseProfile, delta);
+            glControlSkyMap.Render += delta => RenderView(glControlSkyMap, delta);
+            glControlPulseProfile.Render += delta => RenderView(glControlPulseProfile, delta);
 
             // GLコントロールの設定
             var settings = new GLWpfControlSettings()
@@ -77,8 +83,8 @@ namespace WpfApp
             glControlPolarCapNorthClosed.Start(settings);
             glControlPolarCapSouthOpened.Start(settings);
             glControlPolarCapSouthClosed.Start(settings);
-            //glControlSkyMap.Start(settings);
-            //glControlPulseProfile.Start(settings);
+            glControlSkyMap.Start(settings);
+            glControlPulseProfile.Start(settings);
         }
 
 
@@ -108,21 +114,25 @@ namespace WpfApp
             else if (
                 control == glControlPolarCapNorthOpened || control == glControlPolarCapNorthClosed)
             {
-                // ポーラーキャップ
+                // ポーラーキャップ北
                 dicCameras[control] = new Camera(33f, 0f, 0.01f, Vector3.Zero);
             }
             else if(
                 control == glControlPolarCapSouthOpened || control == glControlPolarCapSouthClosed)
             {
-                // ポーラーキャップ
+                // ポーラーキャップ南
                 dicCameras[control] = new Camera(33f, 0f, -0.01f, Vector3.Zero);
             }
-            //else if(control == glControlSkyMap)
-            //{
-            //}
-            //else if(control == glControlPulseProfile)
-            //{
-            //}
+            else if (control == glControlSkyMap)
+            {
+                // スカイマップ
+                dicCameras[control] = new Camera(90f, 0f, 10f, Vector3.Zero);
+            }
+            else if (control == glControlPulseProfile)
+            {
+                // パルスプロファイル
+                dicCameras[control] = new Camera(90f, 0f, 10f, Vector3.Zero);
+            }
         }
 
 
@@ -159,12 +169,18 @@ namespace WpfApp
                 vertices = new float[GetPolarCapSouthClosed(null)];
                 GetPolarCapSouthClosed(vertices);
             }
-            //else if(control == glControlSkyMap)
-            //{
-            //}
-            //else if(control == glControlPulseProfile)
-            //{
-            //}
+            else if (control == glControlSkyMap)
+            {
+                // スカイマップ
+                vertices = new float[GetSkyMap(null)];
+                GetSkyMap(vertices);
+            }
+            else if (control == glControlPulseProfile)
+            {
+                // パルスプロファイル
+                vertices = new float[GetPulseProfile(null, false)];
+                GetPulseProfile(vertices, true);
+            }
 
             if (vertices != null)
             {
@@ -175,7 +191,7 @@ namespace WpfApp
 
         private void InitVBO(GLWpfControl control)
         {
-            if(dicVertices.TryGetValue(control, out var vertices))
+            if (dicVertices.TryGetValue(control, out var vertices))
             {
                 int vbo = GL.GenBuffer();
 
@@ -191,7 +207,8 @@ namespace WpfApp
                     BufferUsageHint.StaticDraw);
 
                 dicVbos[control] = vbo;
-                dicVertexCount[control] = vertices.Length / 3;
+                int size = (control == glControlSkyMap || control == glControlPulseProfile) ? 2 : 3;
+                dicVertexCount[control] = vertices.Length / size;
 
                 // DEBUG
                 //int arrayBuffer;
@@ -229,12 +246,25 @@ namespace WpfApp
 
                 // 固定機能パイプライン
                 GL.EnableClientState(ArrayCap.VertexArray);
-                GL.VertexPointer(3, VertexPointerType.Float, 0, IntPtr.Zero);
+                int size = (control == glControlSkyMap || control == glControlPulseProfile) ? 2 : 3;
+                GL.VertexPointer(size, VertexPointerType.Float, 0, IntPtr.Zero);
 
-                // 頂点の描画
                 GL.Color4(Color4.White);
-                GL.PointSize(1f);
-                GL.DrawArrays(PrimitiveType.Points, 0, count);   // PrimitiveType.LineStrip
+
+                if (control == glControlPulseProfile)
+                {
+                    int vertexCount = 360;
+                    int lineCount = count / vertexCount;
+                    for (int i = 0; i < lineCount; i++)
+                    {
+                        GL.DrawArrays(PrimitiveType.LineStrip, i * vertexCount, vertexCount);
+                    }
+                }
+                else
+                {
+                    GL.PointSize(1f);
+                    GL.DrawArrays(PrimitiveType.Points, 0, count);
+                }
 
                 GL.DisableClientState(ArrayCap.VertexArray);
                 GL.BindBuffer(BufferTarget.ArrayBuffer, 0);
@@ -246,7 +276,7 @@ namespace WpfApp
         {
             if (dicCameras.ContainsKey(control))
             {
-                Matrix4 proj;
+                Matrix4 proj = Matrix4.Identity; // ここで初期化
 
                 if (control == glControlMagneticLine)
                 {
@@ -257,32 +287,30 @@ namespace WpfApp
                         0.001f, 100f
                     );
                 }
-                else
+                else if (control == glControlPolarCapNorthOpened ||
+                        control == glControlPolarCapNorthClosed ||
+                        control == glControlPolarCapSouthOpened ||
+                        control == glControlPolarCapSouthClosed)
                 {
-                    float aspect = (float)control.ActualWidth / (float)control.ActualHeight;
-                    float size = 0.001f; // 基準スケール
-
-                    float left, right, bottom, top;
-                    if (aspect >= 1.0f)
-                    {
-                        // 横長画面 → 横に合わせる
-                        left = -size * aspect;
-                        right = size * aspect;
-                        bottom = -size;
-                        top = size;
-                    }
-                    else
-                    {
-                        // 縦長画面 → 縦に合わせる
-                        left = -size;
-                        right = size;
-                        bottom = -size / aspect;
-                        top = size / aspect;
-                    }
-
                     proj = Matrix4.CreateOrthographicOffCenter(
-                        left, right,
-                        bottom, top,
+                        -0.001f, 0.001f,
+                        -0.001f, 0.001f,
+                        0.001f, 100f
+                    );
+                }
+                else if (control == glControlSkyMap)
+                {
+                    proj = Matrix4.CreateOrthographicOffCenter(
+                        0f, 360f,
+                        0f, 180f,
+                        0.001f, 100f
+                    );
+                }
+                else if (control == glControlPulseProfile)
+                {
+                    proj = Matrix4.CreateOrthographicOffCenter(
+                        0f, 360f,
+                        0f, 180f,
                         0.001f, 100f
                     );
                 }

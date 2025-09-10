@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:WpfApp"
         xmlns:gl="clr-namespace:OpenTK.Wpf;assembly=GLWpfControl"
         mc:Ignorable="d"
-        Title="MainWindow" Height="900" Width="900">
+        Title="MainWindow" Height="900" Width="1350" ResizeMode="NoResize">
     
     <Window.Resources>
         <Style x:Key="CommonGlControlStyle" TargetType="gl:GLWpfControl">
@@ -25,28 +25,16 @@
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="*"/>
             <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
-
-        <!-- Top Left -->
-        <!--<gl:GLWpfControl x:Name="glControlSkyMap"
-                         Style="{StaticResource CommonGlControlStyle}"
-                         Grid.Row="0" Grid.Column="0"
-                         Ready="GLControl_Ready"
-                         Render="GLControl_Render"/>-->
 
         <!-- Top Right -->
         <gl:GLWpfControl x:Name="glControlMagneticLine"
                          Style="{StaticResource CommonGlControlStyle}"
-                         Grid.Row="0" Grid.Column="1"/>
+                         Grid.Row="0" Grid.Column="2"/>
 
-        <!-- Bottom Left -->
-        <!--<gl:GLWpfControl x:Name="glControlPulseProfile"
-                         Style="{StaticResource CommonGlControlStyle}"
-                         Grid.Row="1" Grid.Column="0"
-                         Ready="GLControl_Ready"
-                         Render="GLControl_Render"/>-->
-
-        <Grid Grid.Row="1" Grid.Column="1">
+        <!-- Top Center -->
+        <Grid Grid.Row="0" Grid.Column="1">
             <Grid.RowDefinitions>
                 <RowDefinition Height="*"/>
                 <RowDefinition Height="*"/>
@@ -56,7 +44,7 @@
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
 
-            <!-- Bottom Right 2x2 -->
+            <!-- 2x2 -->
             <gl:GLWpfControl x:Name="glControlPolarCapNorthOpened"
                              Style="{StaticResource CommonGlControlStyle}"
                              Grid.Row="0" Grid.Column="0"/>
@@ -73,5 +61,17 @@
                              Style="{StaticResource CommonGlControlStyle}"
                              Grid.Row="1" Grid.Column="1"/>
         </Grid>
+        
+        <!-- Bottom Right -->
+        <gl:GLWpfControl x:Name="glControlSkyMap"
+                         Style="{StaticResource CommonGlControlStyle}"
+                         Grid.Row="1" Grid.Column="1"
+                         Grid.ColumnSpan="2"/>
+
+        <!-- Bottom Left -->
+        <gl:GLWpfControl x:Name="glControlPulseProfile"
+                         Style="{StaticResource CommonGlControlStyle}"
+                         Grid.Row="0" Grid.Column="0"
+                         Grid.RowSpan="2"/>
     </Grid>
 </Window>

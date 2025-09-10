@@ -12,4 +12,6 @@ extern "C" {
     CALCLIB_API int GetPolarCapNorthClosed(float* buffer);
     CALCLIB_API int GetPolarCapSouthOpened(float* buffer);
     CALCLIB_API int GetPolarCapSouthClosed(float* buffer);
+    CALCLIB_API int GetSkyMap(float* buffer);
+    CALCLIB_API int GetPulseProfile(float* buffer, bool normalize);
 }

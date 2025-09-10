@@ -196,22 +196,22 @@ namespace ModelGenerator {
 
 	int CalcManager::GetMagneticLine(float* buffer)
 	{
-		std::vector<std::vector<Vector3Dd>>* p_vec_vec_line(new std::vector<std::vector<Vector3Dd>>);
-		m_pPulsar->GetMagneticLineVertex(*p_vec_vec_line);
+		std::vector<std::vector<Vector3Dd>>* p_vec_vec_v3d(new std::vector<std::vector<Vector3Dd>>);
+		m_pPulsar->GetMagneticLineVertex(*p_vec_vec_v3d);
 		int counter(0);
 
-		for (unsigned int i = 0; i < p_vec_vec_line->size(); i++) {
-			std::vector<Vector3Dd> vec_line((*p_vec_vec_line)[i]);
+		for (unsigned int i = 0; i < p_vec_vec_v3d->size(); i++) {
+			std::vector<Vector3Dd> vec_v3d((*p_vec_vec_v3d)[i]);
 
 			if (buffer) {
-				for (unsigned int j = 0; j < vec_line.size(); j++) {
-					buffer[counter++] = vec_line[j].x;
-					buffer[counter++] = vec_line[j].y;
-					buffer[counter++] = vec_line[j].z;
+				for (unsigned int j = 0; j < vec_v3d.size(); j++) {
+					buffer[counter++] = vec_v3d[j].x;
+					buffer[counter++] = vec_v3d[j].y;
+					buffer[counter++] = vec_v3d[j].z;
 				}
 			}
 			else {
-				counter += vec_line.size() * 3;
+				counter += vec_v3d.size() * 3;
 			}
 		}
 		return counter;
@@ -219,25 +219,25 @@ namespace ModelGenerator {
 
 	int CalcManager::GetPolarCapNorthOpened(float* buffer)
 	{
-		return GetVertices(buffer, m_pPulsar->GetPolarCapNorthBeginVertex());
+		return GetVertices3Dd(buffer, m_pPulsar->GetPolarCapNorthBeginVertex());
 	}
 
 	int CalcManager::GetPolarCapNorthClosed(float* buffer)
 	{
-		return GetVertices(buffer, m_pPulsar->GetPolarCapNorthEndVertex());
+		return GetVertices3Dd(buffer, m_pPulsar->GetPolarCapNorthEndVertex());
 	}
 
 	int CalcManager::GetPolarCapSouthOpened(float* buffer)
 	{
-		return GetVertices(buffer, m_pPulsar->GetPolarCapSouthBeginVertex());
+		return GetVertices3Dd(buffer, m_pPulsar->GetPolarCapSouthBeginVertex());
 	}
 
 	int CalcManager::GetPolarCapSouthClosed(float* buffer)
 	{
-		return GetVertices(buffer, m_pPulsar->GetPolarCapSouthEndVertex());
+		return GetVertices3Dd(buffer, m_pPulsar->GetPolarCapSouthEndVertex());
 	}
 
-	int CalcManager::GetVertices(float* buffer, std::vector<Vector3Dd>& vertices)
+	int CalcManager::GetVertices3Dd(float* buffer, std::vector<Vector3Dd>& vertices)
 	{
 		int counter(0);
 
@@ -250,6 +250,55 @@ namespace ModelGenerator {
 		}
 		else {
 			counter = vertices.size() * 3;
+		}
+		return counter;
+	}
+
+    int CalcManager::GetSkyMap(float* buffer)
+    {
+		std::vector<std::vector<Vector2Dd>>* p_vec_vec_v2d(new std::vector<std::vector<Vector2Dd>>);
+		m_pPulsar->GetSkyMapVertex(*p_vec_vec_v2d);
+		int counter(0);
+
+		for (unsigned int i = 0; i < p_vec_vec_v2d->size(); i++) {
+			std::vector<Vector2Dd> vec_v2d((*p_vec_vec_v2d)[i]);
+
+			if (buffer) {
+				for (unsigned int j = 0; j < vec_v2d.size(); j++) {
+					buffer[counter++] = vec_v2d[j].x;
+					buffer[counter++] = vec_v2d[j].y;
+				}
+			}
+			else {
+				counter += vec_v2d.size() * 2;
+			}
+		}
+		return counter;
+    }
+
+	int CalcManager::GetPulseProfile(float* buffer, bool normalize)
+	{
+		std::vector<std::vector<Vector2Dd>>* p_vec_vec_v2d(new std::vector<std::vector<Vector2Dd>>);
+
+		if (normalize)
+		{
+			m_pPulsar->NormalizePulse();
+		}
+		m_pPulsar->GetPulseVertex(*p_vec_vec_v2d);
+		int counter(0);
+
+		for (unsigned int i = 0; i < p_vec_vec_v2d->size(); i++) {
+			std::vector<Vector2Dd> vec_v2d((*p_vec_vec_v2d)[i]);
+
+			if (buffer) {
+				for (unsigned int j = 0; j < vec_v2d.size(); j++) {
+					buffer[counter++] = vec_v2d[j].x;
+					buffer[counter++] = vec_v2d[j].y + i;
+				}
+			}
+			else {
+				counter += vec_v2d.size() * 2;
+			}
 		}
 		return counter;
 	}
