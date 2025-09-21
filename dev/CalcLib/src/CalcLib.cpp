@@ -22,6 +22,12 @@ BOOL APIENTRY DllMain( HMODULE hModule,
     return TRUE;
 }
 
+void SetInclinationAngle(int degree)
+{
+    ModelGenerator::CalcManager::GetInstance()
+        .SetInclinationAngle(degree);
+}
+
 int GetMagneticLine(float* buffer)
 {
     return ModelGenerator::CalcManager::GetInstance()
@@ -63,3 +69,4 @@ int GetPulseProfile(float* buffer, bool normalize)
     return ModelGenerator::CalcManager::GetInstance()
         .GetPulseProfile(buffer, normalize);
 }
+

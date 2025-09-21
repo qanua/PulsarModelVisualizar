@@ -194,6 +194,12 @@ namespace ModelGenerator {
 		//m_pPulseProfile->SetElement(p_shape);
 	}
 
+	void CalcManager::SetInclinationAngle(int degree)
+	{
+		m_pPulsar->m_InclinationAngle = degree;
+		CreateScene();
+	}
+
 	int CalcManager::GetMagneticLine(float* buffer)
 	{
 		std::vector<std::vector<Vector3Dd>>* p_vec_vec_v3d(new std::vector<std::vector<Vector3Dd>>);
@@ -205,9 +211,9 @@ namespace ModelGenerator {
 
 			if (buffer) {
 				for (unsigned int j = 0; j < vec_v3d.size(); j++) {
-					buffer[counter++] = vec_v3d[j].x;
 					buffer[counter++] = vec_v3d[j].y;
 					buffer[counter++] = vec_v3d[j].z;
+					buffer[counter++] = vec_v3d[j].x;
 				}
 			}
 			else {
@@ -292,8 +298,8 @@ namespace ModelGenerator {
 
 			if (buffer) {
 				for (unsigned int j = 0; j < vec_v2d.size(); j++) {
-					buffer[counter++] = vec_v2d[j].x;
-					buffer[counter++] = vec_v2d[j].y + i;
+					buffer[counter++] = vec_v2d[j].x;	// phase
+					buffer[counter++] = vec_v2d[j].y;	// value      
 				}
 			}
 			else {

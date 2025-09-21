@@ -70,6 +70,7 @@ namespace ModelGenerator {
 
 
 	public:
+		void SetInclinationAngle(int degree);
 		int GetMagneticLine(float* buffer);
 		int GetPolarCapNorthOpened(float* buffer);
 		int GetPolarCapNorthClosed(float* buffer);

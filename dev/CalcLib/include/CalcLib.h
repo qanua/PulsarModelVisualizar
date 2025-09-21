@@ -7,6 +7,7 @@
 #endif
 
 extern "C" {
+    CALCLIB_API void SetInclinationAngle(int degree);
     CALCLIB_API int GetMagneticLine(float* buffer);
     CALCLIB_API int GetPolarCapNorthOpened(float* buffer);
     CALCLIB_API int GetPolarCapNorthClosed(float* buffer);

@@ -9,14 +9,22 @@ using System.Runtime.InteropServices;
 using System.Security.Policy;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Controls.Primitives;
 using System.Windows.Input;
+using System.Windows.Media;
+using System.Windows.Media.Imaging;
 using System.Windows.Media.Media3D;
+using System.Windows.Shapes;
+using static System.Formats.Asn1.AsnWriter;
 
 
 namespace WpfApp
 {
     public partial class MainWindow : Window
     {
+        [DllImport("CalcLib.dll")]
+        private static extern void SetInclinationAngle([Out] int degree);
+
         [DllImport("CalcLib.dll")]
         private static extern int GetMagneticLine([Out] float[]? buffer);
 
@@ -39,13 +47,18 @@ namespace WpfApp
         private static extern int GetPulseProfile([Out] float[]? buffer, bool normalize);
 
 
-        private System.Windows.Point lastMousePos;
-        private bool isDragging = false;
+        private System.Windows.Point _lastMousePos;
+        private bool _isDragging = false;
 
-        private Dictionary<GLWpfControl, float[]> dicVertices = new();
-        private Dictionary<GLWpfControl, int> dicVbos = new();
-        private Dictionary<GLWpfControl, int> dicVertexCount = new();
-        private Dictionary<GLWpfControl, Camera> dicCameras = new();
+        private int _inclinationAngle = 0;
+        private int _viewingAngle = 0;
+
+        Color4 _vertexColor = Color4.Black;
+
+        private Dictionary<GLWpfControl, float[]> _verticesByControl = new();
+        private Dictionary<GLWpfControl, int> _vbosByControl = new();
+        private Dictionary<GLWpfControl, int> _vertexCountByControl = new();
+        private Dictionary<GLWpfControl, Camera> _cameraByControl = new();
 
 
         public MainWindow()
@@ -53,21 +66,21 @@ namespace WpfApp
             InitializeComponent();
 
             // イベント登録
-            glControlMagneticLine.Ready += () => ContextReady(glControlMagneticLine, TimeSpan.Zero);
-            glControlPolarCapNorthOpened.Ready += () => ContextReady(glControlPolarCapNorthOpened, TimeSpan.Zero);
-            glControlPolarCapNorthClosed.Ready += () => ContextReady(glControlPolarCapNorthClosed, TimeSpan.Zero);
-            glControlPolarCapSouthOpened.Ready += () => ContextReady(glControlPolarCapSouthOpened, TimeSpan.Zero);
-            glControlPolarCapSouthClosed.Ready += () => ContextReady(glControlPolarCapSouthClosed, TimeSpan.Zero);
-            glControlSkyMap.Ready += () => ContextReady(glControlSkyMap, TimeSpan.Zero);
-            glControlPulseProfile.Ready += () => ContextReady(glControlPulseProfile, TimeSpan.Zero);
+            GLControlMagneticLine.Ready += () => contextReady(GLControlMagneticLine, TimeSpan.Zero);
+            GLControlPolarCapNorthOpened.Ready += () => contextReady(GLControlPolarCapNorthOpened, TimeSpan.Zero);
+            GLControlPolarCapNorthClosed.Ready += () => contextReady(GLControlPolarCapNorthClosed, TimeSpan.Zero);
+            GLControlPolarCapSouthOpened.Ready += () => contextReady(GLControlPolarCapSouthOpened, TimeSpan.Zero);
+            GLControlPolarCapSouthClosed.Ready += () => contextReady(GLControlPolarCapSouthClosed, TimeSpan.Zero);
+            GLControlSkyMap.Ready += () => contextReady(GLControlSkyMap, TimeSpan.Zero);
+            GLControlPulseProfile.Ready += () => contextReady(GLControlPulseProfile, TimeSpan.Zero);
 
-            glControlMagneticLine.Render += delta => RenderView(glControlMagneticLine, delta);
-            glControlPolarCapNorthOpened.Render += delta => RenderView(glControlPolarCapNorthOpened, delta);
-            glControlPolarCapNorthClosed.Render += delta => RenderView(glControlPolarCapNorthClosed, delta);
-            glControlPolarCapSouthOpened.Render += delta => RenderView(glControlPolarCapSouthOpened, delta);
-            glControlPolarCapSouthClosed.Render += delta => RenderView(glControlPolarCapSouthClosed, delta);
-            glControlSkyMap.Render += delta => RenderView(glControlSkyMap, delta);
-            glControlPulseProfile.Render += delta => RenderView(glControlPulseProfile, delta);
+            GLControlMagneticLine.Render += delta => renderView(GLControlMagneticLine, delta);
+            GLControlPolarCapNorthOpened.Render += delta => renderView(GLControlPolarCapNorthOpened, delta);
+            GLControlPolarCapNorthClosed.Render += delta => renderView(GLControlPolarCapNorthClosed, delta);
+            GLControlPolarCapSouthOpened.Render += delta => renderView(GLControlPolarCapSouthOpened, delta);
+            GLControlPolarCapSouthClosed.Render += delta => renderView(GLControlPolarCapSouthClosed, delta);
+            GLControlSkyMap.Render += delta => renderView(GLControlSkyMap, delta);
+            GLControlPulseProfile.Render += delta => renderView(GLControlPulseProfile, delta);
 
             // GLコントロールの設定
             var settings = new GLWpfControlSettings()
@@ -78,120 +91,177 @@ namespace WpfApp
             };
 
             // 描画開始
-            glControlMagneticLine.Start(settings);
-            glControlPolarCapNorthOpened.Start(settings);
-            glControlPolarCapNorthClosed.Start(settings);
-            glControlPolarCapSouthOpened.Start(settings);
-            glControlPolarCapSouthClosed.Start(settings);
-            glControlSkyMap.Start(settings);
-            glControlPulseProfile.Start(settings);
+            GLControlMagneticLine.Start(settings);
+            GLControlPolarCapNorthOpened.Start(settings);
+            GLControlPolarCapNorthClosed.Start(settings);
+            GLControlPolarCapSouthOpened.Start(settings);
+            GLControlPolarCapSouthClosed.Start(settings);
+            GLControlSkyMap.Start(settings);
+            GLControlPulseProfile.Start(settings);
+        }
+
+        private void Slider_Loaded(object sender, RoutedEventArgs e)
+        {
+            var slider = (Slider)sender;
+
+            if (slider == slider_MagneticLine)
+            {
+                _inclinationAngle = (int)slider_MagneticLine.Value;
+                SetInclinationAngle(_inclinationAngle);
+            }
+            else if (slider == slider_SkyMap)
+            {
+                _viewingAngle = (int)slider_SkyMap.Value;
+                updateSkyMapGuideLine(slider);
+            }
         }
 
 
-        private void ContextReady(GLWpfControl control, TimeSpan delta)
+        private void contextReady(GLWpfControl control, TimeSpan delta)
         {
             // OpenGLの初期化
             GL.ClearColor(Color4.Black);
 
             // カメラの生成
-            InitCamera(control);
+            initCamera(control);
 
             // 頂点の取得
-            StoreVertices(control);
+            getVertices(control);
 
             // VBOの初期化
-            InitVBO(control);
+            initVBO(control);
+
+            // グラフの目盛り生成
+            initGraphScale();
         }
 
 
-        private void InitCamera(GLWpfControl control)
+        private void initGraphScale()
         {
-            if (control == glControlMagneticLine)
+            var groupStroke = new GeometryGroup();
+            var groupDash = new GeometryGroup();
+
+            for (int i = 0; i <= 36; i++)
+            {
+                int x = 270 + 15 * i;
+                var geo = new LineGeometry(
+                        new System.Windows.Point(x, 690),
+                        new System.Windows.Point(x, 1350));
+
+                if (i == 0 || i == 36)
+                {
+                    groupStroke.Children.Add(geo);
+                }
+                else
+                {
+                    groupDash.Children.Add(geo);
+                }
+            }
+            PulseProfile_ScaleStroke.Data = groupStroke;
+            PulseProfile_ScaleDash.Data = groupDash;
+        }
+
+
+        private void initCamera(GLWpfControl control)
+        {
+            if (control == GLControlMagneticLine)
             {
                 // 磁力線
-                dicCameras[control] = new Camera(0f, 20f, 5f, Vector3.Zero);
+                _cameraByControl[control] = new Camera(0f, 0f, -5f, Vector3.Zero);
             }
-            else if (
-                control == glControlPolarCapNorthOpened || control == glControlPolarCapNorthClosed)
+            else if (control == GLControlPolarCapNorthOpened || control == GLControlPolarCapNorthClosed)
             {
                 // ポーラーキャップ北
-                dicCameras[control] = new Camera(33f, 0f, 0.01f, Vector3.Zero);
+                _cameraByControl[control] = new Camera(33f, 0f, 0.005f, Vector3.Zero);
             }
-            else if(
-                control == glControlPolarCapSouthOpened || control == glControlPolarCapSouthClosed)
+            else if (control == GLControlPolarCapSouthOpened || control == GLControlPolarCapSouthClosed)
             {
                 // ポーラーキャップ南
-                dicCameras[control] = new Camera(33f, 0f, -0.01f, Vector3.Zero);
+                _cameraByControl[control] = new Camera(33f, 0f, -0.005f, Vector3.Zero);
             }
-            else if (control == glControlSkyMap)
+            else if (control == GLControlSkyMap)
             {
                 // スカイマップ
-                dicCameras[control] = new Camera(90f, 0f, 10f, Vector3.Zero);
+                _cameraByControl[control] = new Camera(90f, 0f, 10f, Vector3.Zero);
             }
-            else if (control == glControlPulseProfile)
+            else if (control == GLControlPulseProfile)
             {
                 // パルスプロファイル
-                dicCameras[control] = new Camera(90f, 0f, 10f, Vector3.Zero);
+                _cameraByControl[control] = new Camera(90f, 0, _viewingAngle + 0.5f, new Vector3(180, 0, 0));
             }
         }
 
 
-        private void StoreVertices(GLWpfControl control)
+        private void getVertices(GLWpfControl control)
         {
             float[]? vertices = null;
 
-            if (control == glControlMagneticLine)
+            if (control == GLControlMagneticLine)
             {
+                // 磁力線
                 vertices = new float[GetMagneticLine(null)];
                 GetMagneticLine(vertices);
             }
-            else if (control == glControlPolarCapNorthOpened)
+            else if (control == GLControlPolarCapNorthOpened)
             {
                 // ポーラーキャップNOP
                 vertices = new float[GetPolarCapNorthOpened(null)];
                 GetPolarCapNorthOpened(vertices);
             }
-            else if (control == glControlPolarCapNorthClosed)
+            else if (control == GLControlPolarCapNorthClosed)
             {
                 // ポーラーキャップNCL
                 vertices = new float[GetPolarCapNorthClosed(null)];
                 GetPolarCapNorthClosed(vertices);
             }
-            else if (control == glControlPolarCapSouthOpened)
+            else if (control == GLControlPolarCapSouthOpened)
             {
                 // ポーラーキャップSOP
                 vertices = new float[GetPolarCapSouthOpened(null)];
                 GetPolarCapSouthOpened(vertices);
             }
-            else if (control == glControlPolarCapSouthClosed)
+            else if (control == GLControlPolarCapSouthClosed)
             {
                 // ポーラーキャップSCL
                 vertices = new float[GetPolarCapSouthClosed(null)];
                 GetPolarCapSouthClosed(vertices);
             }
-            else if (control == glControlSkyMap)
+            else if (control == GLControlSkyMap)
             {
                 // スカイマップ
                 vertices = new float[GetSkyMap(null)];
                 GetSkyMap(vertices);
             }
-            else if (control == glControlPulseProfile)
+            else if (control == GLControlPulseProfile)
             {
                 // パルスプロファイル
-                vertices = new float[GetPulseProfile(null, false)];
-                GetPulseProfile(vertices, true);
+                float[] vertices2d = new float[GetPulseProfile(null, false)];
+                GetPulseProfile(vertices2d, true);
+
+                int count = (int)(vertices2d.Length * 0.5);
+                vertices = new float[count * 3];
+
+                for (int i = 0; i < count; i++)
+                {
+                    int index3d = i * 3;
+                    int index2d = i * 2;
+
+                    vertices[index3d] = vertices2d[index2d];
+                    vertices[index3d + 1] = vertices2d[index2d + 1];
+                    vertices[index3d + 2] = i / 360;
+                }
             }
 
             if (vertices != null)
             {
-                dicVertices[control] = vertices;
+                _verticesByControl[control] = vertices;
             }
         }
 
 
-        private void InitVBO(GLWpfControl control)
+        private void initVBO(GLWpfControl control)
         {
-            if (dicVertices.TryGetValue(control, out var vertices))
+            if (control != null && _verticesByControl.TryGetValue(control, out var vertices))
             {
                 int vbo = GL.GenBuffer();
 
@@ -206,9 +276,9 @@ namespace WpfApp
                     vertices,
                     BufferUsageHint.StaticDraw);
 
-                dicVbos[control] = vbo;
-                int size = (control == glControlSkyMap || control == glControlPulseProfile) ? 2 : 3;
-                dicVertexCount[control] = vertices.Length / size;
+                _vbosByControl[control] = vbo;
+                int size = (control == GLControlSkyMap) ? 2 : 3;
+                _vertexCountByControl[control] = vertices.Length / size;
 
                 // DEBUG
                 //int arrayBuffer;
@@ -218,87 +288,110 @@ namespace WpfApp
                 GL.BindBuffer(BufferTarget.ArrayBuffer, 0);
 
                 // DEBUG
-                //Debug.WriteLine($"InitVBO called for {control.Name}, vertices.Length={vertices.Length}");
+                //Debug.WriteLine($"initVBO called for {control.Name}, vertices.Length={vertices.Length}");
             }
         }
 
 
-        private void RenderView(GLWpfControl control, TimeSpan delta)
+        private void renderView(GLWpfControl control, TimeSpan delta)
         {
-            GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
-
-            if (dicVertexCount.TryGetValue(control, out var count) && dicVbos.TryGetValue(control, out int vbo))
+            if (control != null && _verticesByControl.TryGetValue(control, out var vertices))
             {
-                // カメラの更新
-                UpdateCamera(control);
-
-                // DEBUG
-                //int arrayBuffer;
-                //GL.GetInteger(GetPName.ArrayBufferBinding, out arrayBuffer);
-                //Debug.WriteLine($"[{control.Name}] ArrayBuffer bound = {arrayBuffer}");
-                //Debug.WriteLine($"[{control.Name}] vbo = {vbo}");
-                //if (arrayBuffer == 0)
-                //    return;
-                //if (vbo == 0)
-                //    return;
-
-                GL.BindBuffer(BufferTarget.ArrayBuffer, vbo);
-
-                // 固定機能パイプライン
-                GL.EnableClientState(ArrayCap.VertexArray);
-                int size = (control == glControlSkyMap || control == glControlPulseProfile) ? 2 : 3;
-                GL.VertexPointer(size, VertexPointerType.Float, 0, IntPtr.Zero);
-
-                GL.Color4(Color4.White);
-
-                if (control == glControlPulseProfile)
+                if (vertices.All(x => x == 0))
                 {
-                    int vertexCount = 360;
-                    int lineCount = count / vertexCount;
-                    for (int i = 0; i < lineCount; i++)
+                    // OpenGLの初期化
+                    GL.ClearColor(Color4.Black);
+
+                    // 頂点の取得
+                    getVertices(control);
+
+                    // VBOの初期化
+                    initVBO(control);
+                }
+
+                if (_vertexCountByControl.TryGetValue(control, out var count) &&
+                    _vbosByControl.TryGetValue(control, out int vbo))
+                {
+                    GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
+
+                    // カメラの更新
+                    updateCamera(control);
+
+                    // DEBUG
+                    //int arrayBuffer;
+                    //GL.GetInteger(GetPName.ArrayBufferBinding, out arrayBuffer);
+                    //Debug.WriteLine($"[{control.Name}] ArrayBuffer bound = {arrayBuffer}");
+                    //Debug.WriteLine($"[{control.Name}] vbo = {vbo}");
+                    //if (arrayBuffer == 0)
+                    //    return;
+                    //if (vbo == 0)
+                    //    return;
+
+                    GL.BindBuffer(BufferTarget.ArrayBuffer, vbo);
+
+                    // 固定機能パイプライン
+                    GL.EnableClientState(ArrayCap.VertexArray);
+                    int size = (control == GLControlSkyMap) ? 2 : 3;
+                    GL.VertexPointer(size, VertexPointerType.Float, 0, IntPtr.Zero);
+
+                    GL.Color4(_vertexColor);
+
+                    if (control == GLControlPulseProfile)
                     {
-                        GL.DrawArrays(PrimitiveType.LineStrip, i * vertexCount, vertexCount);
+                        GL.LineWidth(0.5f);
+                        int vertexCount = 360;
+                        int lineCount = count / vertexCount;
+                        for (int i = 0; i < lineCount; i++)
+                        {
+                            GL.DrawArrays(PrimitiveType.LineStrip, i * vertexCount, vertexCount);
+                        }
                     }
-                }
-                else
-                {
-                    GL.PointSize(1f);
-                    GL.DrawArrays(PrimitiveType.Points, 0, count);
-                }
+                    else
+                    {
+                        GL.PointSize(1f);
+                        GL.DrawArrays(PrimitiveType.Points, 0, count);
+                    }
 
-                GL.DisableClientState(ArrayCap.VertexArray);
-                GL.BindBuffer(BufferTarget.ArrayBuffer, 0);
+                    GL.DisableClientState(ArrayCap.VertexArray);
+                    GL.BindBuffer(BufferTarget.ArrayBuffer, 0);
+
+                }
             }
         }
 
 
-        private void UpdateCamera(GLWpfControl control)
+        private void updateCamera(GLWpfControl control)
         {
-            if (dicCameras.ContainsKey(control))
+            if (control != null && _cameraByControl.TryGetValue(control, out var camera))
             {
                 Matrix4 proj = Matrix4.Identity; // ここで初期化
 
-                if (control == glControlMagneticLine)
+                if (control == GLControlMagneticLine)
                 {
-                    // 投影行列
                     proj = Matrix4.CreatePerspectiveFieldOfView(
                         MathHelper.DegreesToRadians(60f),
                         (float)control.ActualWidth / (float)control.ActualHeight,
                         0.001f, 100f
                     );
                 }
-                else if (control == glControlPolarCapNorthOpened ||
-                        control == glControlPolarCapNorthClosed ||
-                        control == glControlPolarCapSouthOpened ||
-                        control == glControlPolarCapSouthClosed)
+                else if (
+                    control == GLControlPolarCapNorthOpened ||
+                    control == GLControlPolarCapNorthClosed ||
+                    control == GLControlPolarCapSouthOpened ||
+                    control == GLControlPolarCapSouthClosed)
                 {
-                    proj = Matrix4.CreateOrthographicOffCenter(
-                        -0.001f, 0.001f,
-                        -0.001f, 0.001f,
-                        0.001f, 100f
+                    proj = Matrix4.CreatePerspectiveFieldOfView(
+                        MathHelper.DegreesToRadians(60f),
+                        (float)control.ActualWidth / (float)control.ActualHeight,
+                        0.0001f, 100f
                     );
+                    //proj = Matrix4.CreateOrthographicOffCenter(
+                    //    -0.001f, 0.001f,
+                    //    -0.001f, 0.001f,
+                    //    0.0001f, 100f
+                    //);
                 }
-                else if (control == glControlSkyMap)
+                else if (control == GLControlSkyMap)
                 {
                     proj = Matrix4.CreateOrthographicOffCenter(
                         0f, 360f,
@@ -306,12 +399,12 @@ namespace WpfApp
                         0.001f, 100f
                     );
                 }
-                else if (control == glControlPulseProfile)
+                else if (control == GLControlPulseProfile)
                 {
                     proj = Matrix4.CreateOrthographicOffCenter(
-                        0f, 360f,
-                        0f, 180f,
-                        0.001f, 100f
+                        -180f, 180f,
+                        -20f, 20f,
+                        0.001f, 1f
                     );
                 }
 
@@ -319,71 +412,223 @@ namespace WpfApp
                 GL.LoadMatrix(ref proj);
 
                 // ビュー行列
-                Matrix4 view = dicCameras[control].GetViewMatrix();
+                Matrix4 view = _cameraByControl[control].GetViewMatrix();
                 GL.MatrixMode(MatrixMode.Modelview);
                 GL.LoadMatrix(ref view);
+
+                if (control == GLControlMagneticLine)
+                {
+                    float radius = 2;
+                    float y = radius * (float)Math.Cos(_inclinationAngle * (Math.PI / 180));
+                    float z = radius * (float)Math.Sin(_inclinationAngle * (Math.PI / 180));
+
+                    // 軸の描画
+                    GL.Color4(Color4.Red);
+                    GL.Begin(PrimitiveType.Lines);
+                    GL.Vertex3(0, y, z);
+                    GL.Vertex3(0, -y, -z);
+                    GL.End();
+                }
             }
         }
 
 
-        private void GLControl_MouseDown(object sender, MouseButtonEventArgs e)
+        private void MagneticLine_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            if (e.ClickCount == 2)
+            {
+                var control = (GLWpfControl)sender;
+                initCamera(control);
+            }
+        }
+
+
+        private void MagneticLine_MouseDown(object sender, MouseButtonEventArgs e)
         {
             if (e.LeftButton == MouseButtonState.Pressed)
             {
-                isDragging = true;
-                lastMousePos = e.GetPosition((IInputElement)sender);
+                _isDragging = true;
+                _lastMousePos = e.GetPosition((IInputElement)sender);
             }
         }
 
 
-        private void GLControl_MouseMove(object sender, MouseEventArgs e)
+        private void MagneticLine_MouseMove(object sender, MouseEventArgs e)
         {
-            if (!isDragging) return;
+            if (!_isDragging) return;
             var control = (GLWpfControl)sender;
 
-            if (dicCameras.ContainsKey(control))
+            if (control != null && _cameraByControl.TryGetValue(control, out var camera))
             {
-                Camera camera = dicCameras[control];
-
                 // マウス移動量を計算
                 System.Windows.Point pos = e.GetPosition(control);
-                float dx = (float)(pos.X - lastMousePos.X);
-                float dy = (float)(pos.Y - lastMousePos.Y);
+                float dx = (float)(pos.X - _lastMousePos.X);
+                float dy = (float)(pos.Y - _lastMousePos.Y);
 
                 // 回転角度に反映（0.5f: 感度調整）
-                camera.Yaw += dx * 0.5f;  // マウス横移動で水平回転
+                camera.Yaw += dx * 0.5f;    // マウス横移動で水平回転
                 camera.Pitch += dy * 0.5f;  // マウス縦移動で垂直回転
 
                 // ピッチ制限（上下90°超え防止）
                 camera.Pitch = Math.Clamp(camera.Pitch, -89f, 89f);
 
-                lastMousePos = pos;
+                _lastMousePos = pos;
             }
         }
 
 
-        private void GLControl_MouseUp(object sender, MouseButtonEventArgs e)
+        private void MagneticLine_MouseUp(object sender, MouseButtonEventArgs e)
         {
-            isDragging = false;
+            _isDragging = false;
         }
 
 
-        private void GLControl_MouseWheel(object sender, MouseWheelEventArgs e)
+        private void GLWpfControl_MouseWheel(object sender, MouseWheelEventArgs e)
         {
             var control = (GLWpfControl)sender;
-            if (dicCameras.ContainsKey(control))
+
+            if (control != null && _cameraByControl.TryGetValue(control, out var camera))
             {
-                Camera camera = dicCameras[control];
+                //float zoom, min, max = 0;
 
-                // スクロール方向によって距離を増減
-                if (e.Delta > 0)
-                    camera.Distance -= 0.5f; // ズームイン
-                else
-                    camera.Distance += 0.5f; // ズームアウト
+                if (control == GLControlPulseProfile)
+                {
+                    zoomCamera(camera, 1.0f, 0.5f, 179.5f, e.Delta);
 
-                // 最小距離の制限（注視点にめり込まないように）
-                //if (camera.Distance < 1.0f) camera.Distance = 1.0f;
+                    // SkyMap の ViewingAngle を同期させる
+                    slider_SkyMap.Value = (int)Math.Round(camera.Distance);
+                }
+                else if (
+                    control == GLControlPolarCapNorthOpened ||
+                    control == GLControlPolarCapNorthClosed ||
+                    control == GLControlPolarCapSouthOpened ||
+                    control == GLControlPolarCapSouthClosed)
+                {
+                    zoomCamera(camera, -0.0001f, 0.0025f, 0.005f, e.Delta);
+                }
             }
+        }
+
+
+        private void zoomCamera(Camera camera, float zoom, float min, float max, float delta)
+        {
+            // スクロール方向によって距離を増減
+            if (0 < delta)
+            {
+                camera.Distance += zoom; // ズームアウト
+            }
+            else
+            {
+                camera.Distance -= zoom; // ズームイン
+            }
+
+            // 最小距離の制限（注視点にめり込まないように）
+            if (camera.Distance < min)
+            {
+                camera.Distance = min;
+            }
+            else if (max < camera.Distance)
+            {
+                camera.Distance = max;
+            }
+        }
+
+        private void Slider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
+        {
+            var slider = (Slider)sender;
+
+            if (slider == slider_MagneticLine)
+            {
+                slider.Value = _inclinationAngle = (int)e.NewValue;
+
+                // 操作中は線色を変更する
+                _vertexColor = (_vertexColor == Color4.Black) ? Color4.White : Color4.DimGray;
+            }
+            else if (slider == slider_SkyMap)
+            {
+                if (slider.Value == 180)
+                {
+                    slider.Value = 179;
+                }
+                slider.Value = _viewingAngle = (int)slider.Value;
+
+                if ((_viewingAngle - (int)e.OldValue) != 0)
+                {
+                    updateSkyMapGuideLine(slider);
+
+                    // PulseProfile の ViewingAngle を同期させる
+                    if (GLControlPulseProfile != null && _cameraByControl.TryGetValue(GLControlPulseProfile, out var camera))
+                    {
+                        camera.Distance = _viewingAngle + 0.5f;
+                    }
+                }
+            }
+        }
+
+
+        private void updateSkyMapGuideLine(Slider slider)
+        {
+            if (slider == slider_SkyMap)
+            {
+                double min = slider.Minimum;
+                double max = slider.Maximum;
+                double height = GuideCanvas.ActualHeight;
+
+                // 値を座標に変換（下が0、上が180）
+                double y = height - (_viewingAngle - min) / (max - min) * height;
+
+                GuideLine.Y1 = y;
+                GuideLine.Y2 = y;
+            }
+        }
+
+
+        private void Thumb_DragCompleted(object sender, DragCompletedEventArgs e)
+        {
+            var thumb = sender as Thumb;
+            var slider = findParentSlider(thumb);
+
+            if (slider != null)
+            {
+                int degree = (int)slider.Value;
+
+                if (slider == slider_MagneticLine)
+                {
+                    SetInclinationAngle(_inclinationAngle);
+                    updatePolarCapCameraAngle();
+
+                    foreach (var key in _verticesByControl.Keys)
+                    {
+                        Array.Clear(_verticesByControl[key], 0, _verticesByControl[key].Length);
+                    }
+                    _vertexColor = Color4.White;
+                }
+            }
+        }
+
+
+        private void updatePolarCapCameraAngle()
+        {
+            foreach (var control in _cameraByControl.Keys)
+            {
+                if (control == GLControlPolarCapNorthOpened ||
+                    control == GLControlPolarCapNorthClosed ||
+                    control == GLControlPolarCapSouthOpened ||
+                    control == GLControlPolarCapSouthClosed)
+                {
+                    _cameraByControl[control].Yaw = 90 - _inclinationAngle;
+                }
+            }
+        }
+
+
+        private Slider? findParentSlider(DependencyObject? child)
+        {
+            while (child != null && !(child is Slider))
+            {
+                child = VisualTreeHelper.GetParent(child);
+            }
+            return child as Slider;
         }
     }
 
