@@ -9,6 +9,80 @@
         Title="MainWindow" Height="1350" Width="1080" ResizeMode="NoResize"
         HorizontalAlignment="Left" VerticalAlignment="Top">
 
+    <Window.Resources>
+        <!--矢印 Thumb 形状-->
+        <PathGeometry x:Key="ArrowThumbGeometry">
+            <PathFigure StartPoint="0,30" IsClosed="True">
+                <BezierSegment Point1="40,20" Point2="80,15" Point3="120,0"/>
+                <BezierSegment Point1="90,20" Point2="90,40" Point3="120,60"/>
+                <BezierSegment Point1="80,45" Point2="40,40" Point3="0,30"/>
+            </PathFigure>
+        </PathGeometry>
+        <!--矢印 Button 形状-->
+        <PathGeometry x:Key="ArrowButtonGeometry">
+            <PathFigure StartPoint="0,60" IsClosed="True">
+                <BezierSegment Point1="40,40" Point2="80,20" Point3="120,0"/>
+                <BezierSegment Point1="90,40" Point2="90,80" Point3="120,120"/>
+                <BezierSegment Point1="80,100" Point2="40,80" Point3="0,60"/>
+            </PathFigure>
+        </PathGeometry>
+        <!--矢印 Thumb-->
+        <Style x:Key="ArrowThumbStyle" TargetType="Thumb">
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Thumb">
+                        <Viewbox RenderTransformOrigin="0.5,0.5">
+                            <Viewbox.RenderTransform>
+                                <TransformGroup>
+                                    <ScaleTransform ScaleX="0.8" ScaleY="0.8"/>
+                                    <SkewTransform/>
+                                    <RotateTransform/>
+                                    <TranslateTransform/>
+                                </TransformGroup>
+                            </Viewbox.RenderTransform>
+                            <Canvas Width="120" Height="60">
+                                <Path x:Name="thumb" Fill="{TemplateBinding Background}" Data="{StaticResource ArrowThumbGeometry}"/>
+                                <TextBlock Text="{Binding Value, RelativeSource={RelativeSource AncestorType=Slider}}"
+                                           Foreground="Gray" FontSize="40" VerticalAlignment="Center" Margin="150,5,0,0"
+                                           RenderTransformOrigin="0.5,0.5"/>
+                            </Canvas>
+                        </Viewbox>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="thumb" Property="Fill" Value="LightGray"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <!--矢印 Button-->
+        <Style x:Key="ArrowButtonStyle" TargetType="Button">
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Viewbox Width="30" RenderTransformOrigin="0.5,0.5">
+                            <Viewbox.RenderTransform>
+                                <TransformGroup>
+                                    <ScaleTransform ScaleX="0.5" ScaleY="0.5"/>
+                                    <SkewTransform/>
+                                    <RotateTransform/>
+                                    <TranslateTransform/>
+                                </TransformGroup>
+                            </Viewbox.RenderTransform>
+                            <Path x:Name="button" Fill="{TemplateBinding Background}"
+                                  Data="{StaticResource ArrowButtonGeometry}"/>
+                        </Viewbox>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+            <EventSetter Event="Click" Handler="PolarCapArrowButton_Click"/>
+            <EventSetter Event="MouseEnter" Handler="PolarCapArrowButton_MouseEnter"/>
+            <EventSetter Event="MouseLeave" Handler="PolarCapArrowButton_MouseLeave"/>
+        </Style>
+    </Window.Resources>
+
+
     <Grid Background="Black">
         <!--<Grid.Background>
             <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
@@ -23,12 +97,12 @@
 
         <!--磁力線-->
         <gl:GLWpfControl x:Name="GLControlMagneticLine"
-                         MouseDown="MagneticLine_MouseDown"
-                         MouseMove="MagneticLine_MouseMove"
-                         MouseUp="MagneticLine_MouseUp"
+                         MouseDown="MagneticLineView_MouseDown"
+                         MouseMove="MagneticLineView_MouseMove"
+                         MouseUp="MagneticLineView_MouseUp"
                          HorizontalAlignment="Left" VerticalAlignment="Top"
                          Width="600" Height="600" Margin="240,50,0,0"
-                         MouseLeftButtonDown="MagneticLine_MouseLeftButtonDown"/>
+                         MouseLeftButtonDown="MagneticLineView_MouseLeftButtonDown"/>
         <!--円のマスク-->
         <Path Fill="Black" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="240,50,0,0">
             <Path.Data>
@@ -69,15 +143,12 @@
             </Path.Data>
         </Path>
         <!--Inclination Angleスライダー-->
-        <Slider x:Name="slider_MagneticLine" HorizontalAlignment="Left" VerticalAlignment="Top" 
+        <Slider x:Name="MagneticLineSlider" HorizontalAlignment="Left" VerticalAlignment="Top" 
                 Margin="780,170,0,0" Orientation="Vertical" Height="360"
-                Maximum="180" Minimum="0" TickFrequency="10" Value="57"
-                ValueChanged="Slider_ValueChanged" SmallChange="1" LargeChange="10"
+                Maximum="180" Minimum="0" IsDirectionReversed="True" TickFrequency="10" Value="57"
+                ValueChanged="ArrowSlider_ValueChanged" SmallChange="1" LargeChange="10"
                 IsSnapToTickEnabled="False" Width="100"
                 Loaded="Slider_Loaded">
-            <Slider.LayoutTransform>
-                <ScaleTransform ScaleY="-1"/>
-            </Slider.LayoutTransform>
             <Slider.Template>
                 <ControlTemplate TargetType="Slider">
                     <Grid>
@@ -96,11 +167,6 @@
                                 <Style TargetType="TextBlock">
                                     <Setter Property="HorizontalAlignment" Value="Right"/>
                                     <Setter Property="FontSize" Value="10"/>
-                                    <Setter Property="LayoutTransform">
-                                        <Setter.Value>
-                                            <ScaleTransform ScaleY="-1"/>
-                                        </Setter.Value>
-                                    </Setter>
                                     <Setter Property="Foreground" Value="Gray"/>
                                 </Style>
                             </Grid.Resources>
@@ -121,34 +187,8 @@
                         <!--つまみ-->
                         <Track x:Name="PART_Track">
                             <Track.Thumb>
-                                <Thumb Width="40" Height="20" DragCompleted="Thumb_DragCompleted" Margin="30,0,0,0">
-                                    <Thumb.Template>
-                                        <ControlTemplate TargetType="Thumb">
-                                            <Viewbox>
-                                                <Canvas Width="120" Height="60">
-                                                    <Path Fill="White">
-                                                        <Path.Data>
-                                                            <PathGeometry>
-                                                                <PathFigure StartPoint="0,30" IsClosed="True">
-                                                                    <BezierSegment Point1="30,30" Point2="90,20" Point3="120,0"/>
-                                                                    <BezierSegment Point1="90,20" Point2="90,40" Point3="120,60"/>
-                                                                    <BezierSegment Point1="90,40" Point2="30,30" Point3="0,30"/>
-                                                                </PathFigure>
-                                                            </PathGeometry>
-                                                        </Path.Data>
-                                                    </Path>
-                                                    <TextBlock Text="{Binding Value, RelativeSource={RelativeSource AncestorType=Slider}}"
-                                                               Foreground="White" FontSize="40"
-                                                               VerticalAlignment="Center" Margin="150,5,0,0">
-                                                        <TextBlock.LayoutTransform>
-                                                            <ScaleTransform ScaleY="-1"/>
-                                                        </TextBlock.LayoutTransform>
-                                                    </TextBlock>
-                                                </Canvas>
-                                            </Viewbox>
-                                        </ControlTemplate>
-                                    </Thumb.Template>
-                                </Thumb>
+                                <Thumb x:Name="PART_Thumb" Style="{StaticResource ArrowThumbStyle}" Background="Gray"
+                                       Width="40" Height="20" DragCompleted="Thumb_DragCompleted" Margin="30,0,0,0"/>
                             </Track.Thumb>
                         </Track>
                     </Grid>
@@ -156,7 +196,7 @@
             </Slider.Template>
         </Slider>
         <!--Inclination Angleテキスト-->
-        <TextBlock x:Name="textBlockInclinationAngle" HorizontalAlignment="Left" VerticalAlignment="Top"
+        <TextBlock HorizontalAlignment="Left" VerticalAlignment="Top"
                    Margin="767,115,0,0" TextWrapping="Wrap" Text="Inclination Angle" 
                    Foreground="Gray" FontSize="10" RenderTransformOrigin="0.5,0.5"
                    Background="Black" Padding="5,0">
@@ -172,25 +212,96 @@
         <gl:GLWpfControl x:Name="GLControlPolarCapSouthClosed"
                          HorizontalAlignment="Left" VerticalAlignment="Top"
                          Width="100" Height="100" Margin="760,560,0,0"
-                         MouseWheel="GLWpfControl_MouseWheel"/>
+                         MouseWheel="ControlView_MouseWheel"/>
 
         <gl:GLWpfControl x:Name="GLControlPolarCapSouthOpened"
                          HorizontalAlignment="Left" VerticalAlignment="Top"
                          Width="100" Height="100" Margin="760,560,0,0"
-                         MouseWheel="GLWpfControl_MouseWheel"/>
+                         MouseWheel="ControlView_MouseWheel"/>
 
         <gl:GLWpfControl x:Name="GLControlPolarCapNorthClosed"
                          HorizontalAlignment="Left" VerticalAlignment="Top"
                          Width="100" Height="100" Margin="760,560,0,0"
-                         MouseWheel="GLWpfControl_MouseWheel"/>
+                         MouseWheel="ControlView_MouseWheel"/>
 
         <gl:GLWpfControl x:Name="GLControlPolarCapNorthOpened"
                          HorizontalAlignment="Left" VerticalAlignment="Top"
                          Width="100" Height="100" Margin="760,560,0,0"
-                         MouseWheel="GLWpfControl_MouseWheel"/>
+                         MouseWheel="ControlView_MouseWheel"/>
+        <!--円のマスク-->
+        <Path Fill="Black" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="760,560,0,0">
+            <Path.Data>
+                <CombinedGeometry GeometryCombineMode="Exclude">
+                    <!-- 全体の長方形 -->
+                    <CombinedGeometry.Geometry1>
+                        <RectangleGeometry Rect="0,0,100,100"/>
+                    </CombinedGeometry.Geometry1>
+                    <!-- くり抜く円 -->
+                    <CombinedGeometry.Geometry2>
+                        <EllipseGeometry Center="50,50" RadiusX="50" RadiusY="50"/>
+                    </CombinedGeometry.Geometry2>
+                </CombinedGeometry>
+            </Path.Data>
+        </Path>
         <!--円-->
         <Ellipse HorizontalAlignment="Left" VerticalAlignment="Top"
                  Height="100" Width="100" Stroke="Gray" StrokeThickness="1" Margin="760,560,0,0"/>
+        <!-- South Close -->
+        <Button x:Name="PolarCapSouthCloseButton"
+                Style="{StaticResource ArrowButtonStyle}"
+                HorizontalAlignment="Left" VerticalAlignment="Top"
+                Margin="840,640,0,0" RenderTransformOrigin="0.5,0.5">
+            <Button.RenderTransform>
+                <TransformGroup>
+                    <ScaleTransform/>
+                    <SkewTransform/>
+                    <RotateTransform Angle="45"/>
+                    <TranslateTransform/>
+                </TransformGroup>
+            </Button.RenderTransform>
+        </Button>
+        <!-- South Open -->
+        <Button x:Name="PolarCapSouthOpenButton"
+                Style="{StaticResource ArrowButtonStyle}"
+                HorizontalAlignment="Left" VerticalAlignment="Top"
+                Margin="750,640,0,0" RenderTransformOrigin="0.5,0.5">
+            <Button.RenderTransform>
+                <TransformGroup>
+                    <ScaleTransform/>
+                    <SkewTransform/>
+                    <RotateTransform Angle="-45"/>
+                    <TranslateTransform/>
+                </TransformGroup>
+            </Button.RenderTransform>
+        </Button>
+        <!-- North Close -->
+        <Button x:Name="PolarCapNorthCloseButton"
+                Style="{StaticResource ArrowButtonStyle}"
+                HorizontalAlignment="Left" VerticalAlignment="Top"
+                Margin="750,550,0,0" RenderTransformOrigin="0.5,0.5">
+            <Button.RenderTransform>
+                <TransformGroup>
+                    <ScaleTransform/>
+                    <SkewTransform/>
+                    <RotateTransform Angle="-135"/>
+                    <TranslateTransform/>
+                </TransformGroup>
+            </Button.RenderTransform>
+        </Button>
+        <!-- North Open -->
+        <Button x:Name="PolarCapNorthOpenButton"
+                Style="{StaticResource ArrowButtonStyle}"
+                HorizontalAlignment="Left" VerticalAlignment="Top"
+                Margin="840,550,0,0" RenderTransformOrigin="0.5,0.5">
+            <Button.RenderTransform>
+                <TransformGroup>
+                    <ScaleTransform/>
+                    <SkewTransform/>
+                    <RotateTransform Angle="135"/>
+                    <TranslateTransform/>
+                </TransformGroup>
+            </Button.RenderTransform>
+        </Button>
 
 
         <!--スカイマップ-->
@@ -210,12 +321,12 @@
             </Path.Data>
         </Path>
         <!--Phaseテキスト-->
-        <TextBlock x:Name="textBlockPhase" HorizontalAlignment="Left" VerticalAlignment="Top"
+        <TextBlock HorizontalAlignment="Left" VerticalAlignment="Top"
                    Margin="920,953,0,0" TextWrapping="Wrap" Text="Phase" 
                    Foreground="Gray" FontSize="10" RenderTransformOrigin="0.5,0.5">
         </TextBlock>
         <!--Viewing Angleテキスト-->
-        <TextBlock x:Name="textBlockViewingAngle" HorizontalAlignment="Left" VerticalAlignment="Top"
+        <TextBlock HorizontalAlignment="Left" VerticalAlignment="Top"
                    Margin="233,568,0,0" TextWrapping="Wrap" Text="Viewing Angle" 
                    Foreground="Gray" FontSize="10" RenderTransformOrigin="0.5,0.5"
                    Background="Black" Padding="5,0">
@@ -226,15 +337,15 @@
             </TextBlock.RenderTransform>
         </TextBlock>
         <!--Viewing Angleガイド-->
-        <Canvas x:Name="GuideCanvas" Width="540" Height="270" Background="Transparent"
+        <Canvas x:Name="SkyMapViewingAngleBar" Width="540" Height="270" Background="Transparent"
                 HorizontalAlignment="Left" VerticalAlignment="Top" Margin="270,690,0,0">
             <Line x:Name="GuideLine" X1="0" X2="540" Stroke="Red" StrokeThickness="1.5"/>
         </Canvas>
         <!--Viewing Angleスライダー-->
-        <Slider x:Name="slider_SkyMap" HorizontalAlignment="Left" VerticalAlignment="Top" 
+        <Slider x:Name="SkyMapSlider" HorizontalAlignment="Left" VerticalAlignment="Top" 
                 Margin="240,680,0,0" Orientation="Vertical" Height="290"
                 Maximum="180" Minimum="0" TickFrequency="10" Value="90"
-                ValueChanged="Slider_ValueChanged" SmallChange="1"
+                ValueChanged="ArrowSlider_ValueChanged" SmallChange="1"
                 IsSnapToTickEnabled="False" Width="640"
                 Loaded="Slider_Loaded">
             <Slider.Template>
@@ -275,49 +386,26 @@
                         <!--つまみ-->
                         <Track x:Name="PART_Track">
                             <Track.Thumb>
-                                <Thumb Width="40" Height="20" DragCompleted="Thumb_DragCompleted" Margin="570,0,0,0">
-                                    <Thumb.Template>
-                                        <ControlTemplate TargetType="Thumb">
-                                            <Viewbox>
-                                                <Canvas Width="120" Height="60">
-                                                    <Path Fill="White">
-                                                        <Path.Data>
-                                                            <PathGeometry>
-                                                                <PathFigure StartPoint="0,30" IsClosed="True">
-                                                                    <BezierSegment Point1="30,30" Point2="90,20" Point3="120,0"/>
-                                                                    <BezierSegment Point1="90,20" Point2="90,40" Point3="120,60"/>
-                                                                    <BezierSegment Point1="90,40" Point2="30,30" Point3="0,30"/>
-                                                                </PathFigure>
-                                                            </PathGeometry>
-                                                        </Path.Data>
-                                                    </Path>
-                                                    <TextBlock Text="{Binding Value, RelativeSource={RelativeSource AncestorType=Slider}}"
-                                                               Foreground="White" FontSize="40"
-                                                               VerticalAlignment="Center" Margin="150,5,0,0">
-                                                    </TextBlock>
-                                                </Canvas>
-                                            </Viewbox>
-                                        </ControlTemplate>
-                                    </Thumb.Template>
-                                </Thumb>
+                                <Thumb Style="{StaticResource ArrowThumbStyle}" Background="Gray"
+                                       Width="40" Height="20" DragCompleted="Thumb_DragCompleted" Margin="570,0,0,0"/>
                             </Track.Thumb>
                         </Track>
                     </Grid>
                 </ControlTemplate>
             </Slider.Template>
         </Slider>
-        
+
 
         <!--パルスプロファイル-->
         <gl:GLWpfControl x:Name="GLControlPulseProfile"
                          HorizontalAlignment="Left" VerticalAlignment="Top"
-                         MouseWheel="GLWpfControl_MouseWheel"
+                         MouseWheel="ControlView_MouseWheel"
                          Width="540" Height="370" Margin="270,965,0,0"/>
         <!--線-->
-        <Path x:Name="PulseProfile_ScaleStroke" Stroke="Gray" StrokeThickness="0.5">
+        <Path x:Name="PathStrokePulseProfile" Stroke="Gray" StrokeThickness="0.5">
             <!--タテ実線-->
         </Path>
-        <Path x:Name="PulseProfile_ScaleDash" Stroke="#FF212121" StrokeThickness="0.5" StrokeDashArray="5.0">
+        <Path x:Name="PathDashPulseProfile" Stroke="#FF212121" StrokeThickness="0.5" StrokeDashArray="5.0">
             <!--タテ破線-->
         </Path>
     </Grid>

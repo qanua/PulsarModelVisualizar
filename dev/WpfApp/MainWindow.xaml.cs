@@ -53,12 +53,15 @@ namespace WpfApp
         private int _inclinationAngle = 0;
         private int _viewingAngle = 0;
 
-        Color4 _vertexColor = Color4.Black;
+        private Color4 _vertexColor = Color4.Black;
+        private Button? _selectedButton;
 
         private Dictionary<GLWpfControl, float[]> _verticesByControl = new();
         private Dictionary<GLWpfControl, int> _vbosByControl = new();
         private Dictionary<GLWpfControl, int> _vertexCountByControl = new();
         private Dictionary<GLWpfControl, Camera> _cameraByControl = new();
+
+        private Dictionary<Button, GLWpfControl> _polarCapViewByButton = new();
 
 
         public MainWindow()
@@ -104,14 +107,14 @@ namespace WpfApp
         {
             var slider = (Slider)sender;
 
-            if (slider == slider_MagneticLine)
+            if (slider == MagneticLineSlider)
             {
-                _inclinationAngle = (int)slider_MagneticLine.Value;
+                _inclinationAngle = (int)MagneticLineSlider.Value;
                 SetInclinationAngle(_inclinationAngle);
             }
-            else if (slider == slider_SkyMap)
+            else if (slider == SkyMapSlider)
             {
-                _viewingAngle = (int)slider_SkyMap.Value;
+                _viewingAngle = (int)SkyMapSlider.Value;
                 updateSkyMapGuideLine(slider);
             }
         }
@@ -123,20 +126,26 @@ namespace WpfApp
             GL.ClearColor(Color4.Black);
 
             // カメラの生成
-            initCamera(control);
+            setupCamera(control);
 
             // 頂点の取得
             getVertices(control);
 
             // VBOの初期化
-            initVBO(control);
+            setupVBO(control);
 
-            // グラフの目盛り生成
-            initGraphScale();
+            // SkyMap グリッド生成
+            if (control == GLControlSkyMap)
+            {
+                setupSkyMapGrid();
+            }
+
+            // PolarCap 表示初期化
+            setupPolarCapDisplay(control);
         }
 
 
-        private void initGraphScale()
+        private void setupSkyMapGrid()
         {
             var groupStroke = new GeometryGroup();
             var groupDash = new GeometryGroup();
@@ -157,12 +166,51 @@ namespace WpfApp
                     groupDash.Children.Add(geo);
                 }
             }
-            PulseProfile_ScaleStroke.Data = groupStroke;
-            PulseProfile_ScaleDash.Data = groupDash;
+            PathStrokePulseProfile.Data = groupStroke;
+            PathDashPulseProfile.Data = groupDash;
         }
 
 
-        private void initCamera(GLWpfControl control)
+        private void setupPolarCapDisplay(GLWpfControl control)
+        {
+            if (_polarCapViewByButton.Count == 0)
+            {
+                _polarCapViewByButton[PolarCapSouthCloseButton] = GLControlPolarCapSouthClosed;
+                _polarCapViewByButton[PolarCapSouthOpenButton] = GLControlPolarCapSouthOpened;
+                _polarCapViewByButton[PolarCapNorthCloseButton] = GLControlPolarCapNorthClosed;
+                _polarCapViewByButton[PolarCapNorthOpenButton] = GLControlPolarCapNorthOpened;
+            }
+
+            var buttons = _polarCapViewByButton.Keys.ToList();
+
+            foreach (var button in buttons)
+            {
+                if(button == PolarCapNorthOpenButton)
+                {
+                    button.Background = Brushes.Red;
+                    _selectedButton = PolarCapNorthOpenButton;
+                }
+                else
+                {
+                    button.Background = Brushes.DimGray;
+                }
+            }
+
+            if (control == GLControlPolarCapNorthOpened)
+            {
+                control.Visibility = Visibility.Visible;
+            }
+            else if (
+                control == GLControlPolarCapNorthClosed ||
+                control == GLControlPolarCapSouthOpened ||
+                control == GLControlPolarCapSouthClosed)
+            {
+                control.Visibility = Visibility.Hidden;
+            }
+        }
+
+
+        private void setupCamera(GLWpfControl control)
         {
             if (control == GLControlMagneticLine)
             {
@@ -259,7 +307,7 @@ namespace WpfApp
         }
 
 
-        private void initVBO(GLWpfControl control)
+        private void setupVBO(GLWpfControl control)
         {
             if (control != null && _verticesByControl.TryGetValue(control, out var vertices))
             {
@@ -288,7 +336,7 @@ namespace WpfApp
                 GL.BindBuffer(BufferTarget.ArrayBuffer, 0);
 
                 // DEBUG
-                //Debug.WriteLine($"initVBO called for {control.Name}, vertices.Length={vertices.Length}");
+                //Debug.WriteLine($"setupVBO called for {control.Name}, vertices.Length={vertices.Length}");
             }
         }
 
@@ -306,7 +354,14 @@ namespace WpfApp
                     getVertices(control);
 
                     // VBOの初期化
-                    initVBO(control);
+                    setupVBO(control);
+
+                    // つまみ有効
+                    var thumb = (MagneticLineSlider.Template.FindName("PART_Thumb", MagneticLineSlider) as Thumb);
+                    if (thumb != null)
+                    {
+                        thumb.IsHitTestVisible = true;
+                    }
                 }
 
                 if (_vertexCountByControl.TryGetValue(control, out var count) &&
@@ -354,7 +409,6 @@ namespace WpfApp
 
                     GL.DisableClientState(ArrayCap.VertexArray);
                     GL.BindBuffer(BufferTarget.ArrayBuffer, 0);
-
                 }
             }
         }
@@ -385,11 +439,6 @@ namespace WpfApp
                         (float)control.ActualWidth / (float)control.ActualHeight,
                         0.0001f, 100f
                     );
-                    //proj = Matrix4.CreateOrthographicOffCenter(
-                    //    -0.001f, 0.001f,
-                    //    -0.001f, 0.001f,
-                    //    0.0001f, 100f
-                    //);
                 }
                 else if (control == GLControlSkyMap)
                 {
@@ -422,28 +471,36 @@ namespace WpfApp
                     float y = radius * (float)Math.Cos(_inclinationAngle * (Math.PI / 180));
                     float z = radius * (float)Math.Sin(_inclinationAngle * (Math.PI / 180));
 
-                    // 軸の描画
-                    GL.Color4(Color4.Red);
+                    GL.LineWidth(1.5f);
                     GL.Begin(PrimitiveType.Lines);
+
+                    // 磁化軸
+                    GL.Color4(Color4.Red);
                     GL.Vertex3(0, y, z);
                     GL.Vertex3(0, -y, -z);
+
+                    // 回転軸
+                    GL.Color4(Color4.Green);
+                    GL.Vertex3(0, radius, 0);
+                    GL.Vertex3(0, -radius, 0);
+
                     GL.End();
                 }
             }
         }
 
 
-        private void MagneticLine_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        private void MagneticLineView_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
             if (e.ClickCount == 2)
             {
                 var control = (GLWpfControl)sender;
-                initCamera(control);
+                setupCamera(control);
             }
         }
 
 
-        private void MagneticLine_MouseDown(object sender, MouseButtonEventArgs e)
+        private void MagneticLineView_MouseDown(object sender, MouseButtonEventArgs e)
         {
             if (e.LeftButton == MouseButtonState.Pressed)
             {
@@ -453,7 +510,7 @@ namespace WpfApp
         }
 
 
-        private void MagneticLine_MouseMove(object sender, MouseEventArgs e)
+        private void MagneticLineView_MouseMove(object sender, MouseEventArgs e)
         {
             if (!_isDragging) return;
             var control = (GLWpfControl)sender;
@@ -477,26 +534,27 @@ namespace WpfApp
         }
 
 
-        private void MagneticLine_MouseUp(object sender, MouseButtonEventArgs e)
+        private void MagneticLineView_MouseUp(object sender, MouseButtonEventArgs e)
         {
             _isDragging = false;
         }
 
 
-        private void GLWpfControl_MouseWheel(object sender, MouseWheelEventArgs e)
+        private void ControlView_MouseWheel(object sender, MouseWheelEventArgs e)
         {
             var control = (GLWpfControl)sender;
 
-            if (control != null && _cameraByControl.TryGetValue(control, out var camera))
+            if (control != null)
             {
-                //float zoom, min, max = 0;
-
                 if (control == GLControlPulseProfile)
                 {
-                    zoomCamera(camera, 1.0f, 0.5f, 179.5f, e.Delta);
+                    if (_cameraByControl.TryGetValue(control, out var camera))
+                    {
+                        zoomCamera(camera, 1.0f, 0.5f, 179.5f, e.Delta);
 
-                    // SkyMap の ViewingAngle を同期させる
-                    slider_SkyMap.Value = (int)Math.Round(camera.Distance);
+                        // SkyMap の ViewingAngle を同期させる
+                        SkyMapSlider.Value = (int)Math.Round(camera.Distance);
+                    }
                 }
                 else if (
                     control == GLControlPolarCapNorthOpened ||
@@ -504,7 +562,22 @@ namespace WpfApp
                     control == GLControlPolarCapSouthOpened ||
                     control == GLControlPolarCapSouthClosed)
                 {
-                    zoomCamera(camera, -0.0001f, 0.0025f, 0.005f, e.Delta);
+                    var views = _polarCapViewByButton.Values;
+
+                    foreach (var view in views)
+                    {
+                        if (_cameraByControl.TryGetValue(view, out var camera))
+                        {
+                            if (view == GLControlPolarCapNorthOpened || view == GLControlPolarCapNorthClosed)
+                            {
+                                zoomCamera(camera, -0.0001f, 0.0025f, 0.005f, e.Delta);
+                            }
+                            else if (view == GLControlPolarCapSouthOpened || view == GLControlPolarCapSouthClosed)
+                            {
+                                zoomCamera(camera, 0.0001f, -0.0025f, -0.005f, e.Delta);
+                            }
+                        }
+                    }
                 }
             }
         }
@@ -523,28 +596,35 @@ namespace WpfApp
             }
 
             // 最小距離の制限（注視点にめり込まないように）
-            if (camera.Distance < min)
+            if (camera.Distance * min < 0)
             {
                 camera.Distance = min;
             }
-            else if (max < camera.Distance)
+            else if (Math.Abs(camera.Distance) < Math.Abs(min))
+            {
+                camera.Distance = min;
+            }
+            else if (Math.Abs(max) < Math.Abs(camera.Distance))
             {
                 camera.Distance = max;
             }
+            // DEBUG
+            //Debug.WriteLine($"camera.Distance = {camera.Distance}");
         }
 
-        private void Slider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
+
+        private void ArrowSlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
             var slider = (Slider)sender;
 
-            if (slider == slider_MagneticLine)
+            if (slider == MagneticLineSlider)
             {
                 slider.Value = _inclinationAngle = (int)e.NewValue;
 
                 // 操作中は線色を変更する
                 _vertexColor = (_vertexColor == Color4.Black) ? Color4.White : Color4.DimGray;
             }
-            else if (slider == slider_SkyMap)
+            else if (slider == SkyMapSlider)
             {
                 if (slider.Value == 180)
                 {
@@ -568,11 +648,11 @@ namespace WpfApp
 
         private void updateSkyMapGuideLine(Slider slider)
         {
-            if (slider == slider_SkyMap)
+            if (slider == SkyMapSlider)
             {
                 double min = slider.Minimum;
                 double max = slider.Maximum;
-                double height = GuideCanvas.ActualHeight;
+                double height = SkyMapViewingAngleBar.ActualHeight;
 
                 // 値を座標に変換（下が0、上が180）
                 double y = height - (_viewingAngle - min) / (max - min) * height;
@@ -588,12 +668,15 @@ namespace WpfApp
             var thumb = sender as Thumb;
             var slider = findParentSlider(thumb);
 
-            if (slider != null)
+            if (slider != null && thumb != null)
             {
                 int degree = (int)slider.Value;
 
-                if (slider == slider_MagneticLine)
+                if (slider == MagneticLineSlider)
                 {
+                    // つまみ無効
+                    thumb.IsHitTestVisible = false;
+
                     SetInclinationAngle(_inclinationAngle);
                     updatePolarCapCameraAngle();
 
@@ -629,6 +712,43 @@ namespace WpfApp
                 child = VisualTreeHelper.GetParent(child);
             }
             return child as Slider;
+        }
+
+
+        private void PolarCapArrowButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (_selectedButton != null)
+            {
+                _selectedButton.Background = Brushes.DimGray;
+                _polarCapViewByButton[_selectedButton].Visibility = Visibility.Hidden;
+            }
+
+            var clicked = (Button)sender;
+            clicked.Background = Brushes.Red;
+            _polarCapViewByButton[clicked].Visibility = Visibility.Visible;
+
+            _selectedButton = clicked;
+        }
+
+
+        private void PolarCapArrowButton_MouseEnter(object sender, RoutedEventArgs e)
+        {
+            var overed = (Button)sender;
+
+            if (overed.Background == Brushes.DimGray)
+            {
+                overed.Background = Brushes.LightGray;
+            }
+        }
+
+        private void PolarCapArrowButton_MouseLeave(object sender, RoutedEventArgs e)
+        {
+            var overed = (Button)sender;
+
+            if (overed.Background == Brushes.LightGray)
+            {
+                overed.Background = Brushes.DimGray;
+            }
         }
     }
 
