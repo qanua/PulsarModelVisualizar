@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:WpfApp"
         xmlns:gl="clr-namespace:OpenTK.Wpf;assembly=GLWpfControl"
         mc:Ignorable="d"
-        Title="MainWindow" Height="1350" Width="1080" ResizeMode="NoResize"
+        Title="Pulsar Model Visualizar" Height="1350" Width="1080" ResizeMode="NoResize"
         HorizontalAlignment="Left" VerticalAlignment="Top">
 
     <Window.Resources>
@@ -43,7 +43,7 @@
                             <Canvas Width="120" Height="60">
                                 <Path x:Name="thumb" Fill="{TemplateBinding Background}" Data="{StaticResource ArrowThumbGeometry}"/>
                                 <TextBlock Text="{Binding Value, RelativeSource={RelativeSource AncestorType=Slider}}"
-                                           Foreground="Gray" FontSize="40" VerticalAlignment="Center" Margin="150,5,0,0"
+                                           Foreground="LightGray" FontSize="40" VerticalAlignment="Center" Margin="150,5,0,0"
                                            RenderTransformOrigin="0.5,0.5"/>
                             </Canvas>
                         </Viewbox>
@@ -83,16 +83,14 @@
     </Window.Resources>
 
 
-    <Grid Background="Black">
-        <!--<Grid.Background>
-            <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
-                <GradientStop Color="Black" Offset="0.637"/>
-                <GradientStop Color="#FF0056BF" Offset="1"/>
-            </LinearGradientBrush>
-        </Grid.Background>-->
-        <!--<Grid.Background>
-            <ImageBrush ImageSource="/background.jpg"/>
-        </Grid.Background>-->
+    <Grid Background="#0A0A0A">
+        <!--Pulsar Model Visualizarタイトル-->
+        <TextBlock HorizontalAlignment="Left" VerticalAlignment="Top"
+                   Margin="20,325,0,0" TextWrapping="Wrap" Text="Pulsar Model Visualizar" 
+                   Foreground="Gray" FontSize="15" TextAlignment="Center" FontFamily="Century Gothic" FontWeight="Bold"/>
+        <TextBlock HorizontalAlignment="Left" VerticalAlignment="Top"
+                   Margin="20,358,0,0" TextWrapping="Wrap" Text="Outer Gap Model" 
+                   Foreground="Gray" FontSize="9" TextAlignment="Center" FontFamily="Century Gothic" Height="11"/>
 
 
         <!--磁力線-->
@@ -100,11 +98,12 @@
                          MouseDown="MagneticLineView_MouseDown"
                          MouseMove="MagneticLineView_MouseMove"
                          MouseUp="MagneticLineView_MouseUp"
+                         MouseLeave="MagneticLineView_MouseLeave"
                          HorizontalAlignment="Left" VerticalAlignment="Top"
                          Width="600" Height="600" Margin="240,50,0,0"
                          MouseLeftButtonDown="MagneticLineView_MouseLeftButtonDown"/>
         <!--円のマスク-->
-        <Path Fill="Black" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="240,50,0,0">
+        <Path Fill="#0A0A0A" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="240,50,0,0">
             <Path.Data>
                 <CombinedGeometry GeometryCombineMode="Exclude">
                     <!-- 全体の長方形 -->
@@ -197,17 +196,36 @@
         </Slider>
         <!--Inclination Angleテキスト-->
         <TextBlock HorizontalAlignment="Left" VerticalAlignment="Top"
-                   Margin="767,115,0,0" TextWrapping="Wrap" Text="Inclination Angle" 
-                   Foreground="Gray" FontSize="10" RenderTransformOrigin="0.5,0.5"
-                   Background="Black" Padding="5,0">
+                   Margin="804,165,0,0" TextWrapping="Wrap" Text="Inclination Angle" 
+                   Foreground="Gray" FontSize="10"
+                   Background="#0A0A0A" Padding="5,0">
             <TextBlock.RenderTransform>
                 <TransformGroup>
                     <RotateTransform Angle="-90"/>
                 </TransformGroup>
             </TextBlock.RenderTransform>
         </TextBlock>
+        <!--Magnetic Lineテキスト-->
+        <TextBlock HorizontalAlignment="Left" VerticalAlignment="Top"
+                   Margin="490,50,0,0" TextWrapping="Wrap" Text="Magnetic Line" 
+                   Foreground="Gray" FontSize="11" Background="#0A0A0A"
+                   Width="100" Height="16" TextAlignment="Center" FontFamily="Century Gothic" FontWeight="Bold"/>
 
 
+        <!--破線-->
+        <Path Stroke="Gray" StrokeThickness="0.5" StrokeDashArray="5.0">
+            <Path.Data>
+                <GeometryGroup>
+                    <!--ヨコ-->
+                    <LineGeometry StartPoint="810,610" EndPoint="1080,610"/>
+                </GeometryGroup>
+            </Path.Data>
+        </Path>
+        <!--Polar Capテキスト-->
+        <TextBlock HorizontalAlignment="Left" VerticalAlignment="Top"
+                   Margin="890,602,0,0" TextWrapping="Wrap" Text="Polar Cap"
+                   Foreground="Gray" FontSize="11" Background="#0A0A0A"
+                   Width="80" TextAlignment="Center" FontFamily="Century Gothic" FontWeight="Bold"/>
         <!--ポーラーキャップ-->
         <gl:GLWpfControl x:Name="GLControlPolarCapSouthClosed"
                          HorizontalAlignment="Left" VerticalAlignment="Top"
@@ -229,7 +247,7 @@
                          Width="100" Height="100" Margin="760,560,0,0"
                          MouseWheel="ControlView_MouseWheel"/>
         <!--円のマスク-->
-        <Path Fill="Black" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="760,560,0,0">
+        <Path Fill="#0A0A0A" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="760,560,0,0">
             <Path.Data>
                 <CombinedGeometry GeometryCombineMode="Exclude">
                     <!-- 全体の長方形 -->
@@ -302,34 +320,55 @@
                 </TransformGroup>
             </Button.RenderTransform>
         </Button>
+        <!--方角（N/S）テキスト-->
+        <TextBlock HorizontalAlignment="Left" VerticalAlignment="Top"
+                   Margin="807,540,0,0" TextWrapping="Wrap" Text="N"
+                   Foreground="Gray" FontSize="10"/>
+        <TextBlock HorizontalAlignment="Left" VerticalAlignment="Top"
+                   Margin="807,665,0,0" TextWrapping="Wrap" Text="S"
+                   Foreground="Gray" FontSize="10"/>
+
 
 
         <!--スカイマップ-->
         <gl:GLWpfControl x:Name="GLControlSkyMap"
                          HorizontalAlignment="Left" VerticalAlignment="Top"
                          Width="540" Height="270" Margin="270,690,0,0"/>
+        <!--実線-->
         <Path Stroke="Gray" StrokeThickness="1.0">
             <Path.Data>
                 <GeometryGroup>
-                    <!--ヨコ枠実線-->
+                    <!--ヨコ-->
                     <LineGeometry StartPoint="270,690" EndPoint="810,690"/>
                     <LineGeometry StartPoint="270,960" EndPoint="910,960"/>
-                    <!--タテ枠実線-->
+                    <!--タテ-->
                     <LineGeometry StartPoint="270,960" EndPoint="270,590"/>
                     <LineGeometry StartPoint="810,690" EndPoint="810,960"/>
                 </GeometryGroup>
             </Path.Data>
         </Path>
+        <!--破線-->
+        <Path Stroke="Gray" StrokeThickness="0.5" StrokeDashArray="5.0">
+            <Path.Data>
+                <GeometryGroup>
+                    <!--ヨコ-->
+                    <LineGeometry StartPoint="0,690" EndPoint="230,690"/>
+                </GeometryGroup>
+            </Path.Data>
+        </Path>
+        <!--Sky Mapテキスト-->
+        <TextBlock HorizontalAlignment="Left" VerticalAlignment="Top"
+                   Margin="135,682,0,0" TextWrapping="Wrap" Text="Sky Map"
+                   Foreground="Gray" FontSize="11" Background="#0A0A0A"
+                   Width="80" TextAlignment="Center" FontFamily="Century Gothic" FontWeight="Bold"/>
         <!--Phaseテキスト-->
         <TextBlock HorizontalAlignment="Left" VerticalAlignment="Top"
                    Margin="920,953,0,0" TextWrapping="Wrap" Text="Phase" 
-                   Foreground="Gray" FontSize="10" RenderTransformOrigin="0.5,0.5">
-        </TextBlock>
+                   Foreground="Gray" FontSize="10" RenderTransformOrigin="0.5,0.5"/>
         <!--Viewing Angleテキスト-->
         <TextBlock HorizontalAlignment="Left" VerticalAlignment="Top"
-                   Margin="233,568,0,0" TextWrapping="Wrap" Text="Viewing Angle" 
-                   Foreground="Gray" FontSize="10" RenderTransformOrigin="0.5,0.5"
-                   Background="Black" Padding="5,0">
+                   Margin="264,620,0,0" TextWrapping="Wrap" Text="Viewing Angle" 
+                   Foreground="Gray" FontSize="10" Background="#0A0A0A" Width="80" TextAlignment="Center">
             <TextBlock.RenderTransform>
                 <TransformGroup>
                     <RotateTransform Angle="-90"/>
@@ -337,7 +376,7 @@
             </TextBlock.RenderTransform>
         </TextBlock>
         <!--Viewing Angleガイド-->
-        <Canvas x:Name="SkyMapViewingAngleBar" Width="540" Height="270" Background="Transparent"
+        <Canvas x:Name="SkyMapViewingAngleBar" Width="540" Height="270" Background="{x:Null}"
                 HorizontalAlignment="Left" VerticalAlignment="Top" Margin="270,690,0,0">
             <Line x:Name="GuideLine" X1="0" X2="540" Stroke="Red" StrokeThickness="1.5"/>
         </Canvas>
@@ -351,7 +390,7 @@
             <Slider.Template>
                 <ControlTemplate TargetType="Slider">
                     <Grid>
-                        <!--目盛りラベル-->
+                        <!--タテ目盛りラベル-->
                         <Grid HorizontalAlignment="Stretch" VerticalAlignment="Bottom">
                             <Grid.RowDefinitions>
                                 <RowDefinition Height="Auto"/>
@@ -369,11 +408,11 @@
                                     <Setter Property="Foreground" Value="Gray"/>
                                 </Style>
                             </Grid.Resources>
-                            <TextBlock Grid.Row="0" Text="180" VerticalAlignment="Top"/>
+                            <TextBlock Grid.Row="0" Text="180" VerticalAlignment="Top" Margin="0,3,0,0"/>
                             <TextBlock Grid.Row="2" Text="90" VerticalAlignment="Center"/>
-                            <TextBlock Grid.Row="4" Text="0" VerticalAlignment="Bottom"/>
+                            <!--<TextBlock Grid.Row="4" Text="0" VerticalAlignment="Bottom" Margin="0,3"/>-->
                         </Grid>
-                        <!--目盛り線-->
+                        <!--タテ目盛り線-->
                         <Border Background="Gray" HorizontalAlignment="Left" VerticalAlignment="Center"
                                 Width="1" Margin="30,0,0,0" Height="270"/>
                         <TickBar x:Name="TopTick" Fill="Gray" SnapsToDevicePixels="True"
@@ -396,17 +435,61 @@
         </Slider>
 
 
-        <!--パルスプロファイル-->
+        <!--PulseProfile-->
         <gl:GLWpfControl x:Name="GLControlPulseProfile"
                          HorizontalAlignment="Left" VerticalAlignment="Top"
-                         MouseWheel="ControlView_MouseWheel"
-                         Width="540" Height="370" Margin="270,965,0,0"/>
-        <!--線-->
-        <Path x:Name="PathStrokePulseProfile" Stroke="Gray" StrokeThickness="0.5">
-            <!--タテ実線-->
+                         Width="540" Height="370" Margin="270,961,0,0"
+                         MouseWheel="ControlView_MouseWheel"/>
+        <!--破線-->
+        <!--タテ-->
+        <Path x:Name="PathDashPulseProfile" Stroke="#FF212121" StrokeThickness="0.5" StrokeDashArray="5.0"/>
+        <!--ヨコ-->
+        <Path Stroke="Gray" StrokeThickness="0.5" StrokeDashArray="5.0">
+            <Path.Data>
+                <GeometryGroup>
+                    <LineGeometry StartPoint="0,1220" EndPoint="1080,1220"/>
+                </GeometryGroup>
+            </Path.Data>
         </Path>
-        <Path x:Name="PathDashPulseProfile" Stroke="#FF212121" StrokeThickness="0.5" StrokeDashArray="5.0">
-            <!--タテ破線-->
-        </Path>
+        <!--実線-->
+        <!--タテ-->
+        <Path x:Name="PathStrokePulseProfile" Stroke="Gray" StrokeThickness="1.0"/>
+        <!--PulseProfile テキスト-->
+        <TextBlock HorizontalAlignment="Left" VerticalAlignment="Top"
+                   Margin="490,1212,0,0" TextWrapping="Wrap" Text="Pulse Profile" 
+                   Foreground="Gray" FontSize="11" Background="Black"
+                   Width="100" TextAlignment="Center" FontFamily="Century Gothic" FontWeight="Bold"/>
+        <!--ヨコ目盛りラベル-->
+        <Grid Width="600" Height="20"
+              HorizontalAlignment="Left" VerticalAlignment="Top"
+              Margin="240,960,0,0">
+            <Grid HorizontalAlignment="Stretch" VerticalAlignment="Bottom">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+            </Grid>
+            <Grid>
+                <Grid.Resources>
+                    <Style TargetType="TextBlock">
+                        <Setter Property="HorizontalAlignment" Value="Right"/>
+                        <Setter Property="FontSize" Value="10"/>
+                        <Setter Property="Foreground" Value="Gray"/>
+                    </Style>
+                </Grid.Resources>
+                <TextBlock Grid.Column="1" Text="0" HorizontalAlignment="Left" VerticalAlignment="Bottom" Margin="12,0,0,0"/>
+                <TextBlock Grid.Column="2" Text="90" HorizontalAlignment="Left" VerticalAlignment="Bottom" Margin="160,0,0,0"/>
+                <TextBlock Grid.Column="4" Text="180" HorizontalAlignment="Left" VerticalAlignment="Bottom" Margin="291,0,0,0"/>
+                <TextBlock Grid.Column="6" Text="270" HorizontalAlignment="Left" VerticalAlignment="Bottom" Margin="427,0,0,0"/>
+                <TextBlock Grid.Column="8" Text="360" HorizontalAlignment="Left" VerticalAlignment="Bottom" Margin="575,0,0,0"/>
+            </Grid>
+        </Grid>
     </Grid>
 </Window>

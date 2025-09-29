@@ -154,8 +154,8 @@ namespace WpfApp
             {
                 int x = 270 + 15 * i;
                 var geo = new LineGeometry(
-                        new System.Windows.Point(x, 690),
-                        new System.Windows.Point(x, 1350));
+                    new System.Windows.Point(x, 690),
+                    new System.Windows.Point(x, 1350));
 
                 if (i == 0 || i == 36)
                 {
@@ -164,6 +164,11 @@ namespace WpfApp
                 else
                 {
                     groupDash.Children.Add(geo);
+
+                    groupStroke.Children.Add(
+                        new LineGeometry(
+                            new System.Windows.Point(x, 960),
+                            new System.Windows.Point(x, 965)));
                 }
             }
             PathStrokePulseProfile.Data = groupStroke;
@@ -185,7 +190,7 @@ namespace WpfApp
 
             foreach (var button in buttons)
             {
-                if(button == PolarCapNorthOpenButton)
+                if (button == PolarCapNorthOpenButton)
                 {
                     button.Background = Brushes.Red;
                     _selectedButton = PolarCapNorthOpenButton;
@@ -540,6 +545,12 @@ namespace WpfApp
         }
 
 
+        private void MagneticLineView_MouseLeave(object sender, MouseEventArgs e)
+        {
+            _isDragging = false;
+        }
+
+
         private void ControlView_MouseWheel(object sender, MouseWheelEventArgs e)
         {
             var control = (GLWpfControl)sender;
@@ -740,6 +751,7 @@ namespace WpfApp
                 overed.Background = Brushes.LightGray;
             }
         }
+
 
         private void PolarCapArrowButton_MouseLeave(object sender, RoutedEventArgs e)
         {
