@@ -43,7 +43,7 @@
                             <Canvas Width="120" Height="60">
                                 <Path x:Name="thumb" Fill="{TemplateBinding Background}" Data="{StaticResource ArrowThumbGeometry}"/>
                                 <TextBlock Text="{Binding Value, RelativeSource={RelativeSource AncestorType=Slider}}"
-                                           Foreground="LightGray" FontSize="40" VerticalAlignment="Center" Margin="150,5,0,0"
+                                           Foreground="DimGray" FontSize="40" VerticalAlignment="Center" Margin="150,1,0,0"
                                            RenderTransformOrigin="0.5,0.5"/>
                             </Canvas>
                         </Viewbox>
@@ -83,7 +83,7 @@
     </Window.Resources>
 
 
-    <Grid Background="#0A0A0A">
+    <Grid Background="#f5f5f5">
         <!--Pulsar Model Visualizarタイトル-->
         <TextBlock HorizontalAlignment="Left" VerticalAlignment="Top"
                    Margin="20,325,0,0" TextWrapping="Wrap" Text="Pulsar Model Visualizar" 
@@ -103,7 +103,7 @@
                          Width="600" Height="600" Margin="240,50,0,0"
                          MouseLeftButtonDown="MagneticLineView_MouseLeftButtonDown"/>
         <!--円のマスク-->
-        <Path Fill="#0A0A0A" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="240,50,0,0">
+        <Path Fill="#f5f5f5" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="240,50,0,0">
             <Path.Data>
                 <CombinedGeometry GeometryCombineMode="Exclude">
                     <!-- 全体の長方形 -->
@@ -198,7 +198,7 @@
         <TextBlock HorizontalAlignment="Left" VerticalAlignment="Top"
                    Margin="804,165,0,0" TextWrapping="Wrap" Text="Inclination Angle" 
                    Foreground="Gray" FontSize="10"
-                   Background="#0A0A0A" Padding="5,0">
+                   Background="#f5f5f5" Padding="5,0">
             <TextBlock.RenderTransform>
                 <TransformGroup>
                     <RotateTransform Angle="-90"/>
@@ -208,7 +208,7 @@
         <!--Magnetic Lineテキスト-->
         <TextBlock HorizontalAlignment="Left" VerticalAlignment="Top"
                    Margin="490,50,0,0" TextWrapping="Wrap" Text="Magnetic Line" 
-                   Foreground="Gray" FontSize="11" Background="#0A0A0A"
+                   Foreground="Gray" FontSize="12" Background="#f5f5f5"
                    Width="100" Height="16" TextAlignment="Center" FontFamily="Century Gothic" FontWeight="Bold"/>
 
 
@@ -224,7 +224,7 @@
         <!--Polar Capテキスト-->
         <TextBlock HorizontalAlignment="Left" VerticalAlignment="Top"
                    Margin="890,602,0,0" TextWrapping="Wrap" Text="Polar Cap"
-                   Foreground="Gray" FontSize="11" Background="#0A0A0A"
+                   Foreground="Gray" FontSize="12" Background="#f5f5f5"
                    Width="80" TextAlignment="Center" FontFamily="Century Gothic" FontWeight="Bold"/>
         <!--ポーラーキャップ-->
         <gl:GLWpfControl x:Name="GLControlPolarCapSouthClosed"
@@ -247,7 +247,7 @@
                          Width="100" Height="100" Margin="760,560,0,0"
                          MouseWheel="ControlView_MouseWheel"/>
         <!--円のマスク-->
-        <Path Fill="#0A0A0A" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="760,560,0,0">
+        <Path Fill="#f5f5f5" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="760,560,0,0">
             <Path.Data>
                 <CombinedGeometry GeometryCombineMode="Exclude">
                     <!-- 全体の長方形 -->
@@ -322,12 +322,11 @@
         </Button>
         <!--方角（N/S）テキスト-->
         <TextBlock HorizontalAlignment="Left" VerticalAlignment="Top"
-                   Margin="807,540,0,0" TextWrapping="Wrap" Text="N"
+                   Margin="807,545,0,0" TextWrapping="Wrap" Text="N"
                    Foreground="Gray" FontSize="10"/>
         <TextBlock HorizontalAlignment="Left" VerticalAlignment="Top"
-                   Margin="807,665,0,0" TextWrapping="Wrap" Text="S"
+                   Margin="807,661,0,0" TextWrapping="Wrap" Text="S"
                    Foreground="Gray" FontSize="10"/>
-
 
 
         <!--スカイマップ-->
@@ -359,7 +358,7 @@
         <!--Sky Mapテキスト-->
         <TextBlock HorizontalAlignment="Left" VerticalAlignment="Top"
                    Margin="135,682,0,0" TextWrapping="Wrap" Text="Sky Map"
-                   Foreground="Gray" FontSize="11" Background="#0A0A0A"
+                   Foreground="Gray" FontSize="12" Background="#f5f5f5"
                    Width="80" TextAlignment="Center" FontFamily="Century Gothic" FontWeight="Bold"/>
         <!--Phaseテキスト-->
         <TextBlock HorizontalAlignment="Left" VerticalAlignment="Top"
@@ -368,7 +367,7 @@
         <!--Viewing Angleテキスト-->
         <TextBlock HorizontalAlignment="Left" VerticalAlignment="Top"
                    Margin="264,620,0,0" TextWrapping="Wrap" Text="Viewing Angle" 
-                   Foreground="Gray" FontSize="10" Background="#0A0A0A" Width="80" TextAlignment="Center">
+                   Foreground="Gray" FontSize="10" Background="#f5f5f5" Width="80" TextAlignment="Center">
             <TextBlock.RenderTransform>
                 <TransformGroup>
                     <RotateTransform Angle="-90"/>
@@ -410,7 +409,6 @@
                             </Grid.Resources>
                             <TextBlock Grid.Row="0" Text="180" VerticalAlignment="Top" Margin="0,3,0,0"/>
                             <TextBlock Grid.Row="2" Text="90" VerticalAlignment="Center"/>
-                            <!--<TextBlock Grid.Row="4" Text="0" VerticalAlignment="Bottom" Margin="0,3"/>-->
                         </Grid>
                         <!--タテ目盛り線-->
                         <Border Background="Gray" HorizontalAlignment="Left" VerticalAlignment="Center"
@@ -434,7 +432,7 @@
             </Slider.Template>
         </Slider>
 
-
+        
         <!--PulseProfile-->
         <gl:GLWpfControl x:Name="GLControlPulseProfile"
                          HorizontalAlignment="Left" VerticalAlignment="Top"
@@ -442,7 +440,7 @@
                          MouseWheel="ControlView_MouseWheel"/>
         <!--破線-->
         <!--タテ-->
-        <Path x:Name="PathDashPulseProfile" Stroke="#FF212121" StrokeThickness="0.5" StrokeDashArray="5.0"/>
+        <Path x:Name="PathDashPulseProfile" Stroke="#e6e6e6" StrokeThickness="0.5" StrokeDashArray="5.0"/>
         <!--ヨコ-->
         <Path Stroke="Gray" StrokeThickness="0.5" StrokeDashArray="5.0">
             <Path.Data>
@@ -457,7 +455,7 @@
         <!--PulseProfile テキスト-->
         <TextBlock HorizontalAlignment="Left" VerticalAlignment="Top"
                    Margin="490,1212,0,0" TextWrapping="Wrap" Text="Pulse Profile" 
-                   Foreground="Gray" FontSize="11" Background="Black"
+                   Foreground="Gray" FontSize="12" Background="White"
                    Width="100" TextAlignment="Center" FontFamily="Century Gothic" FontWeight="Bold"/>
         <!--ヨコ目盛りラベル-->
         <Grid Width="600" Height="20"
