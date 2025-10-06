@@ -9,8 +9,9 @@
         Title="Pulsar Model Visualizar" Height="1350" Width="1080" ResizeMode="NoResize"
         HorizontalAlignment="Left" VerticalAlignment="Top">
 
+    <!--スタイル-->
     <Window.Resources>
-        <!--矢印 Thumb 形状-->
+        <!--つまみ矢印-->
         <PathGeometry x:Key="ArrowThumbGeometry">
             <PathFigure StartPoint="0,30" IsClosed="True">
                 <BezierSegment Point1="40,20" Point2="80,15" Point3="120,0"/>
@@ -18,7 +19,7 @@
                 <BezierSegment Point1="80,45" Point2="40,40" Point3="0,30"/>
             </PathFigure>
         </PathGeometry>
-        <!--矢印 Button 形状-->
+        <!--ボタン矢印-->
         <PathGeometry x:Key="ArrowButtonGeometry">
             <PathFigure StartPoint="0,60" IsClosed="True">
                 <BezierSegment Point1="40,40" Point2="80,20" Point3="120,0"/>
@@ -26,7 +27,7 @@
                 <BezierSegment Point1="80,100" Point2="40,80" Point3="0,60"/>
             </PathFigure>
         </PathGeometry>
-        <!--矢印 Thumb ヨコ-->
+        <!--ヨコ矢印つまみ-->
         <Style x:Key="ArrowThumbVerticalStyle" TargetType="Thumb">
             <Setter Property="Template">
                 <Setter.Value>
@@ -41,10 +42,12 @@
                                 </TransformGroup>
                             </Viewbox.RenderTransform>
                             <Canvas Width="120" Height="60">
-                                <Path x:Name="thumb" Fill="{TemplateBinding Background}" Data="{StaticResource ArrowThumbGeometry}"/>
+                                <Path x:Name="thumb"
+                                      Fill="{TemplateBinding Background}"
+                                      Data="{StaticResource ArrowThumbGeometry}"/>
                                 <TextBlock Text="{Binding Value, RelativeSource={RelativeSource AncestorType=Slider}}"
-                                           Foreground="DimGray" FontSize="40" VerticalAlignment="Center" Margin="150,1,0,0"
-                                           RenderTransformOrigin="0.5,0.5"/>
+                                           Foreground="DimGray" FontSize="40"
+                                           VerticalAlignment="Center" Margin="150,1,0,0"/>
                             </Canvas>
                         </Viewbox>
                         <ControlTemplate.Triggers>
@@ -56,7 +59,7 @@
                 </Setter.Value>
             </Setter>
         </Style>
-        <!--矢印 Thumb タテ-->
+        <!--タテ矢印つまみ-->
         <Style x:Key="ArrowThumbHorizontalStyle" TargetType="Thumb">
             <Setter Property="Template">
                 <Setter.Value>
@@ -71,9 +74,12 @@
                                 </TransformGroup>
                             </Viewbox.RenderTransform>
                             <Canvas Width="120" Height="60">
-                                <Path x:Name="thumb" Fill="{TemplateBinding Background}" Data="{StaticResource ArrowThumbGeometry}"/>
+                                <Path x:Name="thumb"
+                                      Fill="{TemplateBinding Background}"
+                                      Data="{StaticResource ArrowThumbGeometry}"/>
                                 <TextBlock Text="{Binding Value, RelativeSource={RelativeSource AncestorType=Slider}}"
-                                           Foreground="DimGray" FontSize="40" VerticalAlignment="Center" Margin="150,1,0,0"
+                                           Foreground="DimGray" FontSize="40"
+                                           VerticalAlignment="Center" Margin="150,1,0,0"
                                            RenderTransformOrigin="0.5,0.5">
                                     <TextBlock.RenderTransform>
                                         <TransformGroup>
@@ -95,7 +101,7 @@
                 </Setter.Value>
             </Setter>
         </Style>
-        <!--矢印 Button-->
+        <!--矢印ボタン-->
         <Style x:Key="ArrowButtonStyle" TargetType="Button">
             <Setter Property="Template">
                 <Setter.Value>
@@ -109,7 +115,8 @@
                                     <TranslateTransform/>
                                 </TransformGroup>
                             </Viewbox.RenderTransform>
-                            <Path x:Name="button" Fill="{TemplateBinding Background}"
+                            <Path x:Name="button"
+                                  Fill="{TemplateBinding Background}"
                                   Data="{StaticResource ArrowButtonGeometry}"/>
                         </Viewbox>
                     </ControlTemplate>
@@ -119,44 +126,29 @@
             <EventSetter Event="MouseEnter" Handler="PolarCapArrowButton_MouseEnter"/>
             <EventSetter Event="MouseLeave" Handler="PolarCapArrowButton_MouseLeave"/>
         </Style>
-        <!--星型 マーカー-->
-        <ControlTemplate x:Key="StarMarkerTemplate" TargetType="ContentControl">
-            <Viewbox Width="100" Height="100">
-                <Path Fill="Transparent" Stroke="Yellow" StrokeThickness="5.0">
-                    <Path.Data>
-                        <PathGeometry>
-                            <PathFigure StartPoint="0,50" IsClosed="True">
-                                <BezierSegment Point1="40,40" Point2="40,40" Point3="50,0"/>
-                                <BezierSegment Point1="60,40" Point2="60,40" Point3="100,50"/>
-                                <BezierSegment Point1="60,60" Point2="60,60" Point3="50,100"/>
-                                <BezierSegment Point1="40,60" Point2="40,60" Point3="0,50"/>
-                            </PathFigure>
-                        </PathGeometry>
-                    </Path.Data>
-                </Path>
-            </Viewbox>
-        </ControlTemplate>
     </Window.Resources>
 
-
+    <!--レイアウト-->
     <Grid Background="#f5f5f5">
-        <!--Pulsar Model Visualizarタイトル-->
-        <TextBlock HorizontalAlignment="Left" VerticalAlignment="Top"
-                   Margin="20,325,0,0" TextWrapping="Wrap" Text="Pulsar Model Visualizar" 
-                   Foreground="Gray" FontSize="15" TextAlignment="Center" FontFamily="Century Gothic" FontWeight="Bold"/>
-        <TextBlock HorizontalAlignment="Left" VerticalAlignment="Top"
-                   Margin="20,358,0,0" TextWrapping="Wrap" Text="Outer Gap Model" 
-                   Foreground="Gray" FontSize="9" TextAlignment="Center" FontFamily="Century Gothic" Height="11"/>
+        <!--タイトル-->
+        <TextBlock Text="Pulsar Model Visualizar"
+                   Foreground="Gray" FontSize="15"
+                   TextAlignment="Center" FontFamily="Century Gothic" FontWeight="Bold"
+                   HorizontalAlignment="Left" VerticalAlignment="Top" Margin="20,325,0,0"/>
+        <TextBlock Text="Outer Gap Model"
+                   Foreground="Gray" FontSize="9"
+                   TextAlignment="Center" FontFamily="Century Gothic"
+                   HorizontalAlignment="Left" VerticalAlignment="Top" Margin="20,358,0,0"/>
 
-
-        <!--磁力線-->
+        <!--/////////////////// MagneticLine ///////////////////-->
+        <!--MagneticLineコントロール-->
         <gl:GLWpfControl x:Name="GLControlMagneticLine"
+                         Width="600" Height="600"
+                         HorizontalAlignment="Left" VerticalAlignment="Top" Margin="240,50,0,0"
                          MouseDown="MagneticLineView_MouseDown"
                          MouseMove="MagneticLineView_MouseMove"
                          MouseUp="MagneticLineView_MouseUp"
                          MouseLeave="MagneticLineView_MouseLeave"
-                         HorizontalAlignment="Left" VerticalAlignment="Top"
-                         Width="600" Height="600" Margin="240,50,0,0"
                          MouseLeftButtonDown="MagneticLineView_MouseLeftButtonDown"/>
         <!--円のマスク-->
         <Path Fill="#f5f5f5" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="240,50,0,0">
@@ -173,41 +165,44 @@
                 </CombinedGeometry>
             </Path.Data>
         </Path>
-        <!--円の線-->
-        <Ellipse HorizontalAlignment="Left" VerticalAlignment="Top"
-                 Height="540" Width="540" Stroke="Gray" StrokeThickness="1" Margin="270,80,0,0"/>
-        <!--直線-->
+        <!--円の輪郭線-->
+        <Ellipse Width="540" Height="540"
+                 Stroke="Gray" StrokeThickness="1" 
+                 HorizontalAlignment="Left" VerticalAlignment="Top" Margin="270,80,0,0"/>
+        <!--実線-->
         <Path Stroke="Gray" StrokeThickness="0.5">
             <Path.Data>
                 <GeometryGroup>
-                    <!--タテ実線-->
+                    <!--タテ-->
                     <LineGeometry StartPoint="270,0" EndPoint="270,600"/>
                 </GeometryGroup>
             </Path.Data>
         </Path>
+        <!--破線-->
         <Path Stroke="Gray" StrokeThickness="0.5" StrokeDashArray="5.0">
             <Path.Data>
                 <GeometryGroup>
-                    <!--ヨコ破線-->
+                    <!--ヨコ-->
                     <LineGeometry StartPoint="0,350" EndPoint="300,350"/>
                     <LineGeometry StartPoint="780,350" EndPoint="1080,350"/>
-                    <!--センター破線-->
+                    <!--中央-->
                     <LineGeometry StartPoint="540,0" EndPoint="540,110"/>
                     <LineGeometry StartPoint="540,590" EndPoint="540,690"/>
                 </GeometryGroup>
             </Path.Data>
         </Path>
-        <!--Inclination Angleスライダー-->
-        <Slider x:Name="MagneticLineSlider" HorizontalAlignment="Left" VerticalAlignment="Top" 
-                Margin="780,170,0,0" Orientation="Vertical" Height="360"
-                Maximum="180" Minimum="0" IsDirectionReversed="True" TickFrequency="10" Value="57"
-                ValueChanged="ArrowSlider_ValueChanged" SmallChange="1" LargeChange="10"
-                IsSnapToTickEnabled="False" Width="100"
-                Loaded="Slider_Loaded">
+        <!--InclinationAngleスライダー-->
+        <Slider x:Name="MagneticLineSlider"
+                Width="100" Height="360"
+                HorizontalAlignment="Left" VerticalAlignment="Top" Margin="780,170,0,0"
+                Maximum="180" Minimum="0" IsDirectionReversed="True" Value="57"
+                TickFrequency="10" IsSnapToTickEnabled="False" Orientation="Vertical"
+                Loaded="Slider_Loaded"
+                ValueChanged="ArrowSlider_ValueChanged">
             <Slider.Template>
                 <ControlTemplate TargetType="Slider">
                     <Grid>
-                        <!--目盛りラベル-->
+                        <!--タテ目盛りラベル-->
                         <Grid HorizontalAlignment="Stretch" VerticalAlignment="Bottom">
                             <Grid.RowDefinitions>
                                 <RowDefinition Height="Auto"/>
@@ -229,11 +224,13 @@
                             <TextBlock Grid.Row="2" Text="90" VerticalAlignment="Center"/>
                             <TextBlock Grid.Row="4" Text="180" VerticalAlignment="Bottom"/>
                         </Grid>
-                        <!--目盛り線-->
-                        <Border Background="Gray" HorizontalAlignment="Left" VerticalAlignment="Center"
-                                Width="1" Margin="30,0,0,0" Height="340"/>
-                        <TickBar x:Name="TopTick" Fill="Gray" SnapsToDevicePixels="True"
-                                 Placement="Right" Width="8" Margin="0,0,37,0"
+                        <!--目盛りタテ線-->
+                        <Border Width="1" Height="340" Background="Gray"
+                                HorizontalAlignment="Left" VerticalAlignment="Center" Margin="30,0,0,0" />
+                        <!--目盛りヨコ線-->
+                        <TickBar Fill="Gray" Width="8" Margin="27,0,0,0"
+                                 Placement="Right" SnapsToDevicePixels="True"
+                                 HorizontalAlignment="Left" VerticalAlignment="Stretch"
                                  TickFrequency="{TemplateBinding TickFrequency}"
                                  Minimum="{TemplateBinding Minimum}"
                                  Maximum="{TemplateBinding Maximum}"
@@ -242,32 +239,34 @@
                         <!--つまみ-->
                         <Track x:Name="PART_Track">
                             <Track.Thumb>
-                                <Thumb x:Name="PART_Thumb" Style="{StaticResource ArrowThumbVerticalStyle}" Background="Gray"
-                                       Width="40" Height="20" DragCompleted="Thumb_DragCompleted" Margin="30,0,0,0"/>
+                                <Thumb x:Name="PART_Thumb"
+                                       Style="{StaticResource ArrowThumbVerticalStyle}" Background="Gray"
+                                       Width="40" Height="20" Margin="30,0,0,0"
+                                       DragCompleted="Thumb_DragCompleted"/>
                             </Track.Thumb>
                         </Track>
                     </Grid>
                 </ControlTemplate>
             </Slider.Template>
         </Slider>
-        <!--Inclination Angleテキスト-->
-        <TextBlock HorizontalAlignment="Left" VerticalAlignment="Top"
-                   Margin="804,165,0,0" TextWrapping="Wrap" Text="Inclination Angle" 
+        <!--InclinationAngleラベル-->
+        <TextBlock Text="Inclination Angle"
                    Foreground="Gray" FontSize="10"
-                   Background="#f5f5f5" Padding="5,0">
+                   HorizontalAlignment="Left" VerticalAlignment="Top" Margin="803,160,0,0">
             <TextBlock.RenderTransform>
                 <TransformGroup>
                     <RotateTransform Angle="-90"/>
                 </TransformGroup>
             </TextBlock.RenderTransform>
         </TextBlock>
-        <!--Magnetic Lineテキスト-->
-        <TextBlock HorizontalAlignment="Left" VerticalAlignment="Top"
-                   Margin="490,50,0,0" TextWrapping="Wrap" Text="Magnetic Line" 
-                   Foreground="Gray" FontSize="12" Background="#f5f5f5"
-                   Width="100" Height="16" TextAlignment="Center" FontFamily="Century Gothic" FontWeight="Bold"/>
+        <!--MagneticLineラベル-->
+        <TextBlock Text="Magnetic Line"
+                   Foreground="Gray" FontSize="12"
+                   TextAlignment="Center" FontFamily="Century Gothic" FontWeight="Bold"
+                   Background="#f5f5f5" Width="100" Height="16"
+                   HorizontalAlignment="Left" VerticalAlignment="Top" Margin="490,50,0,0"/>
 
-
+        <!--/////////////////// PolarCap ///////////////////-->
         <!--破線-->
         <Path Stroke="Gray" StrokeThickness="0.5" StrokeDashArray="5.0">
             <Path.Data>
@@ -277,30 +276,32 @@
                 </GeometryGroup>
             </Path.Data>
         </Path>
-        <!--Polar Capテキスト-->
-        <TextBlock HorizontalAlignment="Left" VerticalAlignment="Top"
-                   Margin="890,602,0,0" TextWrapping="Wrap" Text="Polar Cap"
-                   Foreground="Gray" FontSize="12" Background="#f5f5f5"
-                   Width="80" TextAlignment="Center" FontFamily="Century Gothic" FontWeight="Bold"/>
-        <!--ポーラーキャップ-->
+        <!--PolarCapラベル-->
+        <TextBlock Text="Polar Cap"
+                   Foreground="Gray" FontSize="12"
+                   TextAlignment="Center" FontFamily="Century Gothic" FontWeight="Bold"
+                   Background="#f5f5f5" Width="80"
+                   HorizontalAlignment="Left" VerticalAlignment="Top" Margin="890,602,0,0"/>
+        <!--PolarCapコントロール-->
+        <!--SouthClosed-->
         <gl:GLWpfControl x:Name="GLControlPolarCapSouthClosed"
-                         HorizontalAlignment="Left" VerticalAlignment="Top"
                          Width="100" Height="100" Margin="760,560,0,0"
+                         HorizontalAlignment="Left" VerticalAlignment="Top"
                          MouseWheel="ControlView_MouseWheel"/>
-
+        <!--SouthOpened-->
         <gl:GLWpfControl x:Name="GLControlPolarCapSouthOpened"
-                         HorizontalAlignment="Left" VerticalAlignment="Top"
                          Width="100" Height="100" Margin="760,560,0,0"
+                         HorizontalAlignment="Left" VerticalAlignment="Top"
                          MouseWheel="ControlView_MouseWheel"/>
-
+        <!--NorthClosed-->
         <gl:GLWpfControl x:Name="GLControlPolarCapNorthClosed"
-                         HorizontalAlignment="Left" VerticalAlignment="Top"
                          Width="100" Height="100" Margin="760,560,0,0"
+                         HorizontalAlignment="Left" VerticalAlignment="Top"
                          MouseWheel="ControlView_MouseWheel"/>
-
+        <!--CapNorthOpened-->
         <gl:GLWpfControl x:Name="GLControlPolarCapNorthOpened"
-                         HorizontalAlignment="Left" VerticalAlignment="Top"
                          Width="100" Height="100" Margin="760,560,0,0"
+                         HorizontalAlignment="Left" VerticalAlignment="Top"
                          MouseWheel="ControlView_MouseWheel"/>
         <!--円のマスク-->
         <Path Fill="#f5f5f5" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="760,560,0,0">
@@ -317,14 +318,16 @@
                 </CombinedGeometry>
             </Path.Data>
         </Path>
-        <!--円-->
-        <Ellipse HorizontalAlignment="Left" VerticalAlignment="Top"
-                 Height="100" Width="100" Stroke="Gray" StrokeThickness="1" Margin="760,560,0,0"/>
-        <!-- South Close -->
-        <Button x:Name="PolarCapSouthCloseButton"
+        <!--円の輪郭線-->
+        <Ellipse Width="100" Height="100"
+                 Stroke="Gray" StrokeThickness="1"
+                 HorizontalAlignment="Left" VerticalAlignment="Top" Margin="760,560,0,0"/>
+        <!--表示切り替えボタン-->
+        <!-- SouthClosed -->
+        <Button x:Name="PolarCapSouthClosedButton"
                 Style="{StaticResource ArrowButtonStyle}"
-                HorizontalAlignment="Left" VerticalAlignment="Top"
-                Margin="840,640,0,0" RenderTransformOrigin="0.5,0.5">
+                HorizontalAlignment="Left" VerticalAlignment="Top" Margin="840,640,0,0"
+                RenderTransformOrigin="0.5,0.5">
             <Button.RenderTransform>
                 <TransformGroup>
                     <ScaleTransform/>
@@ -334,11 +337,11 @@
                 </TransformGroup>
             </Button.RenderTransform>
         </Button>
-        <!-- South Open -->
-        <Button x:Name="PolarCapSouthOpenButton"
+        <!-- SouthOpened -->
+        <Button x:Name="PolarCapSouthOpenedButton"
                 Style="{StaticResource ArrowButtonStyle}"
-                HorizontalAlignment="Left" VerticalAlignment="Top"
-                Margin="750,640,0,0" RenderTransformOrigin="0.5,0.5">
+                HorizontalAlignment="Left" VerticalAlignment="Top" Margin="750,640,0,0"
+                RenderTransformOrigin="0.5,0.5">
             <Button.RenderTransform>
                 <TransformGroup>
                     <ScaleTransform/>
@@ -348,11 +351,11 @@
                 </TransformGroup>
             </Button.RenderTransform>
         </Button>
-        <!-- North Close -->
-        <Button x:Name="PolarCapNorthCloseButton"
+        <!-- NorthClosed -->
+        <Button x:Name="PolarCapNorthClosedButton"
                 Style="{StaticResource ArrowButtonStyle}"
-                HorizontalAlignment="Left" VerticalAlignment="Top"
-                Margin="750,550,0,0" RenderTransformOrigin="0.5,0.5">
+                HorizontalAlignment="Left" VerticalAlignment="Top" Margin="750,550,0,0"
+                RenderTransformOrigin="0.5,0.5">
             <Button.RenderTransform>
                 <TransformGroup>
                     <ScaleTransform/>
@@ -362,11 +365,11 @@
                 </TransformGroup>
             </Button.RenderTransform>
         </Button>
-        <!-- North Open -->
-        <Button x:Name="PolarCapNorthOpenButton"
+        <!-- NorthOpened -->
+        <Button x:Name="PolarCapNorthOpenedButton"
                 Style="{StaticResource ArrowButtonStyle}"
-                HorizontalAlignment="Left" VerticalAlignment="Top"
-                Margin="840,550,0,0" RenderTransformOrigin="0.5,0.5">
+                HorizontalAlignment="Left" VerticalAlignment="Top" Margin="840,550,0,0"
+                RenderTransformOrigin="0.5,0.5">
             <Button.RenderTransform>
                 <TransformGroup>
                     <ScaleTransform/>
@@ -376,19 +379,19 @@
                 </TransformGroup>
             </Button.RenderTransform>
         </Button>
-        <!--方角（N/S）テキスト-->
-        <TextBlock HorizontalAlignment="Left" VerticalAlignment="Top"
-                   Margin="807,545,0,0" TextWrapping="Wrap" Text="N"
-                   Foreground="Gray" FontSize="10"/>
-        <TextBlock HorizontalAlignment="Left" VerticalAlignment="Top"
-                   Margin="807,661,0,0" TextWrapping="Wrap" Text="S"
-                   Foreground="Gray" FontSize="10"/>
+        <!--方角（N/S）ラベル-->
+        <TextBlock Text="N"
+                   Foreground="Gray" FontSize="10"
+                   HorizontalAlignment="Left" VerticalAlignment="Top" Margin="807,545,0,0"/>
+        <TextBlock Text="S"
+                   Foreground="Gray" FontSize="10"
+                   HorizontalAlignment="Left" VerticalAlignment="Top" Margin="807,661,0,0"/>
 
-
-        <!--スカイマップ-->
+        <!--/////////////////// SkyMap &  PulseProfile ///////////////////-->
+        <!--SkyMapコントロール-->
         <gl:GLWpfControl x:Name="GLControlSkyMap"
-                         HorizontalAlignment="Left" VerticalAlignment="Top"
-                         Width="540" Height="270" Margin="270,690,0,0"/>
+                         Width="540" Height="270"
+                         HorizontalAlignment="Left" VerticalAlignment="Top" Margin="270,690,0,0"/>
         <!--実線-->
         <Path Stroke="Gray" StrokeThickness="1.0">
             <Path.Data>
@@ -407,35 +410,35 @@
             <Path.Data>
                 <GeometryGroup>
                     <!--ヨコ-->
-                    <LineGeometry StartPoint="0,690" EndPoint="230,690"/>
+                    <LineGeometry StartPoint="0,690" EndPoint="238,690"/>
                 </GeometryGroup>
             </Path.Data>
         </Path>
-        <!--Sky Mapテキスト-->
-        <TextBlock HorizontalAlignment="Left" VerticalAlignment="Top"
-                   Margin="135,682,0,0" TextWrapping="Wrap" Text="Sky Map"
-                   Foreground="Gray" FontSize="12" Background="#f5f5f5"
-                   Width="80" TextAlignment="Center" FontFamily="Century Gothic" FontWeight="Bold"/>
-        <!--Phaseテキスト-->
-        <TextBlock HorizontalAlignment="Left" VerticalAlignment="Top"
-                   Margin="920,953,0,0" TextWrapping="Wrap" Text="Phase" 
-                   Foreground="Gray" FontSize="10" RenderTransformOrigin="0.5,0.5"/>
-        <!--Viewing Angleテキスト-->
-        <TextBlock HorizontalAlignment="Left" VerticalAlignment="Top"
-                   Margin="264,620,0,0" TextWrapping="Wrap" Text="Viewing Angle" 
-                   Foreground="Gray" FontSize="10" Background="#f5f5f5" Width="80" TextAlignment="Center">
+        <!--SkyMapラベル-->
+        <TextBlock Text="Sky Map"
+                   Foreground="Gray" FontSize="12"
+                   TextAlignment="Center" FontFamily="Century Gothic" FontWeight="Bold"
+                   Background="#f5f5f5" Width="80"
+                   HorizontalAlignment="Left" VerticalAlignment="Top" Margin="135,682,0,0"/>
+        <!--Phaseラベル-->
+        <TextBlock Text="Phase"
+                   Foreground="Gray" FontSize="10"
+                   HorizontalAlignment="Left" VerticalAlignment="Top" Margin="920,953,0,0"/>
+        <!--ViewingAngleラベル-->
+        <TextBlock Text="Viewing Angle"
+                   Foreground="Gray" FontSize="10"
+                   TextAlignment="Center" Background="#f5f5f5" Width="80"
+                   HorizontalAlignment="Left" VerticalAlignment="Top" Margin="262,620,0,0">
             <TextBlock.RenderTransform>
                 <TransformGroup>
                     <RotateTransform Angle="-90"/>
                 </TransformGroup>
             </TextBlock.RenderTransform>
         </TextBlock>
-
-
-        <!--PulseProfile-->
+        <!--PulseProfileコントロール-->
         <gl:GLWpfControl x:Name="GLControlPulseProfile"
-                         HorizontalAlignment="Left" VerticalAlignment="Top"
-                         Width="540" Height="370" Margin="270,961,0,0"
+                         Width="540" Height="370"
+                         HorizontalAlignment="Left" VerticalAlignment="Top" Margin="270,961,0,0"
                          MouseWheel="ControlView_MouseWheel"/>
         <!--破線-->
         <!--タテ-->
@@ -451,23 +454,28 @@
         <!--実線-->
         <!--タテ-->
         <Path x:Name="PathStrokePulseProfile" Stroke="Gray" StrokeThickness="1.0"/>
-        <!--PulseProfile テキスト-->
-        <TextBlock HorizontalAlignment="Left" VerticalAlignment="Top"
-                   Margin="490,1222,0,0" TextWrapping="Wrap" Text="Pulse Profile" 
-                   Foreground="Gray" FontSize="12" Background="White"
-                   Width="100" TextAlignment="Center" FontFamily="Century Gothic" FontWeight="Bold"/>
-        <!--Viewing Angleガイド-->
-        <Canvas x:Name="SkyMapViewingAngleCanvas" Width="540" Height="270" Background="{x:Null}"
+        <!--PulseProfileラベル-->
+        <TextBlock Text="Pulse Profile"
+                   Foreground="Gray" FontSize="12"
+                   TextAlignment="Center" FontFamily="Century Gothic" FontWeight="Bold"
+                   Background="White" Width="100"
+                   HorizontalAlignment="Left" VerticalAlignment="Top" Margin="490,1222,0,0"/>
+        <!--ViewingAngleガイド-->
+        <Canvas x:Name="SkyMapViewingAngleCanvas"
+                Width="540" Height="270" Background="{x:Null}"
                 HorizontalAlignment="Left" VerticalAlignment="Top" Margin="270,690,0,0">
-            <Line x:Name="ViewingAngleLine" X1="0" X2="540" Stroke="Red" StrokeThickness="1.5"/>
+            <Line x:Name="ViewingAngleGuide"
+                  Stroke="Red" StrokeThickness="1.5"
+                  X1="0" X2="540"/>
         </Canvas>
-        <!--Viewing Angleスライダー-->
-        <Slider x:Name="SkyMapViewingAngleSlider" HorizontalAlignment="Left" VerticalAlignment="Top" 
-                Margin="240,680,0,0" Orientation="Vertical" Height="290"
-                Maximum="180" Minimum="0" IsDirectionReversed="True" TickFrequency="10" Value="90"
-                ValueChanged="ArrowSlider_ValueChanged" SmallChange="1"
-                IsSnapToTickEnabled="False" Width="640"
-                Loaded="Slider_Loaded">
+        <!--ViewingAngleスライダー-->
+        <Slider x:Name="SkyMapViewingAngleSlider"
+                Width="640" Height="290"
+                HorizontalAlignment="Left" VerticalAlignment="Top" Margin="240,680,0,0"
+                Maximum="180" Minimum="0" IsDirectionReversed="True" Value="90"
+                TickFrequency="10" IsSnapToTickEnabled="False" Orientation="Vertical"
+                Loaded="Slider_Loaded"
+                ValueChanged="ArrowSlider_ValueChanged">
             <Slider.Template>
                 <ControlTemplate TargetType="Slider">
                     <Grid>
@@ -493,12 +501,13 @@
                             <TextBlock Grid.Row="2" Text="90" VerticalAlignment="Center"/>
                             <TextBlock Grid.Row="4" Text="180" VerticalAlignment="Bottom" Margin="0,3"/>
                         </Grid>
-                        <!--タテ目盛り線-->
-                        <Border Background="Gray" HorizontalAlignment="Left" VerticalAlignment="Center"
-                                Width="1" Margin="29.5,0,0,0" Height="270"/>
-                        <TickBar x:Name="TopTick" Fill="Gray" SnapsToDevicePixels="True"
+                        <!--目盛りタテ線-->
+                        <Border Width="1" Height="270" Background="Gray"
+                                HorizontalAlignment="Left" VerticalAlignment="Center" Margin="29.5,0,0,0"/>
+                        <!--目盛りヨコ線-->
+                        <TickBar Fill="Gray" Width="8" Margin="22,0,0,0"
+                                 Placement="Left" SnapsToDevicePixels="True"
                                  HorizontalAlignment="Left" VerticalAlignment="Stretch"
-                                 Placement="Left" Width="8" Margin="22,0,0,0"
                                  TickFrequency="{TemplateBinding TickFrequency}"
                                  Minimum="{TemplateBinding Minimum}"
                                  Maximum="{TemplateBinding Maximum}"
@@ -507,8 +516,9 @@
                         <!--つまみ-->
                         <Track x:Name="PART_Track">
                             <Track.Thumb>
-                                <Thumb x:Name="PART_Thumb" Style="{StaticResource ArrowThumbVerticalStyle}" Background="Gray"
-                                       Width="40" Height="20" DragCompleted="Thumb_DragCompleted" Margin="570,0,0,0"/>
+                                <Thumb x:Name="PART_Thumb"
+                                       Style="{StaticResource ArrowThumbVerticalStyle}" Background="Gray"
+                                       Width="40" Height="20" Margin="570,0,0,0"/>
                             </Track.Thumb>
                         </Track>
                     </Grid>
@@ -516,17 +526,21 @@
             </Slider.Template>
         </Slider>
         <!--Phaseガイド-->
-        <Canvas x:Name="SkyMapPhaseCanvas" Width="540" Height="428" Background="{x:Null}"
+        <Canvas x:Name="SkyMapPhaseCanvas"
+                Width="540" Height="428" Background="{x:Null}"
                 HorizontalAlignment="Left" VerticalAlignment="Top" Margin="270,690,0,0">
-            <Line x:Name="PhaseLine" Y1="0" Y2="428" Stroke="Red" StrokeThickness="1.5"/>
+            <Line x:Name="PhaseGuide"
+                  Stroke="Red" StrokeThickness="1.5"
+                  Y1="0" Y2="428"/>
         </Canvas>
         <!--Phaseスライダー-->
-        <Slider x:Name="SkyMapPhaseSlider" HorizontalAlignment="Left" VerticalAlignment="Top" 
-                Margin="250,960,0,0" Orientation="Horizontal" Width="580" Height="290"
-                Maximum="360" Minimum="0" IsDirectionReversed="False" TickFrequency="10" Value="90"
-                ValueChanged="ArrowSlider_ValueChanged" SmallChange="1" LargeChange="10"
-                IsSnapToTickEnabled="False"
-                Loaded="Slider_Loaded">
+        <Slider x:Name="SkyMapPhaseSlider"
+                Width="580" Height="290"
+                HorizontalAlignment="Left" VerticalAlignment="Top" Margin="250,960,0,0"
+                Maximum="360" Minimum="0" IsDirectionReversed="False" Value="90"
+                TickFrequency="10" IsSnapToTickEnabled="False" Orientation="Horizontal"
+                Loaded="Slider_Loaded"
+                ValueChanged="ArrowSlider_ValueChanged">
             <Slider.Template>
                 <ControlTemplate TargetType="Slider">
                     <Grid>
@@ -559,12 +573,13 @@
                             <TextBlock Grid.Column="6" Text="270" Margin="417,0,0,0"/>
                             <TextBlock Grid.Column="8" Text="360" Margin="564,0,0,0"/>
                         </Grid>
-                        <!--ヨコ目盛り線-->
-                        <Border Background="Gray" HorizontalAlignment="Left" VerticalAlignment="Top"
-                                Width="540" Margin="20,-0.5,0,0" Height="1"/>
-                        <TickBar x:Name="TopTick" Fill="Gray" SnapsToDevicePixels="True"
-                                 VerticalAlignment="Top" HorizontalAlignment="Stretch"
-                                 Placement="Bottom" Height="8"
+                        <!--目盛りヨコ線-->
+                        <Border Width="540" Height="1" Background="Gray"
+                                HorizontalAlignment="Left" VerticalAlignment="Top" Margin="20,-0.5,0,0" />
+                        <!--目盛りタテ線-->
+                        <TickBar Fill="Gray" Height="8" 
+                                 Placement="Bottom" SnapsToDevicePixels="True"
+                                 HorizontalAlignment="Stretch" VerticalAlignment="Top"
                                  TickFrequency="{TemplateBinding TickFrequency}"
                                  Minimum="{TemplateBinding Minimum}"
                                  Maximum="{TemplateBinding Maximum}"
@@ -573,7 +588,8 @@
                         <!--つまみ-->
                         <Track x:Name="PART_Track">
                             <Track.Thumb>
-                                <Thumb x:Name="PART_Thumb" Style="{StaticResource ArrowThumbHorizontalStyle}" Background="Gray"
+                                <Thumb x:Name="PART_Thumb"
+                                       Style="{StaticResource ArrowThumbHorizontalStyle}" Background="Gray"
                                        Width="40" Height="20" VerticalAlignment="Bottom" Margin="0,0,0,90"/>
                             </Track.Thumb>
                         </Track>

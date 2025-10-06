@@ -1,21 +1,12 @@
 ﻿using OpenTK.Graphics.OpenGL;
 using OpenTK.Mathematics;
 using OpenTK.Wpf;
-using System;
-using System.Diagnostics;
-using System.Drawing;
-using System.Reflection;
 using System.Runtime.InteropServices;
-using System.Security.Policy;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
 using System.Windows.Input;
 using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Media.Media3D;
-using System.Windows.Shapes;
-using static System.Formats.Asn1.AsnWriter;
 
 
 namespace WpfApp
@@ -47,7 +38,7 @@ namespace WpfApp
         private static extern int GetPulseProfile([Out] float[]? buffer, bool normalize);
 
 
-        private System.Windows.Point _lastMousePos;
+        private Point _lastMousePos;
         private bool _isDragging = false;
 
         private int _inclinationAngle = 0;
@@ -76,9 +67,9 @@ namespace WpfApp
         private Color4 RED_COLOR = new Color4(225, 75, 50, 255);
         private Color4 GREEN_COLOR = new Color4(0, 185, 75, 255);
 
-        private Brush RED_BRUSH = new SolidColorBrush(System.Windows.Media.Color.FromArgb(255, 225, 75, 50));
-        private Brush BLUE_BRUSH = new SolidColorBrush(System.Windows.Media.Color.FromArgb(255, 60, 90, 255));
-        private Brush GREEN_BRUSH = new SolidColorBrush(System.Windows.Media.Color.FromArgb(255, 0, 185, 75));
+        private Brush RED_BRUSH = new SolidColorBrush(Color.FromArgb(255, 225, 75, 50));
+        private Brush BLUE_BRUSH = new SolidColorBrush(Color.FromArgb(255, 60, 90, 255));
+        private Brush GREEN_BRUSH = new SolidColorBrush(Color.FromArgb(255, 0, 185, 75));
 
 
         public MainWindow()
@@ -128,6 +119,7 @@ namespace WpfApp
             GLControlPulseProfile.Start(settings);
         }
 
+
         private void Slider_Loaded(object sender, RoutedEventArgs e)
         {
             var slider = (Slider)sender;
@@ -176,8 +168,8 @@ namespace WpfApp
             if (control == GLControlSkyMap)
             {
                 setupSkyMapGrid();
-                ViewingAngleLine.Stroke = BLUE_BRUSH;
-                PhaseLine.Stroke = GREEN_BRUSH;
+                ViewingAngleGuide.Stroke = BLUE_BRUSH;
+                PhaseGuide.Stroke = GREEN_BRUSH;
             }
 
             // PolarCap設定
@@ -217,7 +209,7 @@ namespace WpfApp
 
         private void setupShader()
         {
-            //頂点シェーダー(Vertex Shader)
+            //頂点シェーダー
             string vertexShaderSource = @"
             #version 330 core
             layout(location = 0) in vec3 aPosition;
@@ -232,7 +224,7 @@ namespace WpfApp
             }
             ";
 
-            // フラグメントシェーダー (Fragment Shader)
+            // フラグメントシェーダー
             string fragmentShaderSource = @"
             #version 330 core
             out vec4 FragColor;
@@ -318,6 +310,7 @@ namespace WpfApp
                 int count = (int)(vertices2d.Length * 0.5);
                 vertices = new float[count * 3];
 
+                // 二次元から三次元に展開する
                 for (int i = 0; i < count; i++)
                 {
                     int index3d = i * 3;
@@ -347,20 +340,23 @@ namespace WpfApp
 
                 // 頂点バッファ
                 GL.BindBuffer(BufferTarget.ArrayBuffer, vbo);
-                GL.BufferData(BufferTarget.ArrayBuffer,
-                    (IntPtr)(vertices.Length * sizeof(float)),
-                    vertices, BufferUsageHint.StaticDraw);
+                GL.BufferData(
+                    BufferTarget.ArrayBuffer,                   // バッファの種類: VBO
+                    (IntPtr)(vertices.Length * sizeof(float)),  // バッファのサイズ
+                    vertices,                                   // 転送データ
+                    BufferUsageHint.StaticDraw                  // データの使い方: 毎フレーム更新
+                );
 
                 // 頂点属性
                 int size = (control == GLControlSkyMap) ? 2 : 3;
                 GL.EnableVertexAttribArray(0);
                 GL.VertexAttribPointer(
-                    0,                              // location=0 に渡す
-                    size,                           // 1頂点あたり「3要素」(x,y,z)
-                    VertexAttribPointerType.Float,  // データ型は float
-                    false,                          // 正規化しない（整数→float変換時のみ関係）
+                    0,                              // シェーダーの入力変数位置: location = 0
+                    size,                           // 1頂点あたりの要素数
+                    VertexAttribPointerType.Float,  // データ型: float
+                    false,                          // 正規化: しない
                     size * sizeof(float),           // 1頂点あたりのバイト数
-                    0                               // VBO先頭からのオフセット
+                    0                               // データ開始位置のオフセット: 0
                 );
 
                 // VAOを保存
@@ -435,20 +431,20 @@ namespace WpfApp
             // 初回のみ
             if (_polarCapViewByButton.Count == 0)
             {
-                _polarCapViewByButton[PolarCapSouthCloseButton] = GLControlPolarCapSouthClosed;
-                _polarCapViewByButton[PolarCapSouthOpenButton] = GLControlPolarCapSouthOpened;
-                _polarCapViewByButton[PolarCapNorthCloseButton] = GLControlPolarCapNorthClosed;
-                _polarCapViewByButton[PolarCapNorthOpenButton] = GLControlPolarCapNorthOpened;
+                _polarCapViewByButton[PolarCapSouthClosedButton] = GLControlPolarCapSouthClosed;
+                _polarCapViewByButton[PolarCapSouthOpenedButton] = GLControlPolarCapSouthOpened;
+                _polarCapViewByButton[PolarCapNorthClosedButton] = GLControlPolarCapNorthClosed;
+                _polarCapViewByButton[PolarCapNorthOpenedButton] = GLControlPolarCapNorthOpened;
             }
 
             var buttons = _polarCapViewByButton.Keys.ToList();
 
             foreach (var button in buttons)
             {
-                if (button == PolarCapNorthOpenButton)
+                if (button == PolarCapNorthOpenedButton)
                 {
                     button.Background = RED_BRUSH;
-                    _selectedButton = PolarCapNorthOpenButton;
+                    _selectedButton = PolarCapNorthOpenedButton;
                 }
                 else
                 {
@@ -852,8 +848,8 @@ namespace WpfApp
                 // 値を座標に変換（上が0、下が180）
                 double y = (_viewingAngle - min) / (max - min) * height;
 
-                ViewingAngleLine.Y1 = y;
-                ViewingAngleLine.Y2 = y;
+                ViewingAngleGuide.Y1 = y;
+                ViewingAngleGuide.Y2 = y;
             }
             else if(slider == SkyMapPhaseSlider)
             {
@@ -862,8 +858,8 @@ namespace WpfApp
                 // 値を座標に変換（左が0、右が360）
                 double x = (_phase - min) / (max - min) * width;
 
-                PhaseLine.X1 = x;
-                PhaseLine.X2 = x;
+                PhaseGuide.X1 = x;
+                PhaseGuide.X2 = x;
             }
         }
 
