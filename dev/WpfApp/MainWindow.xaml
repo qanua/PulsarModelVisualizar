@@ -26,8 +26,8 @@
                 <BezierSegment Point1="80,100" Point2="40,80" Point3="0,60"/>
             </PathFigure>
         </PathGeometry>
-        <!--矢印 Thumb-->
-        <Style x:Key="ArrowThumbStyle" TargetType="Thumb">
+        <!--矢印 Thumb ヨコ-->
+        <Style x:Key="ArrowThumbVerticalStyle" TargetType="Thumb">
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="Thumb">
@@ -45,6 +45,45 @@
                                 <TextBlock Text="{Binding Value, RelativeSource={RelativeSource AncestorType=Slider}}"
                                            Foreground="DimGray" FontSize="40" VerticalAlignment="Center" Margin="150,1,0,0"
                                            RenderTransformOrigin="0.5,0.5"/>
+                            </Canvas>
+                        </Viewbox>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="thumb" Property="Fill" Value="LightGray"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <!--矢印 Thumb タテ-->
+        <Style x:Key="ArrowThumbHorizontalStyle" TargetType="Thumb">
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Thumb">
+                        <Viewbox RenderTransformOrigin="0.5,0.5">
+                            <Viewbox.RenderTransform>
+                                <TransformGroup>
+                                    <ScaleTransform ScaleX="0.8" ScaleY="0.8"/>
+                                    <SkewTransform/>
+                                    <RotateTransform Angle="90"/>
+                                    <TranslateTransform/>
+                                </TransformGroup>
+                            </Viewbox.RenderTransform>
+                            <Canvas Width="120" Height="60">
+                                <Path x:Name="thumb" Fill="{TemplateBinding Background}" Data="{StaticResource ArrowThumbGeometry}"/>
+                                <TextBlock Text="{Binding Value, RelativeSource={RelativeSource AncestorType=Slider}}"
+                                           Foreground="DimGray" FontSize="40" VerticalAlignment="Center" Margin="150,1,0,0"
+                                           RenderTransformOrigin="0.5,0.5">
+                                    <TextBlock.RenderTransform>
+                                        <TransformGroup>
+                                            <ScaleTransform/>
+                                            <SkewTransform/>
+                                            <RotateTransform Angle="-90"/>
+                                            <TranslateTransform/>
+                                        </TransformGroup>
+                                    </TextBlock.RenderTransform>
+                                </TextBlock>
                             </Canvas>
                         </Viewbox>
                         <ControlTemplate.Triggers>
@@ -80,6 +119,23 @@
             <EventSetter Event="MouseEnter" Handler="PolarCapArrowButton_MouseEnter"/>
             <EventSetter Event="MouseLeave" Handler="PolarCapArrowButton_MouseLeave"/>
         </Style>
+        <!--星型 マーカー-->
+        <ControlTemplate x:Key="StarMarkerTemplate" TargetType="ContentControl">
+            <Viewbox Width="100" Height="100">
+                <Path Fill="Transparent" Stroke="Yellow" StrokeThickness="5.0">
+                    <Path.Data>
+                        <PathGeometry>
+                            <PathFigure StartPoint="0,50" IsClosed="True">
+                                <BezierSegment Point1="40,40" Point2="40,40" Point3="50,0"/>
+                                <BezierSegment Point1="60,40" Point2="60,40" Point3="100,50"/>
+                                <BezierSegment Point1="60,60" Point2="60,60" Point3="50,100"/>
+                                <BezierSegment Point1="40,60" Point2="40,60" Point3="0,50"/>
+                            </PathFigure>
+                        </PathGeometry>
+                    </Path.Data>
+                </Path>
+            </Viewbox>
+        </ControlTemplate>
     </Window.Resources>
 
 
@@ -186,7 +242,7 @@
                         <!--つまみ-->
                         <Track x:Name="PART_Track">
                             <Track.Thumb>
-                                <Thumb x:Name="PART_Thumb" Style="{StaticResource ArrowThumbStyle}" Background="Gray"
+                                <Thumb x:Name="PART_Thumb" Style="{StaticResource ArrowThumbVerticalStyle}" Background="Gray"
                                        Width="40" Height="20" DragCompleted="Thumb_DragCompleted" Margin="30,0,0,0"/>
                             </Track.Thumb>
                         </Track>
@@ -339,9 +395,9 @@
                 <GeometryGroup>
                     <!--ヨコ-->
                     <LineGeometry StartPoint="270,690" EndPoint="810,690"/>
-                    <LineGeometry StartPoint="270,960" EndPoint="910,960"/>
+                    <LineGeometry StartPoint="810,960" EndPoint="910,960"/>
                     <!--タテ-->
-                    <LineGeometry StartPoint="270,960" EndPoint="270,590"/>
+                    <LineGeometry StartPoint="270,690" EndPoint="270,590"/>
                     <LineGeometry StartPoint="810,690" EndPoint="810,960"/>
                 </GeometryGroup>
             </Path.Data>
@@ -374,15 +430,41 @@
                 </TransformGroup>
             </TextBlock.RenderTransform>
         </TextBlock>
+
+
+        <!--PulseProfile-->
+        <gl:GLWpfControl x:Name="GLControlPulseProfile"
+                         HorizontalAlignment="Left" VerticalAlignment="Top"
+                         Width="540" Height="370" Margin="270,961,0,0"
+                         MouseWheel="ControlView_MouseWheel"/>
+        <!--破線-->
+        <!--タテ-->
+        <Path x:Name="PathDashPulseProfile" Stroke="#e6e6e6" StrokeThickness="0.5" StrokeDashArray="5.0"/>
+        <!--ヨコ-->
+        <Path Stroke="Gray" StrokeThickness="0.5" StrokeDashArray="5.0">
+            <Path.Data>
+                <GeometryGroup>
+                    <LineGeometry StartPoint="0,1230" EndPoint="1080,1220"/>
+                </GeometryGroup>
+            </Path.Data>
+        </Path>
+        <!--実線-->
+        <!--タテ-->
+        <Path x:Name="PathStrokePulseProfile" Stroke="Gray" StrokeThickness="1.0"/>
+        <!--PulseProfile テキスト-->
+        <TextBlock HorizontalAlignment="Left" VerticalAlignment="Top"
+                   Margin="490,1222,0,0" TextWrapping="Wrap" Text="Pulse Profile" 
+                   Foreground="Gray" FontSize="12" Background="White"
+                   Width="100" TextAlignment="Center" FontFamily="Century Gothic" FontWeight="Bold"/>
         <!--Viewing Angleガイド-->
-        <Canvas x:Name="SkyMapViewingAngleBar" Width="540" Height="270" Background="{x:Null}"
+        <Canvas x:Name="SkyMapViewingAngleCanvas" Width="540" Height="270" Background="{x:Null}"
                 HorizontalAlignment="Left" VerticalAlignment="Top" Margin="270,690,0,0">
-            <Line x:Name="GuideLine" X1="0" X2="540" Stroke="Red" StrokeThickness="1.5"/>
+            <Line x:Name="ViewingAngleLine" X1="0" X2="540" Stroke="Red" StrokeThickness="1.5"/>
         </Canvas>
         <!--Viewing Angleスライダー-->
-        <Slider x:Name="SkyMapSlider" HorizontalAlignment="Left" VerticalAlignment="Top" 
+        <Slider x:Name="SkyMapViewingAngleSlider" HorizontalAlignment="Left" VerticalAlignment="Top" 
                 Margin="240,680,0,0" Orientation="Vertical" Height="290"
-                Maximum="180" Minimum="0" TickFrequency="10" Value="90"
+                Maximum="180" Minimum="0" IsDirectionReversed="True" TickFrequency="10" Value="90"
                 ValueChanged="ArrowSlider_ValueChanged" SmallChange="1"
                 IsSnapToTickEnabled="False" Width="640"
                 Loaded="Slider_Loaded">
@@ -407,14 +489,16 @@
                                     <Setter Property="Foreground" Value="Gray"/>
                                 </Style>
                             </Grid.Resources>
-                            <TextBlock Grid.Row="0" Text="180" VerticalAlignment="Top" Margin="0,3,0,0"/>
+                            <TextBlock Grid.Row="0" Text="0" VerticalAlignment="Top" Margin="0,3"/>
                             <TextBlock Grid.Row="2" Text="90" VerticalAlignment="Center"/>
+                            <TextBlock Grid.Row="4" Text="180" VerticalAlignment="Bottom" Margin="0,3"/>
                         </Grid>
                         <!--タテ目盛り線-->
                         <Border Background="Gray" HorizontalAlignment="Left" VerticalAlignment="Center"
-                                Width="1" Margin="30,0,0,0" Height="270"/>
+                                Width="1" Margin="29.5,0,0,0" Height="270"/>
                         <TickBar x:Name="TopTick" Fill="Gray" SnapsToDevicePixels="True"
-                                 Placement="Right" Width="8" Margin="0,0,583,0"
+                                 HorizontalAlignment="Left" VerticalAlignment="Stretch"
+                                 Placement="Left" Width="8" Margin="22,0,0,0"
                                  TickFrequency="{TemplateBinding TickFrequency}"
                                  Minimum="{TemplateBinding Minimum}"
                                  Maximum="{TemplateBinding Maximum}"
@@ -423,7 +507,7 @@
                         <!--つまみ-->
                         <Track x:Name="PART_Track">
                             <Track.Thumb>
-                                <Thumb Style="{StaticResource ArrowThumbStyle}" Background="Gray"
+                                <Thumb x:Name="PART_Thumb" Style="{StaticResource ArrowThumbVerticalStyle}" Background="Gray"
                                        Width="40" Height="20" DragCompleted="Thumb_DragCompleted" Margin="570,0,0,0"/>
                             </Track.Thumb>
                         </Track>
@@ -431,63 +515,71 @@
                 </ControlTemplate>
             </Slider.Template>
         </Slider>
-
-        
-        <!--PulseProfile-->
-        <gl:GLWpfControl x:Name="GLControlPulseProfile"
-                         HorizontalAlignment="Left" VerticalAlignment="Top"
-                         Width="540" Height="370" Margin="270,961,0,0"
-                         MouseWheel="ControlView_MouseWheel"/>
-        <!--破線-->
-        <!--タテ-->
-        <Path x:Name="PathDashPulseProfile" Stroke="#e6e6e6" StrokeThickness="0.5" StrokeDashArray="5.0"/>
-        <!--ヨコ-->
-        <Path Stroke="Gray" StrokeThickness="0.5" StrokeDashArray="5.0">
-            <Path.Data>
-                <GeometryGroup>
-                    <LineGeometry StartPoint="0,1220" EndPoint="1080,1220"/>
-                </GeometryGroup>
-            </Path.Data>
-        </Path>
-        <!--実線-->
-        <!--タテ-->
-        <Path x:Name="PathStrokePulseProfile" Stroke="Gray" StrokeThickness="1.0"/>
-        <!--PulseProfile テキスト-->
-        <TextBlock HorizontalAlignment="Left" VerticalAlignment="Top"
-                   Margin="490,1212,0,0" TextWrapping="Wrap" Text="Pulse Profile" 
-                   Foreground="Gray" FontSize="12" Background="White"
-                   Width="100" TextAlignment="Center" FontFamily="Century Gothic" FontWeight="Bold"/>
-        <!--ヨコ目盛りラベル-->
-        <Grid Width="600" Height="20"
-              HorizontalAlignment="Left" VerticalAlignment="Top"
-              Margin="240,960,0,0">
-            <Grid HorizontalAlignment="Stretch" VerticalAlignment="Bottom">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="Auto"/>
-                    <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="Auto"/>
-                    <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="Auto"/>
-                    <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="Auto"/>
-                    <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="Auto"/>
-                </Grid.ColumnDefinitions>
-            </Grid>
-            <Grid>
-                <Grid.Resources>
-                    <Style TargetType="TextBlock">
-                        <Setter Property="HorizontalAlignment" Value="Right"/>
-                        <Setter Property="FontSize" Value="10"/>
-                        <Setter Property="Foreground" Value="Gray"/>
-                    </Style>
-                </Grid.Resources>
-                <TextBlock Grid.Column="1" Text="0" HorizontalAlignment="Left" VerticalAlignment="Bottom" Margin="12,0,0,0"/>
-                <TextBlock Grid.Column="2" Text="90" HorizontalAlignment="Left" VerticalAlignment="Bottom" Margin="160,0,0,0"/>
-                <TextBlock Grid.Column="4" Text="180" HorizontalAlignment="Left" VerticalAlignment="Bottom" Margin="291,0,0,0"/>
-                <TextBlock Grid.Column="6" Text="270" HorizontalAlignment="Left" VerticalAlignment="Bottom" Margin="427,0,0,0"/>
-                <TextBlock Grid.Column="8" Text="360" HorizontalAlignment="Left" VerticalAlignment="Bottom" Margin="575,0,0,0"/>
-            </Grid>
-        </Grid>
+        <!--Phaseガイド-->
+        <Canvas x:Name="SkyMapPhaseCanvas" Width="540" Height="428" Background="{x:Null}"
+                HorizontalAlignment="Left" VerticalAlignment="Top" Margin="270,690,0,0">
+            <Line x:Name="PhaseLine" Y1="0" Y2="428" Stroke="Red" StrokeThickness="1.5"/>
+        </Canvas>
+        <!--Phaseスライダー-->
+        <Slider x:Name="SkyMapPhaseSlider" HorizontalAlignment="Left" VerticalAlignment="Top" 
+                Margin="250,960,0,0" Orientation="Horizontal" Width="580" Height="290"
+                Maximum="360" Minimum="0" IsDirectionReversed="False" TickFrequency="10" Value="90"
+                ValueChanged="ArrowSlider_ValueChanged" SmallChange="1" LargeChange="10"
+                IsSnapToTickEnabled="False"
+                Loaded="Slider_Loaded">
+            <Slider.Template>
+                <ControlTemplate TargetType="Slider">
+                    <Grid>
+                        <!--ヨコ目盛りラベル-->
+                        <Grid HorizontalAlignment="Stretch" VerticalAlignment="Bottom">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                        </Grid>
+                        <Grid Margin="0,8,0,0">
+                            <Grid.Resources>
+                                <Style TargetType="TextBlock">
+                                    <Setter Property="HorizontalAlignment" Value="Left"/>
+                                    <Setter Property="VerticalAlignment" Value="Top"/>
+                                    <Setter Property="FontSize" Value="10"/>
+                                    <Setter Property="Foreground" Value="Gray"/>
+                                </Style>
+                            </Grid.Resources>
+                            <TextBlock Grid.Column="1" Text="0" Margin="11,0,0,0"/>
+                            <TextBlock Grid.Column="2" Text="90" Margin="150,0,0,0"/>
+                            <TextBlock Grid.Column="4" Text="180" Margin="281,0,0,0"/>
+                            <TextBlock Grid.Column="6" Text="270" Margin="417,0,0,0"/>
+                            <TextBlock Grid.Column="8" Text="360" Margin="564,0,0,0"/>
+                        </Grid>
+                        <!--ヨコ目盛り線-->
+                        <Border Background="Gray" HorizontalAlignment="Left" VerticalAlignment="Top"
+                                Width="540" Margin="20,-0.5,0,0" Height="1"/>
+                        <TickBar x:Name="TopTick" Fill="Gray" SnapsToDevicePixels="True"
+                                 VerticalAlignment="Top" HorizontalAlignment="Stretch"
+                                 Placement="Bottom" Height="8"
+                                 TickFrequency="{TemplateBinding TickFrequency}"
+                                 Minimum="{TemplateBinding Minimum}"
+                                 Maximum="{TemplateBinding Maximum}"
+                                 Ticks="{TemplateBinding Ticks}">
+                        </TickBar>
+                        <!--つまみ-->
+                        <Track x:Name="PART_Track">
+                            <Track.Thumb>
+                                <Thumb x:Name="PART_Thumb" Style="{StaticResource ArrowThumbHorizontalStyle}" Background="Gray"
+                                       Width="40" Height="20" VerticalAlignment="Bottom" Margin="0,0,0,90"/>
+                            </Track.Thumb>
+                        </Track>
+                    </Grid>
+                </ControlTemplate>
+            </Slider.Template>
+        </Slider>
     </Grid>
 </Window>

@@ -272,7 +272,7 @@ namespace ModelGenerator {
 			if (buffer) {
 				for (unsigned int j = 0; j < vec_v2d.size(); j++) {
 					buffer[counter++] = vec_v2d[j].x;
-					buffer[counter++] = vec_v2d[j].y;
+					buffer[counter++] = std::abs(vec_v2d[j].y - 180);
 				}
 			}
 			else {

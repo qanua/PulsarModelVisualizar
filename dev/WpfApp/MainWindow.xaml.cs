@@ -51,7 +51,8 @@ namespace WpfApp
         private bool _isDragging = false;
 
         private int _inclinationAngle = 0;
-        private int _viewingAngle = 0;
+        private int _viewingAngle = 90;
+        private int _phase = 90;
 
         private Color4 _vertexColor = Color4.White;
         private Button? _selectedButton;
@@ -72,10 +73,12 @@ namespace WpfApp
         private int _modelLoc, _viewLoc, _projLoc, _colorLoc;
 
         private Color4 VERTEX_COLOR = new Color4(0.3f, 0.3f, 0.3f, 1f);
-        private Color4 RED_COLOR4 = new Color4(225, 75, 50, 225);
-        private Color4 GREEN_COLOR4 = new Color4(0, 185, 50, 225);
+        private Color4 RED_COLOR = new Color4(225, 75, 50, 255);
+        private Color4 GREEN_COLOR = new Color4(0, 185, 75, 255);
 
         private Brush RED_BRUSH = new SolidColorBrush(System.Windows.Media.Color.FromArgb(255, 225, 75, 50));
+        private Brush BLUE_BRUSH = new SolidColorBrush(System.Windows.Media.Color.FromArgb(255, 60, 90, 255));
+        private Brush GREEN_BRUSH = new SolidColorBrush(System.Windows.Media.Color.FromArgb(255, 0, 185, 75));
 
 
         public MainWindow()
@@ -134,9 +137,14 @@ namespace WpfApp
                 _inclinationAngle = (int)MagneticLineSlider.Value;
                 SetInclinationAngle(_inclinationAngle);
             }
-            else if (slider == SkyMapSlider)
+            else if (slider == SkyMapViewingAngleSlider)
             {
-                _viewingAngle = (int)SkyMapSlider.Value;
+                _viewingAngle = (int)SkyMapViewingAngleSlider.Value;
+                updateSkyMapGuideLine(slider);
+            }
+            else if (slider == SkyMapPhaseSlider)
+            {
+                _phase = (int)SkyMapPhaseSlider.Value;
                 updateSkyMapGuideLine(slider);
             }
         }
@@ -164,13 +172,15 @@ namespace WpfApp
                 setupAxisVAO(control);
             }
 
-            // SkyMap グリッド生成
+            // SkyMapの設定
             if (control == GLControlSkyMap)
             {
                 setupSkyMapGrid();
+                ViewingAngleLine.Stroke = BLUE_BRUSH;
+                PhaseLine.Stroke = GREEN_BRUSH;
             }
 
-            // PolarCap 表示初期化
+            // PolarCap設定
             setupPolarCapDisplay(control);
         }
 
@@ -247,16 +257,6 @@ namespace WpfApp
             GL.AttachShader(_shader, vertexShader);
             GL.AttachShader(_shader, fragmentShader);
             GL.LinkProgram(_shader);
-
-            // DEBUG: リンクエラーの確認
-            //int linkStatus;
-            //GL.GetProgram(_shader, GetProgramParameterName.LinkStatus, out linkStatus);
-            //if (linkStatus == 0)
-            //{
-            //    string infoLog = GL.GetProgramInfoLog(_shader);
-            //    Debug.WriteLine("Shader Link Error: " + infoLog);
-            //    MessageBox.Show("Shader Link Error:\n" + infoLog);
-            //}
 
             // ソースの削除
             GL.DeleteShader(vertexShader);
@@ -423,11 +423,6 @@ namespace WpfApp
                 else
                 {
                     groupDash.Children.Add(geo);
-
-                    groupStroke.Children.Add(
-                        new LineGeometry(
-                            new System.Windows.Point(x, 960),
-                            new System.Windows.Point(x, 965)));
                 }
             }
             PathStrokePulseProfile.Data = groupStroke;
@@ -440,8 +435,6 @@ namespace WpfApp
             // 初回のみ
             if (_polarCapViewByButton.Count == 0)
             {
-                GuideLine.Stroke = RED_BRUSH;
-
                 _polarCapViewByButton[PolarCapSouthCloseButton] = GLControlPolarCapSouthClosed;
                 _polarCapViewByButton[PolarCapSouthOpenButton] = GLControlPolarCapSouthOpened;
                 _polarCapViewByButton[PolarCapNorthCloseButton] = GLControlPolarCapNorthClosed;
@@ -528,7 +521,7 @@ namespace WpfApp
                 {
                     proj = Matrix4.CreateOrthographicOffCenter(
                         -180f, 180f,
-                        -20f, 20f,
+                        -23f, 17f,
                         0.001f, 1f
                     );
                 }
@@ -582,40 +575,40 @@ namespace WpfApp
                 GL.UniformMatrix4(_projLoc, false, ref proj);
 
                 // パルサー情報の描画
-                if (_pulsarVaosByControl.TryGetValue(control, out var pulsarVao) &&
-                    _pulsarVerticesCountsByControl.TryGetValue(control, out var pulsarVC))
+                if (_pulsarVaosByControl.TryGetValue(control, out var pulvao) &&
+                    _pulsarVerticesCountsByControl.TryGetValue(control, out var pulvcount))
                 {
                     Matrix4 model = Matrix4.Identity;
 
                     GL.UniformMatrix4(_modelLoc, false, ref model);
                     GL.Uniform4(_colorLoc, _vertexColor);
 
-                    drawVertices(control, pulsarVao, pulsarVC);
+                    drawVertices(control, pulvao, pulvcount);
                 }
 
                 // プリミティブの描画
-                if (_primitiveVaosByControl.TryGetValue(control, out var primitiveVao) &&
-                    _primitiveVerticesCountsByControl.TryGetValue(control, out var primitiveVC))
+                if (_primitiveVaosByControl.TryGetValue(control, out var privao) &&
+                    _primitiveVerticesCountsByControl.TryGetValue(control, out var privcount))
                 {
                     // 回転軸
                     Matrix4 model = Matrix4.CreateScale(0.02f, 4.0f, 0.02f);
-                    Color4 color = GREEN_COLOR4;
+                    Color4 color = GREEN_COLOR;
 
                     GL.UniformMatrix4(_modelLoc, false, ref model);
                     GL.Uniform4(_colorLoc, color);
 
                     GL.LineWidth(3.0f);
-                    GL.BindVertexArray(primitiveVao);
-                    GL.DrawArrays(PrimitiveType.Lines, 0, primitiveVC);
+                    GL.BindVertexArray(privao);
+                    GL.DrawArrays(PrimitiveType.Lines, 0, privcount);
 
                     // 磁化軸
                     model *= Matrix4.CreateRotationX(MathHelper.DegreesToRadians(_inclinationAngle));
-                    color = RED_COLOR4;
+                    color = RED_COLOR;
 
                     GL.UniformMatrix4(_modelLoc, false, ref model);
                     GL.Uniform4(_colorLoc, color);
 
-                    GL.DrawArrays(PrimitiveType.Lines, 0, primitiveVC);
+                    GL.DrawArrays(PrimitiveType.Lines, 0, privcount);
                 }
             }
         }
@@ -663,6 +656,12 @@ namespace WpfApp
             {
                 var control = (GLWpfControl)sender;
                 setupCamera(control);
+
+                // SkyMap の ViewingAngle を同期させる
+                SkyMapViewingAngleSlider.Value = 90;
+
+                // MagneticLine の ViewingAngle を同期させる
+                SkyMapPhaseSlider.Value = 90;
             }
         }
 
@@ -694,7 +693,16 @@ namespace WpfApp
                 camera.Pitch += dy * 0.5f;  // マウス縦移動で垂直回転
 
                 // ピッチ制限（上下90°超え防止）
-                camera.Pitch = Math.Clamp(camera.Pitch, -89f, 89f);
+                camera.Pitch = Math.Clamp(camera.Pitch, -89.9f, 89.9f);
+
+                // SkyMap の ViewingAngle を同期させる
+                _viewingAngle = 90 + (int)camera.Pitch;
+                SkyMapViewingAngleSlider.Value = _viewingAngle;
+
+                // MagneticLine の ViewingAngle を同期させる
+                int delta = (90 + (int)camera.Yaw) % 360;
+                _phase = (0 <= delta) ? delta : 360 + delta;
+                SkyMapPhaseSlider.Value = _phase;
 
                 _lastMousePos = pos;
             }
@@ -723,10 +731,10 @@ namespace WpfApp
                 {
                     if (_camerasByControl.TryGetValue(control, out var camera))
                     {
-                        zoomCamera(camera, 1.0f, 0.5f, 179.5f, e.Delta);
+                        zoomCamera(camera, 1.0f, 0.5f, 179.5f, -e.Delta);
 
                         // SkyMap の ViewingAngle を同期させる
-                        SkyMapSlider.Value = (int)Math.Round(camera.Distance);
+                        SkyMapViewingAngleSlider.Value = (int)camera.Distance;
                     }
                 }
                 else if (
@@ -781,8 +789,6 @@ namespace WpfApp
             {
                 camera.Distance = max;
             }
-            // DEBUG
-            //Debug.WriteLine($"camera.Distance = {camera.Distance}");
         }
 
 
@@ -797,41 +803,67 @@ namespace WpfApp
                 // 操作中は線色を変更する
                 _vertexColor = (_vertexColor == Color4.White) ? VERTEX_COLOR : Color4.LightGray;
             }
-            else if (slider == SkyMapSlider)
+            else if (slider == SkyMapViewingAngleSlider)
             {
-                if (slider.Value == 180)
+                if (_viewingAngle != e.NewValue)
                 {
-                    slider.Value = 179;
-                }
-                slider.Value = _viewingAngle = (int)slider.Value;
-
-                if ((_viewingAngle - (int)e.OldValue) != 0)
-                {
-                    updateSkyMapGuideLine(slider);
+                    int value = (int)e.NewValue;
+                    slider.Value = _viewingAngle = (value == 180) ? 179 : value;
 
                     // PulseProfile の ViewingAngle を同期させる
-                    if (GLControlPulseProfile != null && _camerasByControl.TryGetValue(GLControlPulseProfile, out var camera))
+                    if (GLControlPulseProfile != null && _camerasByControl.TryGetValue(GLControlPulseProfile, out var pulcam))
                     {
-                        camera.Distance = _viewingAngle + 0.5f;
+                        pulcam.Distance = _viewingAngle + 0.5f;
+                    }
+                    // MagneticLine の ViewingAngle を同期させる
+                    if (GLControlMagneticLine != null && _camerasByControl.TryGetValue(GLControlMagneticLine, out var magcam))
+                    {
+                        magcam.Pitch = Math.Clamp(_viewingAngle - 90f, -89.9f, 89.9f);
                     }
                 }
+                updateSkyMapGuideLine(slider);
+            }
+            else if (slider == SkyMapPhaseSlider)
+            {
+                if (_phase != e.NewValue)
+                {
+                    slider.Value = _phase = (int)e.NewValue;
+
+                    // MagneticLine の Phase を同期させる
+                    if (GLControlMagneticLine != null && _camerasByControl.TryGetValue(GLControlMagneticLine, out var camera))
+                    {
+                        camera.Yaw = _phase - 90f;
+                    }
+                }
+                updateSkyMapGuideLine(slider);
             }
         }
 
 
         private void updateSkyMapGuideLine(Slider slider)
         {
-            if (slider == SkyMapSlider)
+            double min = slider.Minimum;
+            double max = slider.Maximum;
+
+            if (slider == SkyMapViewingAngleSlider)
             {
-                double min = slider.Minimum;
-                double max = slider.Maximum;
-                double height = SkyMapViewingAngleBar.ActualHeight;
+                double height = SkyMapViewingAngleCanvas.ActualHeight;
 
-                // 値を座標に変換（下が0、上が180）
-                double y = height - (_viewingAngle - min) / (max - min) * height;
+                // 値を座標に変換（上が0、下が180）
+                double y = (_viewingAngle - min) / (max - min) * height;
 
-                GuideLine.Y1 = y;
-                GuideLine.Y2 = y;
+                ViewingAngleLine.Y1 = y;
+                ViewingAngleLine.Y2 = y;
+            }
+            else if(slider == SkyMapPhaseSlider)
+            {
+                double width = SkyMapPhaseCanvas.ActualWidth;
+
+                // 値を座標に変換（左が0、右が360）
+                double x = (_phase - min) / (max - min) * width;
+
+                PhaseLine.X1 = x;
+                PhaseLine.X2 = x;
             }
         }
 
@@ -847,7 +879,7 @@ namespace WpfApp
 
                 if (slider == MagneticLineSlider)
                 {
-                    // スライダー無効
+                    // スライダー無効化
                     thumb.IsHitTestVisible = false;
 
                     SetInclinationAngle(_inclinationAngle);
@@ -955,17 +987,4 @@ namespace WpfApp
             return Matrix4.LookAt(cameraPos, Target, Vector3.UnitY);
         }
     }
-
-
-    //class Asset
-    //{
-    //    public float[]? PulsarVertices {  get; set; }
-    //    public int PulsarVerticesCount {  get; set; }
-    //    public int PulsarVao {  get; set; }
-    //    public int PrimitiveVao {  get; set; }
-    //    public int PrimitiveVerticesCount { get; set; }
-    //    public Camera? Camera { get; set; }
-
-    //    public Asset() { }
-    //}
 }
