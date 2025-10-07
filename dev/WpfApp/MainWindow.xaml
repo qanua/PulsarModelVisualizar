@@ -145,11 +145,11 @@
         <gl:GLWpfControl x:Name="GLControlMagneticLine"
                          Width="600" Height="600"
                          HorizontalAlignment="Left" VerticalAlignment="Top" Margin="240,50,0,0"
-                         MouseDown="MagneticLineView_MouseDown"
-                         MouseMove="MagneticLineView_MouseMove"
-                         MouseUp="MagneticLineView_MouseUp"
-                         MouseLeave="MagneticLineView_MouseLeave"
-                         MouseLeftButtonDown="MagneticLineView_MouseLeftButtonDown"/>
+                         MouseDown="MagneticLine_MouseDown"
+                         MouseMove="MagneticLine_MouseMove"
+                         MouseUp="MagneticLine_MouseUp"
+                         MouseLeave="MagneticLine_MouseLeave"
+                         MouseLeftButtonDown="MagneticLine_MouseLeftButtonDown"/>
         <!--円のマスク-->
         <Path Fill="#f5f5f5" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="240,50,0,0">
             <Path.Data>
@@ -287,22 +287,22 @@
         <gl:GLWpfControl x:Name="GLControlPolarCapSouthClosed"
                          Width="100" Height="100" Margin="760,560,0,0"
                          HorizontalAlignment="Left" VerticalAlignment="Top"
-                         MouseWheel="ControlView_MouseWheel"/>
+                         MouseWheel="Control_MouseWheel"/>
         <!--SouthOpened-->
         <gl:GLWpfControl x:Name="GLControlPolarCapSouthOpened"
                          Width="100" Height="100" Margin="760,560,0,0"
                          HorizontalAlignment="Left" VerticalAlignment="Top"
-                         MouseWheel="ControlView_MouseWheel"/>
+                         MouseWheel="Control_MouseWheel"/>
         <!--NorthClosed-->
         <gl:GLWpfControl x:Name="GLControlPolarCapNorthClosed"
                          Width="100" Height="100" Margin="760,560,0,0"
                          HorizontalAlignment="Left" VerticalAlignment="Top"
-                         MouseWheel="ControlView_MouseWheel"/>
+                         MouseWheel="Control_MouseWheel"/>
         <!--CapNorthOpened-->
         <gl:GLWpfControl x:Name="GLControlPolarCapNorthOpened"
                          Width="100" Height="100" Margin="760,560,0,0"
                          HorizontalAlignment="Left" VerticalAlignment="Top"
-                         MouseWheel="ControlView_MouseWheel"/>
+                         MouseWheel="Control_MouseWheel"/>
         <!--円のマスク-->
         <Path Fill="#f5f5f5" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="760,560,0,0">
             <Path.Data>
@@ -439,7 +439,7 @@
         <gl:GLWpfControl x:Name="GLControlPulseProfile"
                          Width="540" Height="370"
                          HorizontalAlignment="Left" VerticalAlignment="Top" Margin="270,961,0,0"
-                         MouseWheel="ControlView_MouseWheel"/>
+                         MouseWheel="Control_MouseWheel"/>
         <!--破線-->
         <!--タテ-->
         <Path x:Name="PathDashPulseProfile" Stroke="#e6e6e6" StrokeThickness="0.5" StrokeDashArray="5.0"/>
