@@ -11,8 +11,10 @@ using System.Windows.Media;
 
 namespace WpfApp
 {
+     /** @brief MainWindow.xamlの相互作用ロジック */
     public partial class MainWindow : Window
     {
+        #region DllImport
         [DllImport("CalcLib.dll")]
         private static extern void SetInclinationAngle([Out] int degree);
 
@@ -36,64 +38,138 @@ namespace WpfApp
 
         [DllImport("CalcLib.dll")]
         private static extern int GetPulseProfile([Out] float[]? buffer, bool normalize);
+        #endregion
 
 
-        // Model
+        #region メンバ変数
+        #region モデル
+        /** @brief 頂点の色
+         * 
+         *  @details        頂点の座標更新時に変更する
+         */
         private Color4 _vertexColor = Color4.White;
+
+        /** @brief Inclination Angle
+         * 
+         *  @details        パルサーの回転軸と磁化軸のなす角
+         */
         private int _inclinationAngle = 0;
+
+        /** @brief Viewing Angle
+         * 
+         *  @details        パルサーの回転軸と視線方向のなす角
+         */
         private int _viewingAngle = 90;
+
+        /** @brief 位相
+         * 
+         *  @details        パルサーの自転角度
+         */
         private int _phase = 90;
+
+        /** @brief 描画対象の管理
+         * 
+         *  @details        GLWpfControlごとに描画対象を切り替えるため
+         */
         private Dictionary<GLWpfControl, Object> _objsByControl = new();
+        #endregion
 
-        // GUI
-        private Button? _selectedButton;
+        #region GUI
+        /** @brief ポーラーキャップ表示ボタンの管理
+         * 
+         *  @details        ボタンごとに表示を切り替えるため
+         */
         private Dictionary<Button, GLWpfControl> _polarCapViewByButton = new();
+
+        /** @brief ポーラーキャップ表示で選択されているボタン */
+        private Button? _selectedPolarCapButton;
+
+        /** @brief マウス位置の前回値
+         * 
+         *  @details        ドラッグ中のマウス位置を保持する
+         */
         private Point _lastMousePos;
+
+        /** @brief マウスドラッグフラグ */
         private bool _isDragging = false;
+        #endregion
 
-        // Shader
-        private int _shader, _modelLoc, _viewLoc, _projLoc, _colorLoc;
+        #region シェーダー
+        /** @brief シェーダープログラム */
+        private int _shader;
 
-        // Color
+        /** @brief モデル変換行列のの位置 */
+        private int _modelLoc;
+
+        /** @brief ビュー変換行列のの位置 */
+        private int _viewLoc;
+
+        /** @brief 投影変換行列の位置 */
+        private int _projLoc;
+
+        /** @brief オブジェクト色の位置 */
+        private int _colorLoc;
+        #endregion
+        #endregion
+
+        #region 定数
+        #region 色
+        /** @brief 頂点の灰色
+         * 
+         *  @details        _vertexColor を変更するため
+         */
         private Color4 VERTEX_COLOR = new Color4(0.3f, 0.3f, 0.3f, 1f);
+
+        /** @brief 磁化軸の赤色 */
         private Color4 RED_COLOR = new Color4(1f, 75 / 255f, 50 / 255f , 1f);
+
+        /** @brief 回転軸の緑色 */
         private Color4 GREEN_COLOR = new Color4(0f, 185 / 255f, 75 / 255f, 1f);
 
+        /** @brief ボタンの赤色 */
         private Brush RED_BRUSH = new SolidColorBrush(Color.FromArgb(255, 225, 75, 50));
-        private Brush BLUE_BRUSH = new SolidColorBrush(Color.FromArgb(255, 60, 90, 255));
+
+        /** @brief ガイドの緑色 */
         private Brush GREEN_BRUSH = new SolidColorBrush(Color.FromArgb(255, 0, 185, 75));
 
+        /** @brief ガイドの青色 */
+        private Brush BLUE_BRUSH = new SolidColorBrush(Color.FromArgb(255, 60, 90, 255));
+        #endregion
+        #endregion
 
+
+        #region 初期化処理
+        /** @brief MainWindowのコンストラクタ */
         public MainWindow()
         {
             InitializeComponent();
 
             // イベント登録
-            GLControlMagneticLine.Ready += () => contextReady(GLControlMagneticLine, TimeSpan.Zero);
-            GLControlPolarCapNorthOpened.Ready += () => contextReady(GLControlPolarCapNorthOpened, TimeSpan.Zero);
-            GLControlPolarCapNorthClosed.Ready += () => contextReady(GLControlPolarCapNorthClosed, TimeSpan.Zero);
-            GLControlPolarCapSouthOpened.Ready += () => contextReady(GLControlPolarCapSouthOpened, TimeSpan.Zero);
-            GLControlPolarCapSouthClosed.Ready += () => contextReady(GLControlPolarCapSouthClosed, TimeSpan.Zero);
-            GLControlSkyMap.Ready += () => contextReady(GLControlSkyMap, TimeSpan.Zero);
-            GLControlPulseProfile.Ready += () => contextReady(GLControlPulseProfile, TimeSpan.Zero);
+            GLControlMagneticLine.Ready += () => glControlReady(GLControlMagneticLine);
+            GLControlPolarCapNorthOpened.Ready += () => glControlReady(GLControlPolarCapNorthOpened);
+            GLControlPolarCapNorthClosed.Ready += () => glControlReady(GLControlPolarCapNorthClosed);
+            GLControlPolarCapSouthOpened.Ready += () => glControlReady(GLControlPolarCapSouthOpened);
+            GLControlPolarCapSouthClosed.Ready += () => glControlReady(GLControlPolarCapSouthClosed);
+            GLControlSkyMap.Ready += () => glControlReady(GLControlSkyMap);
+            GLControlPulseProfile.Ready += () => glControlReady(GLControlPulseProfile);
 
-            GLControlMagneticLine.Loaded += (s, e) => layoutLoaded(GLControlMagneticLine);
-            GLControlPolarCapNorthOpened.Loaded += (s, e) => layoutLoaded(GLControlPolarCapNorthOpened);
-            GLControlPolarCapNorthClosed.Loaded += (s, e) => layoutLoaded(GLControlPolarCapNorthClosed);
-            GLControlPolarCapSouthOpened.Loaded += (s, e) => layoutLoaded(GLControlPolarCapSouthOpened);
-            GLControlPolarCapSouthClosed.Loaded += (s, e) => layoutLoaded(GLControlPolarCapSouthClosed);
-            GLControlSkyMap.Loaded += (s, e) => layoutLoaded(GLControlSkyMap);
-            GLControlPulseProfile.Loaded += (s, e) => layoutLoaded(GLControlPulseProfile);
+            GLControlMagneticLine.Loaded += (s, e) => glControlLoaded(GLControlMagneticLine);
+            GLControlPolarCapNorthOpened.Loaded += (s, e) => glControlLoaded(GLControlPolarCapNorthOpened);
+            GLControlPolarCapNorthClosed.Loaded += (s, e) => glControlLoaded(GLControlPolarCapNorthClosed);
+            GLControlPolarCapSouthOpened.Loaded += (s, e) => glControlLoaded(GLControlPolarCapSouthOpened);
+            GLControlPolarCapSouthClosed.Loaded += (s, e) => glControlLoaded(GLControlPolarCapSouthClosed);
+            GLControlSkyMap.Loaded += (s, e) => glControlLoaded(GLControlSkyMap);
+            GLControlPulseProfile.Loaded += (s, e) => glControlLoaded(GLControlPulseProfile);
 
-            GLControlMagneticLine.Render += delta => renderView(GLControlMagneticLine, delta);
-            GLControlPolarCapNorthOpened.Render += delta => renderView(GLControlPolarCapNorthOpened, delta);
-            GLControlPolarCapNorthClosed.Render += delta => renderView(GLControlPolarCapNorthClosed, delta);
-            GLControlPolarCapSouthOpened.Render += delta => renderView(GLControlPolarCapSouthOpened, delta);
-            GLControlPolarCapSouthClosed.Render += delta => renderView(GLControlPolarCapSouthClosed, delta);
-            GLControlSkyMap.Render += delta => renderView(GLControlSkyMap, delta);
-            GLControlPulseProfile.Render += delta => renderView(GLControlPulseProfile, delta);
+            GLControlMagneticLine.Render += delta => glControlRender(GLControlMagneticLine);
+            GLControlPolarCapNorthOpened.Render += delta => glControlRender(GLControlPolarCapNorthOpened);
+            GLControlPolarCapNorthClosed.Render += delta => glControlRender(GLControlPolarCapNorthClosed);
+            GLControlPolarCapSouthOpened.Render += delta => glControlRender(GLControlPolarCapSouthOpened);
+            GLControlPolarCapSouthClosed.Render += delta => glControlRender(GLControlPolarCapSouthClosed);
+            GLControlSkyMap.Render += delta => glControlRender(GLControlSkyMap);
+            GLControlPulseProfile.Render += delta => glControlRender(GLControlPulseProfile);
 
-            // GL コントロールの設定
+            // GLコントロールの設定
             var settings = new GLWpfControlSettings()
             {
                 MajorVersion = 3,
@@ -111,32 +187,14 @@ namespace WpfApp
             GLControlPulseProfile.Start(settings);
         }
 
-
-        private void Slider_Loaded(object sender, RoutedEventArgs e)
+        #region Readyイベント
+        /** @brief GLControlのコンテキスト初期化完了イベント
+         * 
+         *  @param[in]      control     GLWpfControlコントロール
+         */
+        private void glControlReady(GLWpfControl control)
         {
-            var slider = (Slider)sender;
-
-            if (slider == MagneticLineSlider)
-            {
-                _inclinationAngle = (int)MagneticLineSlider.Value;
-                SetInclinationAngle(_inclinationAngle);
-            }
-            else if (slider == SkyMapViewingAngleSlider)
-            {
-                _viewingAngle = (int)SkyMapViewingAngleSlider.Value;
-                updateSkyMapGuideLine(slider);
-            }
-            else if (slider == SkyMapPhaseSlider)
-            {
-                _phase = (int)SkyMapPhaseSlider.Value;
-                updateSkyMapGuideLine(slider);
-            }
-        }
-
-
-        private void contextReady(GLWpfControl control, TimeSpan delta)
-        {
-            // OpenGL の設定
+            // OpenGLの設定
             GL.ClearColor(Color4.White);
             GL.Enable(EnableCap.DepthTest);
 
@@ -149,14 +207,14 @@ namespace WpfApp
             // 頂点の取得
             getVertices(control);
 
-            // VAO の生成
-            setupVAO(control);
+            // VAOの生成
+            setupVerticesVAO(control);
             if (control == GLControlMagneticLine)
             {
-                setupAxisVAO(control);
+                setupPrimitiveVAO(control);
             }
 
-            // スカイマップの GUI 設定
+            // スカイマップのGUI設定
             if (control == GLControlSkyMap)
             {
                 setupSkyMapView();
@@ -164,11 +222,15 @@ namespace WpfApp
                 PhaseGuide.Stroke = GREEN_BRUSH;
             }
 
-            // ポーラーキャップの GUI 設定
+            // ポーラーキャップのGUI設定
             setupPolarCapView(control);
         }
 
 
+        /** @brief カメラの設定
+         * 
+         *  @param[in]      control     GLWpfControlコントロール
+         */
         private void setupCamera(GLWpfControl control)
         {
             Camera? camera = null;
@@ -213,6 +275,7 @@ namespace WpfApp
         }
 
 
+        /** @brief シェーダーの設定 */
         private void setupShader()
         {
             // 頂点シェーダー
@@ -261,7 +324,7 @@ namespace WpfApp
             GL.DeleteShader(vertexShader);
             GL.DeleteShader(fragmentShader);
 
-            // シェーダー location の格納
+            // シェーダーlocationの格納
             _modelLoc = GL.GetUniformLocation(_shader, "model");
             _viewLoc = GL.GetUniformLocation(_shader, "view");
             _projLoc = GL.GetUniformLocation(_shader, "projection");
@@ -269,6 +332,10 @@ namespace WpfApp
         }
 
 
+        /** @brief 頂点の取得
+         * 
+         *  @param[in]      control     GLWpfControlコントロール
+         */
         private void getVertices(GLWpfControl control)
         {
             float[]? vertices = null;
@@ -338,7 +405,11 @@ namespace WpfApp
         }
 
 
-        private void setupVAO(GLWpfControl control)
+        /** @brief 頂点のVAO設定
+         * 
+         *  @param[in]      control     GLWpfControlコントロール
+         */
+        private void setupVerticesVAO(GLWpfControl control)
         {
             Object obj = _objsByControl[control];
 
@@ -358,7 +429,7 @@ namespace WpfApp
                     BufferUsageHint.StaticDraw                  // データの使い方: 毎フレーム更新
                 );
 
-                // 頂点 attribute
+                // 頂点attribute
                 int size = (control == GLControlSkyMap) ? 2 : 3;
                 GL.EnableVertexAttribArray(0);
                 GL.VertexAttribPointer(
@@ -370,7 +441,7 @@ namespace WpfApp
                     0                               // データ開始位置のオフセット: 0
                 );
 
-                // VAO の格納
+                // VAOの格納
                 obj.PulsarVao = vao;
                 obj.PulsarVerticesCount = vertices.Length / size;
 
@@ -379,7 +450,11 @@ namespace WpfApp
         }
 
 
-        private void setupAxisVAO(GLWpfControl control)
+        /** @brief プリミティブのVAO設定
+         * 
+         *  @param[in]      control     GLWpfControlコントロール
+         */
+        private void setupPrimitiveVAO(GLWpfControl control)
         {
             Object obj = _objsByControl[control];
 
@@ -403,7 +478,7 @@ namespace WpfApp
                 vertices, BufferUsageHint.StaticDraw
             );
 
-            // 頂点 attribute
+            // 頂点attribute
             GL.EnableVertexAttribArray(0);
             GL.VertexAttribPointer(
                 0,
@@ -414,7 +489,7 @@ namespace WpfApp
                 0
             );
 
-            // VAO の格納
+            // VAOの格納
             obj.PrimitiveVao = vao;
             obj.PrimitiveVerticesCount = vertices.Length / 3;
 
@@ -422,6 +497,7 @@ namespace WpfApp
         }
 
 
+        /** @brief スカイマップ表示の設定 */
         private void setupSkyMapView()
         {
             var groupStroke = new GeometryGroup();
@@ -451,6 +527,10 @@ namespace WpfApp
         }
 
 
+        /** @brief ポーラーキャップ表示の設定
+         * 
+         *  @param[in]      control     GLWpfControlコントロール
+         */
         private void setupPolarCapView(GLWpfControl control)
         {
             // ボタンの色を変更（初回のみ）
@@ -468,7 +548,7 @@ namespace WpfApp
                     if (button == PolarCapNorthOpenedButton)
                     {
                         button.Background = RED_BRUSH;
-                        _selectedButton = PolarCapNorthOpenedButton;
+                        _selectedPolarCapButton = PolarCapNorthOpenedButton;
                     }
                     else
                     {
@@ -490,9 +570,14 @@ namespace WpfApp
                 control.Visibility = Visibility.Hidden;
             }
         }
+        #endregion
 
-
-        private void layoutLoaded(GLWpfControl control)
+        #region Loadedイベント
+        /** @brief GLControlの読み込みイベント
+         * 
+         *  @param[in]      control GLWpfControlコントロール
+         */
+        private void glControlLoaded(GLWpfControl control)
         {
             // レイアウト処理後に実行（ActualWidth、ActualHeight 取得のため）
             Dispatcher.BeginInvoke(new Action(() =>
@@ -504,6 +589,10 @@ namespace WpfApp
         }
 
 
+        /** @brief 投影行列の設定
+         * 
+         *  @param[in]      control     GLWpfControlコントロール
+         */
         private void setupProjection(GLWpfControl control)
         {
             Matrix4 proj = Matrix4.Identity;
@@ -558,7 +647,42 @@ namespace WpfApp
         }
 
 
-        private void renderView(GLWpfControl control, TimeSpan delta)
+        /** @brief スライダーの読み込みイベント
+         * 
+         *  @param[in]      sender      イベント発生スライダー
+         *  @param[in]      e           イベントデータ
+         */
+        private void Slider_Loaded(object sender, RoutedEventArgs e)
+        {
+            var slider = (Slider)sender;
+
+            if (slider == MagneticLineSlider)
+            {
+                _inclinationAngle = (int)MagneticLineSlider.Value;
+                SetInclinationAngle(_inclinationAngle);
+            }
+            else if (slider == SkyMapViewingAngleSlider)
+            {
+                _viewingAngle = (int)SkyMapViewingAngleSlider.Value;
+                updateSkyMapGuideLine(slider);
+            }
+            else if (slider == SkyMapPhaseSlider)
+            {
+                _phase = (int)SkyMapPhaseSlider.Value;
+                updateSkyMapGuideLine(slider);
+            }
+        }
+        #endregion
+        #endregion
+
+
+        #region 描画処理
+        #region Renderイベント
+        /** @brief GLControl のレンダーイベント
+         * 
+         *  @param[in]      control     GLWpfControlコントロール
+         */
+        private void glControlRender(GLWpfControl control)
         {
             // バッファの消去
             GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
@@ -570,8 +694,8 @@ namespace WpfApp
                 // 頂点の取得
                 getVertices(control);
 
-                // VAO の更新
-                setupVAO(control);
+                // VAOの更新
+                setupVerticesVAO(control);
 
                 // 磁力線のスライダーを有効化
                 var thumb = (MagneticLineSlider.Template.FindName("PART_Thumb", MagneticLineSlider) as Thumb);
@@ -585,6 +709,10 @@ namespace WpfApp
         }
 
 
+        /** @brief Objectの描画
+         * 
+         *  @param[in]      control     GLWpfControlコントロール
+         */
         private void drawObjects(GLWpfControl control)
         {
             Object obj = _objsByControl[control];
@@ -640,6 +768,12 @@ namespace WpfApp
         }
 
 
+        /** @brief 頂点の描画
+         * 
+         *  @param[in]      control     GLWpfControlコントロール
+         *  @param[in]      vao         対象のVAO
+         *  @param[in]      count       対象の頂点数
+         */
         private void drawVertices(GLWpfControl control, int vao, int count)
         {
             GL.BindVertexArray(vao);
@@ -674,34 +808,43 @@ namespace WpfApp
             }
             GL.BindVertexArray(0);
         }
+        #endregion
+        #endregion
 
 
+        #region GUI操作
+        #region GLControlのマウスイベント
+        /** @brief MagneticLine 上でのマウス左ボタン押下イベント
+         * 
+         *  @param[in]      sender      GLControlMagneticLine
+         *  @param[in]      e           マウス状態などを含むイベントデータ
+         */
         private void MagneticLine_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
         {
-            if (e.ClickCount == 2)
+            if(e.ClickCount == 1)
+            {
+                _isDragging = true;
+                _lastMousePos = e.GetPosition((IInputElement)sender);
+            }
+            else if (e.ClickCount == 2)
             {
                 var control = (GLWpfControl)sender;
                 setupCamera(control);
 
-                // ViewingAngle スライダーの同期
+                // ViewingAngleスライダーの同期
                 SkyMapViewingAngleSlider.Value = 90;
 
-                // Phase スライダーの同期
+                // Phaseスライダーの同期
                 SkyMapPhaseSlider.Value = 90;
             }
         }
 
 
-        private void MagneticLine_MouseDown(object sender, MouseButtonEventArgs e)
-        {
-            if (e.LeftButton == MouseButtonState.Pressed)
-            {
-                _isDragging = true;
-                _lastMousePos = e.GetPosition((IInputElement)sender);
-            }
-        }
-
-
+        /** @brief MagneticLine 上でのマウス移動イベント
+         * 
+         *  @param[in]      sender      GLControlMagneticLine
+         *  @param[in]      e           マウス位置などを含むイベントデータ
+         */
         private void MagneticLine_MouseMove(object sender, MouseEventArgs e)
         {
             if (_isDragging)
@@ -722,11 +865,11 @@ namespace WpfApp
                     // ピッチ制限（上下90°未満）
                     camera.Pitch = Math.Clamp(camera.Pitch, -89.9f, 89.9f);
 
-                    // ViewingAngle スライダーの同期
+                    // ViewingAngleスライダーの同期
                     _viewingAngle = 90 + (int)camera.Pitch;
                     SkyMapViewingAngleSlider.Value = _viewingAngle;
 
-                    // Phase スライダーの同期
+                    // Phaseスライダーの同期
                     int delta = (90 + (int)camera.Yaw) % 360;
                     _phase = (0 <= delta) ? delta : 360 + delta;
                     SkyMapPhaseSlider.Value = _phase;
@@ -737,19 +880,34 @@ namespace WpfApp
         }
 
 
+        /** @brief MagneticLine 上でのマウスボタン離上イベント
+         * 
+         *  @param[in]      sender      GLControlMagneticLine
+         *  @param[in]      e           マウスのイベントデータ
+         */
         private void MagneticLine_MouseUp(object sender, MouseButtonEventArgs e)
         {
             _isDragging = false;
         }
 
 
+        /** @brief MagneticLine 上からのマウス離脱イベント
+         * 
+         *  @param[in]      sender      GLControlMagneticLine
+         *  @param[in]      e           マウスのイベントデータ
+         */
         private void MagneticLine_MouseLeave(object sender, MouseEventArgs e)
         {
             _isDragging = false;
         }
 
 
-        private void Control_MouseWheel(object sender, MouseWheelEventArgs e)
+        /** @brief GLコントロール上からでのマウスホイールイベント
+         * 
+         *  @param[in]      sender      GLControl（GLControlPolarCap... / GLControlPulseProfile）
+         *  @param[in]      e           ホイールの回転量などを含むイベントデータ
+         */
+        private void GLControl_MouseWheel(object sender, MouseWheelEventArgs e)
         {
             var control = (GLWpfControl)sender;
 
@@ -759,7 +917,7 @@ namespace WpfApp
                 {
                     zoomCamera(camera, 1.0f, 0.5f, 179.5f, -e.Delta);
 
-                    // ViewingAngle スライダーの同期
+                    // ViewingAngleスライダーの同期
                     SkyMapViewingAngleSlider.Value = (int)camera.Distance;
                 }
             }
@@ -769,17 +927,17 @@ namespace WpfApp
                 control == GLControlPolarCapSouthOpened ||
                 control == GLControlPolarCapSouthClosed)
             {
-                var views = _polarCapViewByButton.Values;
+                var polars = _polarCapViewByButton.Values;
 
-                foreach (var view in views)
+                foreach (var polar in polars)
                 {
-                    if (_objsByControl[control].TryGetValue(_objsByControl[view].Camera, out var camera))
+                    if (_objsByControl[control].TryGetValue(_objsByControl[polar].Camera, out var camera))
                     {
-                        if (view == GLControlPolarCapNorthOpened || view == GLControlPolarCapNorthClosed)
+                        if (polar == GLControlPolarCapNorthOpened || polar == GLControlPolarCapNorthClosed)
                         {
                             zoomCamera(camera, -0.0001f, 0.0025f, 0.005f, e.Delta);
                         }
-                        else if (view == GLControlPolarCapSouthOpened || view == GLControlPolarCapSouthClosed)
+                        else if (polar == GLControlPolarCapSouthOpened || polar == GLControlPolarCapSouthClosed)
                         {
                             zoomCamera(camera, 0.0001f, -0.0025f, -0.005f, e.Delta);
                         }
@@ -789,6 +947,14 @@ namespace WpfApp
         }
 
 
+        /** @brief カメラのズームイン/アウト
+         * 
+         *  @param[in]      camera      対象のカメラオブジェクト
+         *  @param[in]      zoom        ズーム量
+         *  @param[in]      min         カメラと被写体との最小距離
+         *  @param[in]      max         カメラと被写体との最大距離
+         *  @param[in]      delta       ズーム方向（+/-）
+         */
         private void zoomCamera(Camera camera, float zoom, float min, float max, float delta)
         {
             // スクロール方向によって距離を増減
@@ -815,8 +981,14 @@ namespace WpfApp
                 camera.Distance = max;
             }
         }
+        #endregion
 
-
+        #region スライダーイベント
+        /** @brief スライダーの値変更イベント
+         * 
+         *  @param[in]      sender      スライダー
+         *  @param[in]      e           変更前後の値などを含むイベントデータ
+         */
         private void ArrowSlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
             var slider = (Slider)sender;
@@ -859,7 +1031,7 @@ namespace WpfApp
                 {
                     slider.Value = _phase = (int)e.NewValue;
 
-                    // 磁力線の Phase を同期
+                    // 磁力線のPhaseを同期
                     Object obj = _objsByControl[GLControlMagneticLine];
 
                     if (obj.TryGetValue(obj.Camera, out var camera))
@@ -872,6 +1044,10 @@ namespace WpfApp
         }
 
 
+        /** @brief スカイマップのガイドライン更新
+         * 
+         *  @param[in]      sender      スライダー
+         */
         private void updateSkyMapGuideLine(Slider slider)
         {
             double min = slider.Minimum;
@@ -900,6 +1076,11 @@ namespace WpfApp
         }
 
 
+        /** @brief スライダーのドラッグ操作完了イベント
+         * 
+         *  @param[in]      sender      スライダーつまみ
+         *  @param[in]      e           ドラッグ操作結果を含むイベントデータ
+         */
         private void Thumb_DragCompleted(object sender, DragCompletedEventArgs e)
         {
             var thumb = sender as Thumb;
@@ -943,6 +1124,12 @@ namespace WpfApp
         }
 
 
+        /** @brief 子から親要素のスライダーを探索
+         * 
+         *  @param[in]      child       スライダーの子要素
+         *  
+         *  @return         親要素のスライダー
+         */
         private Slider? findParentSlider(DependencyObject? child)
         {
             while (child != null && !(child is Slider))
@@ -951,24 +1138,35 @@ namespace WpfApp
             }
             return child as Slider;
         }
+        #endregion
 
-
+        #region ボタンのマウスイベント
+        /** @brief PolarCap の矢印ボタンクリックイベント
+         * 
+         *  @param[in]      sender      PolarCap...Button
+         *  @param[in]      e           子から親要素へ伝わるルーティングイベント
+         */
         private void PolarCapArrowButton_Click(object sender, RoutedEventArgs e)
         {
-            if (_selectedButton != null)
+            if (_selectedPolarCapButton != null)
             {
-                _selectedButton.Background = Brushes.Gray;
-                _polarCapViewByButton[_selectedButton].Visibility = Visibility.Hidden;
+                _selectedPolarCapButton.Background = Brushes.Gray;
+                _polarCapViewByButton[_selectedPolarCapButton].Visibility = Visibility.Hidden;
             }
 
             var clicked = (Button)sender;
             clicked.Background = RED_BRUSH;
             _polarCapViewByButton[clicked].Visibility = Visibility.Visible;
 
-            _selectedButton = clicked;
+            _selectedPolarCapButton = clicked;
         }
 
 
+        /** @brief PolarCap の矢印ボタン上のマウス侵入イベント
+         * 
+         *  @param[in]      sender      PolarCap...Button
+         *  @param[in]      e           子から親要素へ伝わるルーティングイベント
+         */
         private void PolarCapArrowButton_MouseEnter(object sender, RoutedEventArgs e)
         {
             var overed = (Button)sender;
@@ -980,6 +1178,11 @@ namespace WpfApp
         }
 
 
+        /** @brief PolarCap の矢印ボタン上からのマウス離脱イベント
+         * 
+         *  @param[in]      sender      PolarCap...Button
+         *  @param[in]      e           子から親要素へ伝わるルーティングイベント
+         */
         private void PolarCapArrowButton_MouseLeave(object sender, RoutedEventArgs e)
         {
             var overed = (Button)sender;
@@ -989,16 +1192,38 @@ namespace WpfApp
                 overed.Background = Brushes.Gray;
             }
         }
+        #endregion
+        #endregion
     }
 
-
+    #region クラス
+    #region Camera
+    /** @class Camera
+     * 
+     *  @brief カメラオブジェクトを管理
+     */
     class Camera
     {
-        public float Yaw { get; set; }      // 水平方向回転角
-        public float Pitch { get; set; }    // 垂直方向回転角
-        public float Distance { get; set; } // 注視点からの距離
-        public Vector3 Target { get; set; } // 注視点
+        /** @brief 水平方向回転角 */
+        public float Yaw { get; set; }
 
+        /** @brief 垂直方向回転角 */
+        public float Pitch { get; set; }
+
+        /** @brief 注視点からの距離 */
+        public float Distance { get; set; }
+
+        /** @brief 注視点 */
+        public Vector3 Target { get; set; }
+
+
+        /** @brief Cameraのコンストラクタ
+         * 
+         *  @param[in]      yaw         水平方向回転角
+         *  @param[in]      pitch       垂直方向回転角
+         *  @param[in]      distance    注視点からの距離
+         *  @param[in]      target      注視点
+         */
         public Camera(float yaw, float pitch, float distance, Vector3 target)
         {
             Yaw = yaw;
@@ -1007,9 +1232,9 @@ namespace WpfApp
             Target = target;
         }
 
+        /** @brief 球面座標からカメラ位置を算出 */
         public Matrix4 GetViewMatrix()
         {
-            // 球面座標からカメラ位置を算出
             Vector3 cameraPos = new Vector3(
                 Target.X + Distance * (float)(Math.Cos(MathHelper.DegreesToRadians(Pitch)) * Math.Cos(MathHelper.DegreesToRadians(Yaw))),
                 Target.Y + Distance * (float)(Math.Sin(MathHelper.DegreesToRadians(Pitch))),
@@ -1019,23 +1244,55 @@ namespace WpfApp
             return Matrix4.LookAt(cameraPos, Target, Vector3.UnitY);
         }
     }
+    #endregion
 
-
+    #region Object
+    /** @class Object
+     * 
+     *  @brief 描画対象を管理
+     */
     class Object
     {
-        public float[]? PulsarVertices { get; set; }    // パルサーの頂点
-        public int PulsarVerticesCount { get; set; }    // パルサーの頂点数
-        public int PulsarVao { get; set; }              // パルサーの VAO
-        public int PrimitiveVao { get; set; }           // プリミティブの VAO
-        public int PrimitiveVerticesCount { get; set; } // プリミティブの頂点数
-        public Camera Camera { get; set; }              // カメラ
-        public Matrix4 Projection { get; set; }         // 投影行列
+        /** @brief パルサーの頂点 */
+        public float[]? PulsarVertices { get; set; }
 
+        /** @brief パルサーの頂点数 */
+        public int PulsarVerticesCount { get; set; }
+
+        /** @brief パルサーのVAO */
+        public int PulsarVao { get; set; }
+
+        /** @brief プリミティブのVAO */
+        public int PrimitiveVao { get; set; }
+
+        /** @brief プリミティブの頂点数 */
+        public int PrimitiveVerticesCount { get; set; }
+
+        /** @brief カメラオブジェクト */
+        public Camera Camera { get; set; }
+
+        /** @brief 投影行列 */
+        public Matrix4 Projection { get; set; }
+
+
+        /** @brief Objectのコンストラクタ
+         * 
+         *  @param[in]      camera      カメラオブジェクト
+         */
         public Object(Camera camera)
         {
             Camera = camera;
         }
 
+        /** @brief 入力オブジェクトからの値の取得
+         * 
+         *  @tparam         TObject     対象のオブジェクト型
+         *  @param[in]      obj         入力オブジェクト
+         *  @param[out]     value       出力値
+         *  
+         *  @return         true:   objがnullでなはい
+         *                  false:  objがnullである
+         */
         public bool TryGetValue<TObject>(
             TObject obj,
             out TObject value)
@@ -1052,4 +1309,6 @@ namespace WpfApp
             }
         }
     }
+    #endregion
+    #endregion
 }
