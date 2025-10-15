@@ -7,12 +7,74 @@
 #endif
 
 extern "C" {
-    CALCLIB_API void SetInclinationAngle(int degree);
-    CALCLIB_API int GetMagneticLine(float* buffer);
-    CALCLIB_API int GetPolarCapNorthOpened(float* buffer);
-    CALCLIB_API int GetPolarCapNorthClosed(float* buffer);
-    CALCLIB_API int GetPolarCapSouthOpened(float* buffer);
-    CALCLIB_API int GetPolarCapSouthClosed(float* buffer);
-    CALCLIB_API int GetSkyMap(float* buffer);
-    CALCLIB_API int GetPulseProfile(float* buffer, bool normalize);
+
+    /** @brief InclinationAngleの設定
+     *
+     *  @param[in]      degree          パルサーの回転軸と磁化軸のなす角 [degree]
+     */
+    CALCLIB_API void setInclinationAngle(int degree);
+
+
+    /** @brief 磁力線の頂点を取得
+     *
+     *  @param[in]      buffer          値を格納するfloat配列
+     * 
+     *  @return         格納するデータ数
+     */
+    CALCLIB_API int getMagneticLine(float* buffer);
+
+
+    /** @brief ポーラーキャップ北極側の開磁力線の頂点を取得
+     *
+     *  @param[in]      buffer          値を格納するfloat配列
+     *
+     *  @return         格納するデータ数
+     */
+    CALCLIB_API int getPolarCapNorthOpened(float* buffer);
+
+
+    /** @brief ポーラーキャップ北極側の閉磁力線の頂点を取得
+     *
+     *  @param[in]      buffer          値を格納するfloat配列
+     *
+     *  @return         格納するデータ数
+     */
+    CALCLIB_API int getPolarCapNorthClosed(float* buffer);
+
+
+    /** @brief ポーラーキャップ南極側の開磁力線の頂点を取得
+     *
+     *  @param[in]      buffer          値を格納するfloat配列
+     *
+     *  @return         格納するデータ数
+     */
+    CALCLIB_API int getPolarCapSouthOpened(float* buffer);
+
+
+    /** @brief ポーラーキャップ南極側の閉磁力線の頂点を取得
+     *
+     *  @param[in]      buffer          値を格納するfloat配列
+     *
+     *  @return         格納するデータ数
+     */
+    CALCLIB_API int getPolarCapSouthClosed(float* buffer);
+
+
+    /** @brief スカイマップの頂点を取得
+     *
+     *  @param[in]      buffer          値を格納するfloat配列
+     *
+     *  @return         格納するデータ数
+     */
+    CALCLIB_API int getSkyMap(float* buffer);
+
+
+    /** @brief パルスプロファイルの頂点を取得
+     *
+     *  @param[in]      buffer          値を格納するfloat配列
+     *  @param[in]      normalize       正規化の有無
+     *
+     *  @return         格納するデータ数
+     */
+    CALCLIB_API int getPulseProfile(float* buffer, bool normalize);
 }

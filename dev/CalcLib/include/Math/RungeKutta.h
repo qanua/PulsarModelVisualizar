@@ -26,12 +26,5 @@ inline void RungeKutta( Vector3Dd& f, double& t, double dt, Vector3Dd& df, std::
 	eqn( t + dt, g, df );
 	f += DT6 * ( df1 + 2.0 * ( df2 + df3 ) + df );
 
-	//eqn( t + DT2, g, df3 );
-	//g = f + dt * df3;
-	//df3 += df2;
-
-	//eqn( t + dt, g, df2 );
-	//f += DT6 * ( df1 + df2 + ( 2.0 * df3 ) );
-
 	t += dt;
 }

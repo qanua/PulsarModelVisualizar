@@ -16,28 +16,28 @@ namespace WpfApp
     {
         #region DllImport
         [DllImport("CalcLib.dll")]
-        private static extern void SetInclinationAngle([Out] int degree);
+        private static extern void setInclinationAngle([Out] int degree);
 
         [DllImport("CalcLib.dll")]
-        private static extern int GetMagneticLine([Out] float[]? buffer);
+        private static extern int getMagneticLine([Out] float[]? buffer);
 
         [DllImport("CalcLib.dll")]
-        private static extern int GetPolarCapNorthOpened([Out] float[]? buffer);
+        private static extern int getPolarCapNorthOpened([Out] float[]? buffer);
 
         [DllImport("CalcLib.dll")]
-        private static extern int GetPolarCapNorthClosed([Out] float[]? buffer);
+        private static extern int getPolarCapNorthClosed([Out] float[]? buffer);
 
         [DllImport("CalcLib.dll")]
-        private static extern int GetPolarCapSouthOpened([Out] float[]? buffer);
+        private static extern int getPolarCapSouthOpened([Out] float[]? buffer);
 
         [DllImport("CalcLib.dll")]
-        private static extern int GetPolarCapSouthClosed([Out] float[]? buffer);
+        private static extern int getPolarCapSouthClosed([Out] float[]? buffer);
 
         [DllImport("CalcLib.dll")]
-        private static extern int GetSkyMap([Out] float[]? buffer);
+        private static extern int getSkyMap([Out] float[]? buffer);
 
         [DllImport("CalcLib.dll")]
-        private static extern int GetPulseProfile([Out] float[]? buffer, bool normalize);
+        private static extern int getPulseProfile([Out] float[]? buffer, bool normalize);
         #endregion
 
 
@@ -49,15 +49,15 @@ namespace WpfApp
          */
         private Color4 _vertexColor = Color4.White;
 
-        /** @brief Inclination Angle
+        /** @brief InclinationAngle
          * 
-         *  @details        パルサーの回転軸と磁化軸のなす角
+         *  @details        パルサーの回転軸と磁化軸のなす角 [度]
          */
         private int _inclinationAngle = 0;
 
-        /** @brief Viewing Angle
+        /** @brief ViewingAngle
          * 
-         *  @details        パルサーの回転軸と視線方向のなす角
+         *  @details        パルサーの回転軸と視線方向のなす角 [度]
          */
         private int _viewingAngle = 90;
 
@@ -343,44 +343,44 @@ namespace WpfApp
             if (control == GLControlMagneticLine)
             {
                 // 磁力線
-                vertices = new float[GetMagneticLine(null)];
-                GetMagneticLine(vertices);
+                vertices = new float[getMagneticLine(null)];
+                getMagneticLine(vertices);
             }
             else if (control == GLControlPolarCapNorthOpened)
             {
                 // ポーラーキャップNOP
-                vertices = new float[GetPolarCapNorthOpened(null)];
-                GetPolarCapNorthOpened(vertices);
+                vertices = new float[getPolarCapNorthOpened(null)];
+                getPolarCapNorthOpened(vertices);
             }
             else if (control == GLControlPolarCapNorthClosed)
             {
                 // ポーラーキャップNCL
-                vertices = new float[GetPolarCapNorthClosed(null)];
-                GetPolarCapNorthClosed(vertices);
+                vertices = new float[getPolarCapNorthClosed(null)];
+                getPolarCapNorthClosed(vertices);
             }
             else if (control == GLControlPolarCapSouthOpened)
             {
                 // ポーラーキャップSOP
-                vertices = new float[GetPolarCapSouthOpened(null)];
-                GetPolarCapSouthOpened(vertices);
+                vertices = new float[getPolarCapSouthOpened(null)];
+                getPolarCapSouthOpened(vertices);
             }
             else if (control == GLControlPolarCapSouthClosed)
             {
                 // ポーラーキャップSCL
-                vertices = new float[GetPolarCapSouthClosed(null)];
-                GetPolarCapSouthClosed(vertices);
+                vertices = new float[getPolarCapSouthClosed(null)];
+                getPolarCapSouthClosed(vertices);
             }
             else if (control == GLControlSkyMap)
             {
                 // スカイマップ
-                vertices = new float[GetSkyMap(null)];
-                GetSkyMap(vertices);
+                vertices = new float[getSkyMap(null)];
+                getSkyMap(vertices);
             }
             else if (control == GLControlPulseProfile)
             {
                 // パルスプロファイル
-                float[] vertices2d = new float[GetPulseProfile(null, false)];
-                GetPulseProfile(vertices2d, true);
+                float[] vertices2d = new float[getPulseProfile(null, false)];
+                getPulseProfile(vertices2d, true);
 
                 int count = (int)(vertices2d.Length * 0.5);
                 vertices = new float[count * 3];
@@ -659,7 +659,7 @@ namespace WpfApp
             if (slider == MagneticLineSlider)
             {
                 _inclinationAngle = (int)MagneticLineSlider.Value;
-                SetInclinationAngle(_inclinationAngle);
+                setInclinationAngle(_inclinationAngle);
             }
             else if (slider == SkyMapViewingAngleSlider)
             {
@@ -1095,7 +1095,7 @@ namespace WpfApp
                     // 磁力線のスライダーを無効化
                     thumb.IsHitTestVisible = false;
 
-                    SetInclinationAngle(_inclinationAngle);
+                    setInclinationAngle(_inclinationAngle);
 
                     // ポーラーキャップのカメラ位置を変更
                     foreach (var control in _objsByControl.Keys)

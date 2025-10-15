@@ -1,4 +1,4 @@
-﻿// dllmain.cpp : DLL アプリケーションのエントリ ポイントを定義します。
+﻿// DLL アプリケーションのエントリ ポイントを定義
 #include "pch.h"
 #include "CalcLib.h"
 #include "CalcManager.h"
@@ -6,10 +6,11 @@
 #include <vector>
 #include <iostream>
 
-BOOL APIENTRY DllMain( HMODULE hModule,
-                       DWORD  ul_reason_for_call,
-                       LPVOID lpReserved
-                     )
+
+BOOL APIENTRY DllMain(HMODULE hModule,
+    DWORD  ul_reason_for_call,
+    LPVOID lpReserved
+)
 {
     switch (ul_reason_for_call)
     {
@@ -22,51 +23,59 @@ BOOL APIENTRY DllMain( HMODULE hModule,
     return TRUE;
 }
 
-void SetInclinationAngle(int degree)
+
+void setInclinationAngle(int degree)
 {
-    ModelGenerator::CalcManager::GetInstance()
-        .SetInclinationAngle(degree);
+    CalcLib::CalcManager::getInstance()
+        .setInclinationAngle(degree);
 }
 
-int GetMagneticLine(float* buffer)
+
+int getMagneticLine(float* buffer)
 {
-    return ModelGenerator::CalcManager::GetInstance()
-        .GetMagneticLine(buffer);
+    return CalcLib::CalcManager::getInstance()
+        .getMagneticLine(buffer);
 }
 
-int GetPolarCapNorthOpened(float* buffer)
+
+int getPolarCapNorthOpened(float* buffer)
 {
-    return ModelGenerator::CalcManager::GetInstance()
-        .GetPolarCapNorthOpened(buffer);
+    return CalcLib::CalcManager::getInstance()
+        .getPolarCapNorthOpened(buffer);
 }
 
-int GetPolarCapNorthClosed(float* buffer)
+
+int getPolarCapNorthClosed(float* buffer)
 {
-    return ModelGenerator::CalcManager::GetInstance()
-        .GetPolarCapNorthClosed(buffer);
+    return CalcLib::CalcManager::getInstance()
+        .getPolarCapNorthClosed(buffer);
 }
 
-int GetPolarCapSouthOpened(float* buffer)
+
+int getPolarCapSouthOpened(float* buffer)
 {
-    return ModelGenerator::CalcManager::GetInstance()
-        .GetPolarCapSouthOpened(buffer);
+    return CalcLib::CalcManager::getInstance()
+        .getPolarCapSouthOpened(buffer);
 }
 
-int GetPolarCapSouthClosed(float* buffer)
+
+int getPolarCapSouthClosed(float* buffer)
 {
-    return ModelGenerator::CalcManager::GetInstance()
-        .GetPolarCapSouthClosed(buffer);
+    return CalcLib::CalcManager::getInstance()
+        .getPolarCapSouthClosed(buffer);
 }
 
-int GetSkyMap(float* buffer)
+
+int getSkyMap(float* buffer)
 {
-    return ModelGenerator::CalcManager::GetInstance()
-        .GetSkyMap(buffer);
+    return CalcLib::CalcManager::getInstance()
+        .getSkyMap(buffer);
 }
 
-int GetPulseProfile(float* buffer, bool normalize)
+
+int getPulseProfile(float* buffer, bool normalize)
 {
-    return ModelGenerator::CalcManager::GetInstance()
-        .GetPulseProfile(buffer, normalize);
+    return CalcLib::CalcManager::getInstance()
+        .getPulseProfile(buffer, normalize);
 }
 

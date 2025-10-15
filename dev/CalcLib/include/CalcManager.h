@@ -1,87 +1,131 @@
 #pragma once
 
 #include "Data/Pulsar.h"
-#include "PulseCalculator.h"
-#include "Scene/Scene.h"
-#include "Primitive/Shape.h"
+#include "Calculator.h"
 #include "Primitive/Vertex.h"
 #include "Math/Vector3D.h"
 #include "Math/Vector2D.h"
 
-namespace ModelGenerator {
 
-	/// <summary>
-	/// CalcManager の概要
-	/// </summary>
+namespace CalcLib {
+
+	/** @class CalcManager
+	 *
+	 *  @brief 計算を管理
+	 */
 	class CalcManager {
 
-#pragma region メンバ変数
-	private:
-		Pulsar* m_pPulsar;							// パルサー
-		PulseCalculator* m_pPulseCalculator;		// パルス計算機
-		CRITICAL_SECTION* m_pCriticalSection;		// クリティカルセクション
-
-		//Scene* m_pPulsarModel;						// パルサーモデル
-		//Scene* m_pPolarCapNorthBegin;				// ポーラーキャップ北始点
-		//Scene* m_pPolarCapNorthEnd;					// ポーラーキャップ北終点
-		//Scene* m_pPolarCapSouthBegin;				// ポーラーキャップ南始点
-		//Scene* m_pPolarCapSouthEnd;					// ポーラーキャップ南終点
-		//Scene* m_pSkyMap;							// スカイマップ
-		//Scene* m_pPulseProfile;						// パルス波形
-#pragma endregion
-
-
-#pragma region 定数
-		const double INIT_INCLINATION_ANGLE = 57.0;	// 磁化軸の傾き   [degree]
-		const double INIT_VIEWING_ANGLE = 57.0;		// 視線方向の傾き [degree]
-		const int INIT_MAGNETIC_LINE_COUNT = 60;	// 磁力線の本数
-		const double PULSE_DISPLAY_DEPTH = 1.0;		// パルス表示間隔
-#pragma endregion
-
-
-#pragma region 初期化 / 終了処理
-	private:
+	public:
 		/** @brief コンストラクタ */
 		CalcManager();
 
-		// コピー禁止
-		CalcManager(const CalcManager&) = delete;
-		CalcManager& operator=(const CalcManager&) = delete;
 
-	protected:
 		/** @brief デストラクタ */
 		~CalcManager();
 
-	public:
-		/** @brief インスタンスの取得 */
-		static CalcManager& GetInstance();
-#pragma endregion
+
+		/** @brief コピーの禁止 */
+		CalcManager(const CalcManager&) = delete;
+		CalcManager& operator=(const CalcManager&) = delete;
+
+
+		/** @brief インスタンスの取得（シングルトン）
+		 *
+		 *  @return			CalcManagerのインスタンス
+		 */
+		static CalcManager& getInstance();
+
+
+		/** @brief InclinationAngleの設定
+		 *
+		 *  @param[in]      degree		パルサーの回転軸と磁化軸のなす角 [度]
+		 */
+		void setInclinationAngle(int degree);
+
+
+		/** @brief 磁力線の頂点を取得
+		 *
+		 *  @param[in]      buffer      値を格納するfloat配列
+		 *
+		 *  @return         格納するデータ数
+		 */
+		int getMagneticLine(float* buffer);
+
+
+		/** @brief ポーラーキャップ北極側の開磁力線の頂点を取得
+		 *
+		 *  @param[in]      buffer      値を格納するfloat配列
+		 *
+		 *  @return         格納するデータ数
+		 */
+		int getPolarCapNorthOpened(float* buffer);
+
+
+		/** @brief ポーラーキャップ北極側の閉磁力線の頂点を取得
+		 *
+		 *  @param[in]      buffer      値を格納するfloat配列
+		 *
+		 *  @return         格納するデータ数
+		 */
+		int getPolarCapNorthClosed(float* buffer);
+
+
+		/** @brief ポーラーキャップ南極側の開磁力線の頂点を取得
+		 *
+		 *  @param[in]      buffer      値を格納するfloat配列
+		 *
+		 *  @return         格納するデータ数
+		 */
+		int getPolarCapSouthOpened(float* buffer);
+
+
+		/** @brief ポーラーキャップ南極側の閉磁力線の頂点を取得
+		 *
+		 *  @param[in]      buffer      値を格納するfloat配列
+		 *
+		 *  @return         格納するデータ数
+		 */
+		int getPolarCapSouthClosed(float* buffer);
+
+
+		/** @brief スカイマップの頂点を取得
+		 *
+		 *  @param[in]      buffer      値を格納するfloat配列
+		 *
+		 *  @return         格納するデータ数
+		 */
+		int getSkyMap(float* buffer);
+
+
+		/** @brief パルスプロファイルの頂点を取得
+		 *
+		 *  @param[in]      buffer      値を格納するfloat配列
+		 *  @param[in]      normalize   正規化の有無
+		 *
+		 *  @return         格納するデータ数
+		 */
+		int getPulseProfile(float* buffer, bool normalize);
 
 
 	private:
-		// 設定・更新
-		void SetupPulsar();
+		/** @brief パルサー情報 */
+		Pulsar* p_pulsar_;
 
-	private:
-		void CreateScene();
-		void CreatePolarCap();
-		void CreateSkyMap();
-		void CreatePulse();
+		/** @brief クリティカルセクション */
+		CRITICAL_SECTION* p_critical_section_;
 
 
-	public:
-		void SetInclinationAngle(int degree);
-		int GetMagneticLine(float* buffer);
-		int GetPolarCapNorthOpened(float* buffer);
-		int GetPolarCapNorthClosed(float* buffer);
-		int GetPolarCapSouthOpened(float* buffer);
-		int GetPolarCapSouthClosed(float* buffer);
+		/** @brief パルサーモデルの計算 */
+		void calculatePulsarModel();
 
-	private:
-		int GetVertices3Dd(float* buffer, std::vector<Vector3Dd>& vertices);
 
-	public:
-		int GetSkyMap(float* buffer);
-		int GetPulseProfile(float* buffer, bool normalize);
+		/** @brief 頂点の3次元座標を配列で取得
+		 *
+		 *  @param[in]      vertices	3次元座標の可変長配列
+		 *  @param[in/out]	buffer      値を格納するfloat配列
+		 *
+		 *  @return         頂点数
+		 */
+		int getVertices3Dd(std::vector<Vector3Dd>& vertices, float* buffer);
 	};
 }

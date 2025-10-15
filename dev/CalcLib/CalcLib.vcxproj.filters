@@ -60,10 +60,10 @@
     <ClInclude Include="include\Primitive\Vertex.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
-    <ClInclude Include="include\PulseCalculator.h">
+    <ClInclude Include="include\CalcManager.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
-    <ClInclude Include="include\CalcManager.h">
+    <ClInclude Include="include\Calculator.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
   </ItemGroup>
@@ -77,7 +77,7 @@
     <ClCompile Include="src\CalcManager.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
-    <ClCompile Include="src\PulseCalculator.cpp">
+    <ClCompile Include="src\Calculator.cpp">
       <Filter>ソース ファイル</Filter>
     </ClCompile>
   </ItemGroup>
