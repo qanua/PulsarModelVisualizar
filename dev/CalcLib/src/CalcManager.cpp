@@ -42,7 +42,7 @@ namespace CalcLib {
 
 	void CalcManager::calculatePulsarModel()
 	{
-		static Calculator calclator;
+		static ModelCalculator calclator;
 		calclator.GetResult(*p_pulsar_);
 	}
 

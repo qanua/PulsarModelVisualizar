@@ -1,7 +1,7 @@
 #pragma once
 
 #include "pch.h"
-#include "Calculator.h"
+#include "ModelCalculator.h"
 #include "Math/RungeKutta.h"
 
 #include <iostream>
@@ -10,21 +10,21 @@
 
 namespace CalcLib {
 
-	Calculator::Calculator()
+	ModelCalculator::ModelCalculator()
 	{
 		// クリティカルセクションの初期化
 		::InitializeCriticalSection(&critical_section_);
 	}
 
 
-	Calculator::~Calculator()
+	ModelCalculator::~ModelCalculator()
 	{
 		// クリティカルセクションの破棄
 		::DeleteCriticalSection(&critical_section_);
 	}
 
 
-	void Calculator::GetResult(Pulsar& pulsar)
+	void ModelCalculator::GetResult(Pulsar& pulsar)
 	{
 		// パルサー情報のリセット
 		pulsar.m_vecMagneticLine.clear();
@@ -39,10 +39,11 @@ namespace CalcLib {
 	}
 
 
-	void Calculator::calculatePulsarModel(Pulsar& pulsar)
+	void ModelCalculator::calculatePulsarModel(Pulsar& pulsar)
 	{
 		const int mag_line_count(pulsar.m_MagneticLineCount);
 		const double dphi(360.0 / mag_line_count);
+		const int polarcap_count = (int)PolarCapDirection::NORTH_AND_SOUTH;
 
 		// 方位角方向に探索
 		for (int i = 0; i < mag_line_count; i++) {
@@ -50,7 +51,7 @@ namespace CalcLib {
 			CalculationAssets assets(dphi * i * RADIAN, 0, 0);
 
 			// 南北から探索
-			for (size_t j = 0; j < (int)PolarCapDirection::NORTH_AND_SOUTH; j++) {
+			for (size_t j = 0; j < polarcap_count; j++) {
 
 				// 南極側は180度を加算する
 				assets.inclination_angle_ = (pulsar.m_InclinationAngle + 180.0 * j) * RADIAN;
@@ -122,7 +123,7 @@ namespace CalcLib {
 	}
 
 
-	bool Calculator::findLCFL(double open_angle, double close_angle, CalculationAssets& assets) const
+	bool ModelCalculator::findLCFL(double open_angle, double close_angle, CalculationAssets& assets) const
 	{
 		bool result = false;
 
@@ -144,7 +145,7 @@ namespace CalcLib {
 	}
 
 
-	void Calculator::getMagneticLineState(double polar_angle, CalculationAssets& assets) const
+	void ModelCalculator::getMagneticLineState(double polar_angle, CalculationAssets& assets) const
 	{
 		getCartesianPosition(
 			assets.azimuthal_angle_,
@@ -180,7 +181,7 @@ namespace CalcLib {
 	}
 
 
-	void Calculator::getLCFL(double close_angle, CalculationAssets& assets) const
+	void ModelCalculator::getLCFL(double close_angle, CalculationAssets& assets) const
 	{
 		getCartesianPosition(
 			assets.azimuthal_angle_,
@@ -214,7 +215,7 @@ namespace CalcLib {
 	}
 
 
-	void Calculator::getPulse(double polar_angle, CalculationAssets& assets) const
+	void ModelCalculator::getPulse(double polar_angle, CalculationAssets& assets) const
 	{
 		getCartesianPosition(
 			assets.azimuthal_angle_,
@@ -279,7 +280,7 @@ namespace CalcLib {
 	}
 
 
-	void Calculator::getSkyMap(double polar_angle, CalculationAssets& assets) const
+	void ModelCalculator::getSkyMap(double polar_angle, CalculationAssets& assets) const
 	{
 		getCartesianPosition(
 			assets.azimuthal_angle_,
@@ -344,7 +345,7 @@ namespace CalcLib {
 	}
 
 
-	void Calculator::calculateMagneticField(double /*t*/, Vector3Dd v, Vector3Dd& bv) const
+	void ModelCalculator::calculateMagneticField(double /*t*/, Vector3Dd v, Vector3Dd& bv) const
 	{
 		const double r(v.Length());
 
@@ -366,7 +367,7 @@ namespace CalcLib {
 	}
 
 
-	void Calculator::calculatePulse(const Vector3Dd& pos, const Vector3Dd& pre_Bv, const Vector3Dd& cur_Bv, CalculationAssets& assets) const
+	void ModelCalculator::calculatePulse(const Vector3Dd& pos, const Vector3Dd& pre_Bv, const Vector3Dd& cur_Bv, CalculationAssets& assets) const
 	{
 		// スカイマップの算出
 		SkyMap skymap;
@@ -398,7 +399,7 @@ namespace CalcLib {
 	}
 
 
-	void Calculator::calculateSkyMap(const Vector3Dd& pos, const Vector3Dd& Bv, std::vector<Vector2Dd>& vec_skymap) const
+	void ModelCalculator::calculateSkyMap(const Vector3Dd& pos, const Vector3Dd& Bv, std::vector<Vector2Dd>& vec_skymap) const
 	{
 		const double Vc(std::hypot(pos.x, pos.y));
 		const double Bphi(Bv.x * (-pos.y) + Bv.y * pos.x);
@@ -418,7 +419,7 @@ namespace CalcLib {
 	}
 
 
-	void Calculator::getCartesianPosition(double azimuth, double polar, double inclination, Vector3Dd& pos) const
+	void ModelCalculator::getCartesianPosition(double azimuth, double polar, double inclination, Vector3Dd& pos) const
 	{
 		// 極座標の取得
 		Vector3Dd ppos;
@@ -431,7 +432,7 @@ namespace CalcLib {
 	}
 
 
-	void Calculator::getPolarPosition(double azimuth, double polar, Vector3Dd& pos) const
+	void ModelCalculator::getPolarPosition(double azimuth, double polar, Vector3Dd& pos) const
 	{
 		// 磁化軸を中心とした極座標
 		pos.x = STAR_RADIUS * sin(polar) * cos(azimuth);

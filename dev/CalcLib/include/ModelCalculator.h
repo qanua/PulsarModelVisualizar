@@ -1,9 +1,8 @@
 #pragma once
 
-#include "Data/Pulsar.h"
+#include "PulsarAsset.h"
 #include "Math/Vector3D.h"
 #include "Math/Vector2D.h"
-#include "Math/Constants.h"
 
 #include <windows.h>
 #include <vector>
@@ -11,20 +10,20 @@
 
 namespace CalcLib {
 
-	/** @class Calculator
+	/** @class ModelCalculator
 	 *
 	 *  @brief パルサーモデルの計算
 	 */
-	class Calculator {
+	class ModelCalculator {
 
 	public:
 
 		/** @brief コンストラクタ */
-		Calculator();
+		ModelCalculator();
 
 
 		/** @brief デストラクタ */
-		~Calculator();
+		~ModelCalculator();
 
 
 		/**
@@ -91,7 +90,7 @@ namespace CalcLib {
 			/** @brief 1本のLCFL */
 			MagneticLine lcfl_;
 
-			/** @brief 磁場の位置 */
+			/** @brief 磁場の計算地点 */
 			Vector3Dd magnetic_field_pos_;
 
 			/** @brief 1本のスカイマップ線 */
@@ -125,6 +124,18 @@ namespace CalcLib {
 
 		/** @brief 磁気モーメント */
 		Vector3Dd magnetic_moment_;
+
+		/** @brief 円周率 */
+		const double PI = 3.14159265359;
+
+		/** @brief 度→ラジアン変換 */
+		const double RADIAN = PI / 180.0;
+
+		/** @brief 中性子星の半径 */
+		const double STAR_RADIUS = 0.00209;
+
+		/** @brief 光円柱の半径 */
+		const double LIGHT_CYRINDER_RADIUS = 1.0;
 
 		/** @brief 磁力線などの長さの最大値
 		 *

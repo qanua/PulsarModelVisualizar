@@ -3,7 +3,6 @@
 #include "Data/MagneticLine.h"
 #include "Data/Pulse.h"
 #include "Data/SkyMap.h"
-#include "Math/Constants.h"
 #include "Math/Vector3D.h"
 #include "Math/Vector2D.h"
 
@@ -14,8 +13,6 @@
 struct Pulsar
 {
 public:
-	double									m_StarRadius;				// ¯‚Ì”¼Œa
-	double									m_LightCylinderRadius;		// Œõ‰~’Œ‚Ì”¼Œa
 	double									m_InclinationAngle;			// ¥‰»²‚ÌŒX‚«   [degree]
 	double									m_ViewingAngle;				// ‹ü•ûŒü‚ÌŒX‚« [degree]
 	int										m_MagneticLineCount;		// ¥—Íü‚Ì–{”
@@ -35,9 +32,7 @@ private:
 
 public:
 	/** @brief ƒRƒ“ƒXƒgƒ‰ƒNƒ^ */
-	Pulsar() :m_StarRadius(			  STAR_RADIUS )
-	,m_LightCylinderRadius( LIGHT_CYRINDER_RADIUS )
-	,	m_InclinationAngle(					  0.0 )
+	Pulsar() :m_InclinationAngle(					  0.0 )
 	,		m_ViewingAngle(					  0.0 )
 	,  m_MagneticLineCount(					    0 )
 	,	  m_MaxPhotonCount(					  0.0 )

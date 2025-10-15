@@ -1,8 +1,7 @@
 #pragma once
 
-#include "Data/Pulsar.h"
-#include "Calculator.h"
-#include "Primitive/Vertex.h"
+#include "PulsarAsset.h"
+#include "ModelCalculator.h"
 #include "Math/Vector3D.h"
 #include "Math/Vector2D.h"
 
