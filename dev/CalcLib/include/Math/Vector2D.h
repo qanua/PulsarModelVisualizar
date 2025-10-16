@@ -1,5 +1,6 @@
 #pragma once
 
+#include <cmath>
 
 /** @brief ２次元ベクトルクラス */
 template <class T>

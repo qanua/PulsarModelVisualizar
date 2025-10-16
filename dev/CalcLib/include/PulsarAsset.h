@@ -1,8 +1,6 @@
 #pragma once
 
-#include "Data/MagneticLine.h"
-#include "Data/Pulse.h"
-#include "Data/SkyMap.h"
+
 #include "Math/Vector3D.h"
 #include "Math/Vector2D.h"
 
@@ -10,221 +8,363 @@
 
 
 /** @brief パルサークラス */
-struct Pulsar
+struct PulsarAsset
 {
 public:
-	double									m_InclinationAngle;			// 磁化軸の傾き   [degree]
-	double									m_ViewingAngle;				// 視線方向の傾き [degree]
-	int										m_MagneticLineCount;		// 磁力線の本数
 
-	std::vector<MagneticLine>				m_vecMagneticLine;			// 磁力線
-	std::vector<Pulse>						m_vecPulse;					// パルス
-	std::vector<SkyMap>						m_vecSkyMap;				// スカイマップ
-	MagneticLine							m_vecPolarCapNorthBegin;	// ポーラーキャップ北始点
-	MagneticLine							m_vecPolarCapNorthEnd;		// ポーラーキャップ北終点
-	MagneticLine							m_vecPolarCapSouthBegin;	// ポーラーキャップ南始点
-	MagneticLine							m_vecPolarCapSouthEnd;		// ポーラーキャップ南終点
-
-
-private:
-	double									m_MaxPhotonCount;
-
-
-public:
-	/** @brief コンストラクタ */
-	Pulsar() :m_InclinationAngle(					  0.0 )
-	,		m_ViewingAngle(					  0.0 )
-	,  m_MagneticLineCount(					    0 )
-	,	  m_MaxPhotonCount(					  0.0 )
+	/** @class LCFL（LastClosedFieldLine）
+	 *
+	 *  @brief 光円柱に接するようにして閉じる磁力線
+	 */
+	struct LCFL
 	{
-		// 各種データ
-		 m_vecMagneticLine.reserve( m_MagneticLineCount );
-		       m_vecSkyMap.reserve( m_MagneticLineCount );
+	public:
+		/** @brief LCFLの点群（3次元 double） */
+		std::vector<Vector3Dd> vec_3dd_;
 
-		for( int i = 0; i < 180; i++ )
-		{
-			Pulse* p_pulse( new Pulse );
-			for( int j = 0; j < 360; j++ )
-			{
-				Vector2Dd pos( (double)j, 0.0 );
-				p_pulse->m_vecVertex2D.emplace_back( pos );
+
+		/** @brief コンストラクタ */
+		LCFL() {};
+
+
+		/** @brief デストラクタ */
+		~LCFL() {};
+	};
+
+
+	/** @class パルス波形
+	 *
+	 *  @brief OuterGapから放射される光子の観測結果
+	 */
+	struct Pulse
+	{
+	public:
+		/** @brief 視線方向の傾き [degree] */
+		int viewing_angle_;
+
+		/** @brief パルス波形の点群（2次元 double） */
+		std::vector<Vector2Dd> vec_2dd_;
+
+
+		/** @brief コンストラクタ */
+		Pulse() :viewing_angle_(0) {
+
+			vec_2dd_.reserve(360);
+		};
+
+
+		/** @brief デストラクタ */
+		~Pulse() {};
+	};
+
+
+	/** @class スカイマップ
+	 *
+	 *  @brief 磁力線上から放射された光子が観測される位相をマッピングしたもの
+	 * 　　　　このときの磁力線はOuterGapの外側（UpperBoundary）を採用している
+	 */
+	struct SkyMap
+	{
+	public:
+		/** @brief スカイマップの点群（2次元 double） */
+		std::vector<Vector2Dd> vec_2dd_;
+
+
+		/** @brief コンストラクタ */
+		SkyMap() {};
+
+
+		/** @brief デストラクタ */
+		~SkyMap() {};
+	};
+
+
+	/** @brief 磁化軸の傾き [degree] */
+	double inclination_angle_;
+
+	/** @brief LCFLの点群 */
+	std::vector<LCFL> vec_lcfls_;
+
+	/** @brief パルス波形の点群 */
+	std::vector<Pulse> vec_pulses_;
+
+	/** @brief スカイマップの点群 */
+	std::vector<SkyMap>	vec_skymaps_;
+
+	/** @brief ポーラーキャップ北極側の始点 */
+	LCFL vec_polarcap_n_start_;
+
+	/** @brief ポーラーキャップ南極側の終点 */
+	LCFL vec_polarcap_s_end_;
+
+	/** @brief ポーラーキャップ南極側の始点 */
+	LCFL vec_polarcap_s_start_;
+
+	/** @brief ポーラーキャップ北極側の終点 */
+	LCFL vec_polarcap_n_end_;
+
+	/** @brief 片極の磁力線の本数 */
+	const int MAGNETIC_LINE_COUNT = 60;
+
+
+	/** @brief コンストラクタ */
+	PulsarAsset() :inclination_angle_(0.0), max_photon_count_(0.0) {
+
+		// 両極の点群を格納するためのメモリ確保
+		vec_lcfls_.reserve(MAGNETIC_LINE_COUNT * 2);
+		vec_skymaps_.reserve(MAGNETIC_LINE_COUNT * 2);
+
+		// パルス波形にを初期値(0)を格納
+		for (int i = 0; i < 180; i++) {
+
+			Pulse* p_pulse(new Pulse);
+
+			for (int j = 0; j < 360; j++) {
+
+				// pos(x, y) -> x: 位相 y: 光子数(Intensity)
+				Vector2Dd pos((double)j, 0.0);
+				p_pulse->vec_2dd_.emplace_back(pos);
 			}
-			m_vecPulse.emplace_back( *p_pulse );
+			vec_pulses_.emplace_back(*p_pulse);
 		}
 	}
 
 
 	/** @brief デストラクタ */
-	~Pulsar()
-	{
-	}
+	~PulsarAsset() {}
 
 
-public:
-	/** @brief 磁力線の点群データ取得
+	/** @brief LCFLの点群を取得
 	 *
-	 *  @param[out]			vec_vec_vertex  磁力線の点群データ
+	 *  @param[out]		vec_vec_vertex		LCFLの点群
 	 */
-	void GetMagneticLineVertex( std::vector<std::vector<Vector3Dd>>& vec_vec_vertex )
+	void getLCFLVertices(std::vector<std::vector<Vector3Dd>>& vec_vec_vertex)
 	{
-		// 一時データの生成、サイズ確保
+		// 一時データ
 		std::vector<std::vector<Vector3Dd>> vec_vec_temp;
-		size_t line_count( m_vecMagneticLine.size() );
-		vec_vec_temp.reserve( line_count );
 
-		for( size_t i = 0; i < line_count; i++ )
-		{
-			// 一時データの生成、サイズ確保
+		size_t line_count(vec_lcfls_.size());
+		vec_vec_temp.reserve(line_count);
+
+		for (size_t i = 0; i < line_count; i++) {
+
+			// 一時データ
 			std::vector<Vector3Dd> vertex_temp;
-			size_t vertex_count( m_vecMagneticLine[i].m_vecVertex3D.size() );
-			vertex_temp.reserve( vertex_count );
+			size_t vertex_count(vec_lcfls_[i].vec_3dd_.size());
+			vertex_temp.reserve(vertex_count);
 
-			for( size_t j = 0; j < vertex_count; j++ )
-			{
-				// 点群データの格納
-				Vector3Dd* const p_vertex = &( m_vecMagneticLine[i].m_vecVertex3D[j] );
-				vertex_temp.emplace_back( p_vertex );
+			// 点群の集約
+			for (size_t j = 0; j < vertex_count; j++) {
+
+				Vector3Dd* const p_vertex = &(vec_lcfls_[i].vec_3dd_[j]);
+				vertex_temp.emplace_back(p_vertex);
 			}
-			vec_vec_temp.emplace_back( vertex_temp );
+
+			vec_vec_temp.emplace_back(vertex_temp);
 		}
-		vec_vec_vertex = std::move( vec_vec_temp );
+
+		// 点群の格納
+		vec_vec_vertex = std::move(vec_vec_temp);
 	}
 
 
-	/** @brief ポーラーキャップ北始点の取得 */
-	std::vector<Vector3Dd>& GetPolarCapNorthBeginVertex(){ return m_vecPolarCapNorthBegin.m_vecVertex3D; }
-
-
-	/** @brief ポーラーキャップ北終点の取得 */
-	std::vector<Vector3Dd>& GetPolarCapNorthEndVertex(){ return m_vecPolarCapNorthEnd.m_vecVertex3D; }
-
-
-	/** @brief ポーラーキャップ南始点の取得 */
-	std::vector<Vector3Dd>& GetPolarCapSouthBeginVertex(){ return m_vecPolarCapSouthBegin.m_vecVertex3D; }
-
-
-	/** @brief ポーラーキャップ南終点の取得 */
-	std::vector<Vector3Dd>& GetPolarCapSouthEndVertex(){ return m_vecPolarCapSouthEnd.m_vecVertex3D; }
-
-
-	/** @brief スカイマップの点群データ取得
+	/** @brief ポーラーキャップ北極側の始点を取得
 	 *
-	 *  @param[out]			vec_vec_vertex  スカイマップの点群データ
+	 *  @return			ポーラーキャップの点群
 	 */
-	void GetSkyMapVertex( std::vector<std::vector<Vector2Dd>>& vec_vec_vertex )
-	{
-		// 一時データの生成、サイズ確保
-		std::vector<std::vector<Vector2Dd>> vec_vec_temp;
-		size_t line_count( m_vecSkyMap.size() );
-		vec_vec_temp.reserve( line_count );
+	inline std::vector<Vector3Dd>& getPolarCapNorthStartVertices() {
 
-		for( size_t i = 0; i < line_count; i++ )
-		{
-			// 一時データの生成、サイズ確保
-			std::vector<Vector2Dd> vertex_temp;
-			size_t vertex_count( m_vecSkyMap[i].m_vecVertex2D.size() );
-			vertex_temp.reserve( vertex_count );
-
-			for( size_t j = 0; j < vertex_count; j++ )
-			{
-				// 点群データの格納
-				Vector2Dd* const p_vertex = &( m_vecSkyMap[i].m_vecVertex2D[j] );
-				vertex_temp.emplace_back( p_vertex );
-			}
-			vec_vec_temp.emplace_back( vertex_temp );
-		}
-		vec_vec_vertex = std::move( vec_vec_temp );
+		return vec_polarcap_n_start_.vec_3dd_;
 	}
 
 
-	/** @brief パルス波形の点群データ取得
+	/** @brief ポーラーキャップ南極側の終点を取得
 	 *
-	 *  @param[out]			vec_vec_vertex  パルス波形の点群データ
+	 *  @return			ポーラーキャップの点群
 	 */
-	void GetPulseVertex( std::vector<std::vector<Vector2Dd>>& vec_vec_vertex )
-	{
-		// 一時データの生成、サイズ確保
-		std::vector<std::vector<Vector2Dd>> vec_vec_temp;
-		size_t line_count( m_vecPulse.size() );
-		vec_vec_temp.reserve( line_count );
+	inline std::vector<Vector3Dd>& getPolarCapSouthEndVertices() {
 
-		for( size_t i = 0; i < line_count; i++ )
-		{
-			// 一時データの生成、サイズ確保
-			std::vector<Vector2Dd> vertex_temp;
-			size_t vertex_count( m_vecPulse[i].m_vecVertex2D.size() );
-			vertex_temp.reserve( vertex_count );
-
-			for( size_t j = 0; j < vertex_count; j++ )
-			{
-				// 点群データの格納
-				Vector2Dd* const p_vertex = &( m_vecPulse[i].m_vecVertex2D[j] );
-				vertex_temp.emplace_back( &m_vecPulse[i].m_vecVertex2D[j] );
-			}
-			vec_vec_temp.emplace_back( vertex_temp );
-		}
-		vec_vec_vertex = std::move( vec_vec_temp );
+		return vec_polarcap_s_end_.vec_3dd_;
 	}
 
 
-public:
-	/** @brief パルスの追加 */
-	void AddPulse( std::vector<Pulse> vec_pulse)
-	{
-		for( size_t i = 0; i < vec_pulse.size(); i++ )
-		{
-			Pulse add_pulse( vec_pulse[i] );
-			for( size_t j = 0; j < add_pulse.m_vecVertex2D.size(); j++ )
-			{
-				int viewing_angle( (int)add_pulse.m_ViewingAngle );
-				int			phase( (int)add_pulse.m_vecVertex2D[j].x );
+	/** @brief ポーラーキャップ北極側の終点を取得
+	 *
+	 *  @return			ポーラーキャップの点群
+	 */
+	inline std::vector<Vector3Dd>& getPolarCapNorthEndVertices() {
 
-				if( ( 0 <= phase		 ) && (			phase <= 360 ) && 
-					( 0 <= viewing_angle ) && ( viewing_angle <= 180 ) )
-				{
+		return vec_polarcap_n_end_.vec_3dd_;
+	}
+
+
+	/** @brief ポーラーキャップ南極側の始点を取得
+	 *
+	 *  @return			ポーラーキャップの点群
+	 */
+	inline std::vector<Vector3Dd>& getPolarCapSouthStartVertices() {
+
+		return vec_polarcap_s_start_.vec_3dd_;
+	}
+
+
+	/** @brief スカイマップの点群を取得
+	 *
+	 *  @param[out]		vec_vec_vertex		スカイマップの点群
+	 */
+	void getSkyMapVertex( std::vector<std::vector<Vector2Dd>>& vec_vec_vertex )
+	{
+		// 一時データ
+		std::vector<std::vector<Vector2Dd>> vec_vec_temp;
+
+		size_t line_count(vec_skymaps_.size());
+		vec_vec_temp.reserve(line_count);
+
+		for (size_t i = 0; i < line_count; i++) {
+
+			// 一時データ
+			std::vector<Vector2Dd> vertex_temp;
+
+			size_t vertex_count(vec_skymaps_[i].vec_2dd_.size());
+			vertex_temp.reserve(vertex_count);
+
+			// 点群の集約
+			for (size_t j = 0; j < vertex_count; j++) {
+
+				Vector2Dd* const p_vertex = &(vec_skymaps_[i].vec_2dd_[j]);
+				vertex_temp.emplace_back(p_vertex);
+			}
+
+			vec_vec_temp.emplace_back(vertex_temp);
+		}
+
+		// 点群の格納
+		vec_vec_vertex = std::move(vec_vec_temp);
+	}
+
+
+	/** @brief パルス波形の点群を取得
+	 *
+	 *  @param[out]		vec_vec_vertex		パルス波形の点群
+	 */
+	void getPulseVertex( std::vector<std::vector<Vector2Dd>>& vec_vec_vertex )
+	{
+		// 一時データ
+		std::vector<std::vector<Vector2Dd>> vec_vec_temp;
+
+		size_t line_count(vec_pulses_.size());
+		vec_vec_temp.reserve(line_count);
+
+		for (size_t i = 0; i < line_count; i++) {
+
+			// 一時データ
+			std::vector<Vector2Dd> vertex_temp;
+
+			size_t vertex_count(vec_pulses_[i].vec_2dd_.size());
+			vertex_temp.reserve(vertex_count);
+
+			// 点群の集約
+			for (size_t j = 0; j < vertex_count; j++) {
+
+				Vector2Dd* const p_vertex = &(vec_pulses_[i].vec_2dd_[j]);
+				vertex_temp.emplace_back(&vec_pulses_[i].vec_2dd_[j]);
+			}
+
+			vec_vec_temp.emplace_back(vertex_temp);
+		}
+
+		// 点群の格納
+		vec_vec_vertex = std::move(vec_vec_temp);
+	}
+
+
+	/** @brief パルス波形の追加
+	 *
+	 *  @param[in]		vec_pulse		追加するパルス波形
+	 */
+	void addPulse( std::vector<Pulse> vec_pulse)
+	{
+		for (size_t i = 0; i < vec_pulse.size(); i++) {
+
+			Pulse add_pulse(vec_pulse[i]);
+
+			for (size_t j = 0; j < add_pulse.vec_2dd_.size(); j++) {
+
+				int viewing_angle(add_pulse.viewing_angle_);
+				int	phase((int)add_pulse.vec_2dd_[j].x);
+
+				if ((0 <= phase) && (phase <= 360) &&
+					(0 <= viewing_angle) && (viewing_angle <= 180)) {
+
 					// 光子数の合算
-					m_vecPulse[viewing_angle].m_vecVertex2D[phase].y += add_pulse.m_vecVertex2D[j].y;
+					vec_pulses_[viewing_angle].vec_2dd_[phase].y += add_pulse.vec_2dd_[j].y;
 
-					// 最大光子数の更新（正規化に使用）
-					double count( m_vecPulse[viewing_angle].m_vecVertex2D[phase].y );
-					if( m_MaxPhotonCount < count ) m_MaxPhotonCount = count;
+					double count(vec_pulses_[viewing_angle].vec_2dd_[phase].y);
+
+					// 最大光子数の更新（正規化に使用する）
+					if (max_photon_count_ < count) {
+
+						max_photon_count_ = count;
+					}
 				}
 			}
 		}
 	}
 
 
-	/** @brief 正規化 */
-	void NormalizePulse()
+	/** @brief パルス波形の正規化 */
+	void normalizePulse()
 	{
-		if( m_MaxPhotonCount <= 0 ) return;
+		if (0 < max_photon_count_) {
 
-		// 180本のパルス波形を探索
-		for( size_t i = 0; i < m_vecPulse.size(); i++ )
-		{
-			Pulse* p_pulse( &m_vecPulse[i] );
+			size_t pulse_count = vec_pulses_.size();
 
-			// 360度の位相を走査して光子数を正規化する
-			for( size_t phase = 0; phase < p_pulse->m_vecVertex2D.size(); phase++ )
-				p_pulse->m_vecVertex2D[phase].y /= m_MaxPhotonCount * 0.1;
+			// 180本のパルス波形を探索
+			for (size_t i = 0; i < pulse_count; i++)
+			{
+				Pulse* p_pulse(&vec_pulses_[i]);
+
+				size_t phase_count = p_pulse->vec_2dd_.size();
+
+				// 360度の位相を走査して光子数を正規化する
+				for (size_t phase = 0; phase < phase_count; phase++) {
+
+					p_pulse->vec_2dd_[phase].y /= max_photon_count_ * 0.1;
+				}
+			}
+
+			// 初期化
+			max_photon_count_ = 0;
 		}
-
-		// 初期化
-		m_MaxPhotonCount = 0;
 	}
 
 
-	/** @brief 初期化 */
-	void ResetPulse()
+	/** @brief パルス波形の初期化 */
+	void resetPulse()
 	{
+		size_t pulse_count = vec_pulses_.size();
+
 		// 180本のパルス波形を探索
-		for( size_t index = 0; index < m_vecPulse.size(); index++ )
-		{
-			Pulse pulse( m_vecPulse[index] );
+		for (size_t index = 0; index < pulse_count; index++) {
+
+			Pulse pulse(vec_pulses_[index]);
+
+			size_t phase_count = pulse.vec_2dd_.size();
 
 			// 360度の位相を走査して光子数をリセットする
-			for( size_t phase = 0; phase < pulse.m_vecVertex2D.size(); phase++ )
-				pulse.m_vecVertex2D[phase].y = 0.0;
+			for (size_t phase = 0; phase < phase_count; phase++) {
+
+				pulse.vec_2dd_[phase].y = 0.0;
+			}
 		}
 	}
+
+
+private:
+
+	/** @brief パルス波形の最大光子数
+	 *
+	 *  正規化に使用する
+	 */
+	double max_photon_count_;
 };

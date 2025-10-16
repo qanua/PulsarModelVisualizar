@@ -6,16 +6,16 @@
 namespace CalcLib {
 
 	CalcManager::CalcManager()
-		: p_pulsar_(new Pulsar())
+		: p_pulsar_(new PulsarAsset())
 		, p_critical_section_(new CRITICAL_SECTION())
 	{
 		// クリティカルセクションの初期化
 		::InitializeCriticalSection(p_critical_section_);
 
 		// 初期値の設定
-		p_pulsar_->m_InclinationAngle = 57;
-		p_pulsar_->m_ViewingAngle = 90;
-		p_pulsar_->m_MagneticLineCount = 60;
+		p_pulsar_->inclination_angle_ = 57;
+		//p_pulsar_->viewing_angle_ = 90;
+		//p_pulsar_->m_MagneticLineCount = 60;
 
 		// パルサーモデルの計算
 		calculatePulsarModel();
@@ -43,13 +43,13 @@ namespace CalcLib {
 	void CalcManager::calculatePulsarModel()
 	{
 		static ModelCalculator calclator;
-		calclator.GetResult(*p_pulsar_);
+		calclator.getResult(*p_pulsar_);
 	}
 
 
 	void CalcManager::setInclinationAngle(int degree)
 	{
-		p_pulsar_->m_InclinationAngle = degree;
+		p_pulsar_->inclination_angle_ = degree;
 		calculatePulsarModel();
 	}
 
@@ -58,7 +58,7 @@ namespace CalcLib {
 	{
 		// 磁力線の頂点を取得
 		std::vector<std::vector<Vector3Dd>>* p_vec_vec_v3d(new std::vector<std::vector<Vector3Dd>>);
-		p_pulsar_->GetMagneticLineVertex(*p_vec_vec_v3d);
+		p_pulsar_->getLCFLVertices(*p_vec_vec_v3d);
 
 		// 頂点数
 		int counter(0);
@@ -84,25 +84,25 @@ namespace CalcLib {
 
 	int CalcManager::getPolarCapNorthOpened(float* buffer)
 	{
-		return getVertices3Dd(p_pulsar_->GetPolarCapNorthBeginVertex(), buffer);
-	}
-
-
-	int CalcManager::getPolarCapNorthClosed(float* buffer)
-	{
-		return getVertices3Dd(p_pulsar_->GetPolarCapNorthEndVertex(), buffer);
-	}
-
-
-	int CalcManager::getPolarCapSouthOpened(float* buffer)
-	{
-		return getVertices3Dd(p_pulsar_->GetPolarCapSouthBeginVertex(), buffer);
+		return getVertices3Dd(p_pulsar_->getPolarCapNorthStartVertices(), buffer);
 	}
 
 
 	int CalcManager::getPolarCapSouthClosed(float* buffer)
 	{
-		return getVertices3Dd(p_pulsar_->GetPolarCapSouthEndVertex(), buffer);
+		return getVertices3Dd(p_pulsar_->getPolarCapSouthEndVertices(), buffer);
+	}
+
+
+	int CalcManager::getPolarCapNorthClosed(float* buffer)
+	{
+		return getVertices3Dd(p_pulsar_->getPolarCapNorthEndVertices(), buffer);
+	}
+
+
+	int CalcManager::getPolarCapSouthOpened(float* buffer)
+	{
+		return getVertices3Dd(p_pulsar_->getPolarCapSouthStartVertices(), buffer);
 	}
 
 
@@ -130,7 +130,7 @@ namespace CalcLib {
 	{
 		// スカイマップの頂点を取得
 		std::vector<std::vector<Vector2Dd>>* p_vec_vec_v2d(new std::vector<std::vector<Vector2Dd>>);
-		p_pulsar_->GetSkyMapVertex(*p_vec_vec_v2d);
+		p_pulsar_->getSkyMapVertex(*p_vec_vec_v2d);
 
 		// 頂点数
 		int counter(0);
@@ -158,12 +158,12 @@ namespace CalcLib {
 		// 正規化
 		if (normalize)
 		{
-			p_pulsar_->NormalizePulse();
+			p_pulsar_->normalizePulse();
 		}
 
 		// パルスプロファイルの頂点を取得
 		std::vector<std::vector<Vector2Dd>>* p_vec_vec_v2d(new std::vector<std::vector<Vector2Dd>>);
-		p_pulsar_->GetPulseVertex(*p_vec_vec_v2d);
+		p_pulsar_->getPulseVertex(*p_vec_vec_v2d);
 
 		// 頂点数
 		int counter(0);

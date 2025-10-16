@@ -6,7 +6,7 @@
 
 
 /** @brief ルンゲ・クッタ法 */
-inline void RungeKutta( Vector3Dd& f, double& t, double dt, Vector3Dd& df, std::function<void( double, Vector3Dd, Vector3Dd& )> eqn )
+inline void RungeKutta(Vector3Dd& f, double& t, double dt, Vector3Dd& df, std::function<void(double, Vector3Dd, Vector3Dd&)> eqn)
 {
 	Vector3Dd df1, df2, df3;
 	Vector3Dd g;

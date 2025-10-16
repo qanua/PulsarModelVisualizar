@@ -31,10 +31,14 @@ namespace CalcLib {
 		 *
 		 *  @param[in/out]	pulsar	パルサー情報
 		 */
-		void GetResult(Pulsar& pulsar);
+		void getResult(PulsarAsset& pulsar);
 
 
 	private:
+
+		using LCFL = PulsarAsset::LCFL;
+		using Pulse = PulsarAsset::Pulse;
+		using SkyMap = PulsarAsset::SkyMap;
 
 	/** @class CalculationAssets
 	 *
@@ -88,17 +92,16 @@ namespace CalcLib {
 			MagneticLineState magnetic_line_state_;
 
 			/** @brief 1本のLCFL */
-			MagneticLine lcfl_;
+			LCFL lcfl_;
 
 			/** @brief 磁場の計算地点 */
 			Vector3Dd magnetic_field_pos_;
 
-			/** @brief 1本のスカイマップ線 */
-			SkyMap skymap_;
-
-			/** @brief 1本の磁力線に対するパルス波形 */
+			/** @brief 1本のスカイマップ線に対するパルス波形 */
 			std::vector<Pulse> vec_pulse_;
 
+			/** @brief 1本のスカイマップ線 */
+			SkyMap skymap_;
 
 			/** @brief コンストラクタ */
 			CalculationAssets(double azimuth, double polar, double inclination) {
@@ -160,7 +163,7 @@ namespace CalcLib {
 		 *
 		 *  @param[in/out]	pulsar			パルサー情報
 		 */
-		void calculatePulsarModel(Pulsar& pulsar);
+		void calculatePulsarModel(PulsarAsset& pulsar);
 
 
 		/** @brief LCFLの探索

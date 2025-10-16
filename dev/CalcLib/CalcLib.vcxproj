@@ -144,10 +144,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="include\CalcLib.h" />
-    <ClInclude Include="include\Data\MagneticLine.h" />
     <ClInclude Include="include\PulsarAsset.h" />
-    <ClInclude Include="include\Data\Pulse.h" />
-    <ClInclude Include="include\Data\SkyMap.h" />
     <ClInclude Include="include\framework.h" />
     <ClInclude Include="include\Math\RungeKutta.h" />
     <ClInclude Include="include\Math\Vector2D.h" />

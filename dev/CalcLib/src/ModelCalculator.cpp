@@ -24,24 +24,24 @@ namespace CalcLib {
 	}
 
 
-	void ModelCalculator::GetResult(Pulsar& pulsar)
+	void ModelCalculator::getResult(PulsarAsset& pulsar)
 	{
 		// パルサー情報のリセット
-		pulsar.m_vecMagneticLine.clear();
-		pulsar.m_vecSkyMap.clear();
-		pulsar.m_vecPolarCapNorthBegin.m_vecVertex3D.clear();
-		pulsar.m_vecPolarCapNorthEnd.m_vecVertex3D.clear();
-		pulsar.m_vecPolarCapSouthBegin.m_vecVertex3D.clear();
-		pulsar.m_vecPolarCapSouthEnd.m_vecVertex3D.clear();
-		pulsar.ResetPulse();
+		pulsar.vec_lcfls_.clear();
+		pulsar.vec_skymaps_.clear();
+		pulsar.vec_polarcap_n_start_.vec_3dd_.clear();
+		pulsar.vec_polarcap_s_end_.vec_3dd_.clear();
+		pulsar.vec_polarcap_s_start_.vec_3dd_.clear();
+		pulsar.vec_polarcap_n_end_.vec_3dd_.clear();
+		pulsar.resetPulse();
 
 		calculatePulsarModel(pulsar);
 	}
 
 
-	void ModelCalculator::calculatePulsarModel(Pulsar& pulsar)
+	void ModelCalculator::calculatePulsarModel(PulsarAsset& pulsar)
 	{
-		const int mag_line_count(pulsar.m_MagneticLineCount);
+		const int mag_line_count(pulsar.MAGNETIC_LINE_COUNT);
 		const double dphi(360.0 / mag_line_count);
 		const int polarcap_count = (int)PolarCapDirection::NORTH_AND_SOUTH;
 
@@ -54,7 +54,7 @@ namespace CalcLib {
 			for (size_t j = 0; j < polarcap_count; j++) {
 
 				// 南極側は180度を加算する
-				assets.inclination_angle_ = (pulsar.m_InclinationAngle + 180.0 * j) * RADIAN;
+				assets.inclination_angle_ = (pulsar.inclination_angle_ + 180.0 * j) * RADIAN;
 
 				// 磁気モーメントの格納
 				magnetic_moment_.x = sin(assets.inclination_angle_);
@@ -89,34 +89,34 @@ namespace CalcLib {
 
 					// LCFLの格納
 					getLCFL(close_angle * RADIAN, assets);
-					pulsar.m_vecMagneticLine.emplace_back(assets.lcfl_);
+					pulsar.vec_lcfls_.emplace_back(assets.lcfl_);
 
 					// ポーラーキャップの格納
 					if (j == (int)PolarCapDirection::NORTH) {
 
-						pulsar.m_vecPolarCapNorthBegin.m_vecVertex3D.emplace_back(assets.lcfl_.m_vecVertex3D.front());
-						pulsar.m_vecPolarCapSouthEnd.m_vecVertex3D.emplace_back(assets.lcfl_.m_vecVertex3D.back());
+						pulsar.vec_polarcap_n_start_.vec_3dd_.emplace_back(assets.lcfl_.vec_3dd_.front());
+						pulsar.vec_polarcap_s_end_.vec_3dd_.emplace_back(assets.lcfl_.vec_3dd_.back());
 					}
 					else if (j == (int)PolarCapDirection::SOUTH) {
 
-						pulsar.m_vecPolarCapNorthEnd.m_vecVertex3D.emplace_back(assets.lcfl_.m_vecVertex3D.back());
-						pulsar.m_vecPolarCapSouthBegin.m_vecVertex3D.emplace_back(assets.lcfl_.m_vecVertex3D.front());
+						pulsar.vec_polarcap_n_end_.vec_3dd_.emplace_back(assets.lcfl_.vec_3dd_.back());
+						pulsar.vec_polarcap_s_start_.vec_3dd_.emplace_back(assets.lcfl_.vec_3dd_.front());
 					}
 
 					// 一時保存のLCFLを削除
-					assets.lcfl_.m_vecVertex3D.clear();
+					assets.lcfl_.vec_3dd_.clear();
 
-					// パルスの格納
+					// OuterGapからのパルスを格納
 					for (int k = 0; k < OUTER_GAP_LAYER_COUNT; k++) {
 
 						close_angle -= OUTER_GAP_LAYER_THICKNESS;
 						getPulse(close_angle * RADIAN, assets);
-						pulsar.AddPulse(assets.vec_pulse_);
+						pulsar.addPulse(assets.vec_pulse_);
 					}
 
-					// LCFLのスカイマップの格納
+					// UpperBoundaryのスカイマップを格納
 					getSkyMap(close_angle * RADIAN, assets);
-					pulsar.m_vecSkyMap.emplace_back(assets.skymap_);
+					pulsar.vec_skymaps_.emplace_back(assets.skymap_);
 				}
 			}
 		}
@@ -197,13 +197,13 @@ namespace CalcLib {
 		const auto fn([&](double t, Vector3Dd v, Vector3Dd& bv) { calculateMagneticField(t, v, bv); });
 
 		// LCFLのメモリ確保
-		assets.lcfl_.m_vecVertex3D.reserve(MAX_LINE_LENGTH);
+		assets.lcfl_.vec_3dd_.reserve(MAX_LINE_LENGTH);
 
 		// 磁場方向に積分
 		for (int i = 0; i < MAX_LINE_LENGTH; i++) {
 
 			// LCFLの格納
-			assets.lcfl_.m_vecVertex3D.emplace_back(pos);
+			assets.lcfl_.vec_3dd_.emplace_back(pos);
 
 			if (0 < i && pos.Length() <= STAR_RADIUS) {
 
@@ -300,7 +300,7 @@ namespace CalcLib {
 		const auto fn([&](double t, Vector3Dd v, Vector3Dd& bv) { calculateMagneticField(t, v, bv); });
 
 		// スカイマップのメモリ確保
-		assets.skymap_.m_vecVertex2D.reserve(MAX_LINE_LENGTH);
+		assets.skymap_.vec_2dd_.reserve(MAX_LINE_LENGTH);
 
 		// 磁場方向に積分
 		for (int i = 0; i < MAX_LINE_LENGTH; i++) {
@@ -328,7 +328,7 @@ namespace CalcLib {
 			// 放射領域（OuterGap）からの光子のみ採用する
 			if (is_outer_gap) {
 
-				calculateSkyMap(pos, cur_Bv, assets.skymap_.m_vecVertex2D);
+				calculateSkyMap(pos, cur_Bv, assets.skymap_.vec_2dd_);
 			}
 
 			pre_Bv = cur_Bv;
@@ -371,8 +371,8 @@ namespace CalcLib {
 	{
 		// スカイマップの算出
 		SkyMap skymap;
-		skymap.m_vecVertex2D.reserve(MAX_LINE_LENGTH);
-		calculateSkyMap(pos, cur_Bv, skymap.m_vecVertex2D);
+		skymap.vec_2dd_.reserve(MAX_LINE_LENGTH);
+		calculateSkyMap(pos, cur_Bv, skymap.vec_2dd_);
 
 		// パルス波形の算出
 		double photon_count(0.0);
@@ -392,9 +392,9 @@ namespace CalcLib {
 		}
 
 		Pulse pulse;
-		Vector2Dd vec_pulse_temp(skymap.m_vecVertex2D.back().x, photon_count);
-		pulse.m_vecVertex2D.emplace_back(vec_pulse_temp);
-		pulse.m_ViewingAngle = skymap.m_vecVertex2D.back().y;
+		Vector2Dd vec_pulse_temp(skymap.vec_2dd_.back().x, photon_count);
+		pulse.vec_2dd_.emplace_back(vec_pulse_temp);
+		pulse.viewing_angle_ = skymap.vec_2dd_.back().y;
 		assets.vec_pulse_.emplace_back(pulse);
 	}
 

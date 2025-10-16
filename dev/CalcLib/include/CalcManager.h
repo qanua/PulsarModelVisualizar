@@ -60,6 +60,15 @@ namespace CalcLib {
 		int getPolarCapNorthOpened(float* buffer);
 
 
+		/** @brief ポーラーキャップ南極側の閉磁力線の頂点を取得
+		 *
+		 *  @param[in]      buffer      値を格納するfloat配列
+		 *
+		 *  @return         格納するデータ数
+		 */
+		int getPolarCapSouthClosed(float* buffer);
+
+
 		/** @brief ポーラーキャップ北極側の閉磁力線の頂点を取得
 		 *
 		 *  @param[in]      buffer      値を格納するfloat配列
@@ -76,15 +85,6 @@ namespace CalcLib {
 		 *  @return         格納するデータ数
 		 */
 		int getPolarCapSouthOpened(float* buffer);
-
-
-		/** @brief ポーラーキャップ南極側の閉磁力線の頂点を取得
-		 *
-		 *  @param[in]      buffer      値を格納するfloat配列
-		 *
-		 *  @return         格納するデータ数
-		 */
-		int getPolarCapSouthClosed(float* buffer);
 
 
 		/** @brief スカイマップの頂点を取得
@@ -108,7 +108,7 @@ namespace CalcLib {
 
 	private:
 		/** @brief パルサー情報 */
-		Pulsar* p_pulsar_;
+		PulsarAsset* p_pulsar_;
 
 		/** @brief クリティカルセクション */
 		CRITICAL_SECTION* p_critical_section_;
