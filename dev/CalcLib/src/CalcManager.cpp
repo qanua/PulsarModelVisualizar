@@ -3,8 +3,6 @@
 #include "pch.h"
 #include "CalcManager.h"
 
-#include <memory>
-
 
 namespace CalcLib {
 
