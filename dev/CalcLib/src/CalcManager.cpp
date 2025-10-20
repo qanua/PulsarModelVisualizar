@@ -3,6 +3,9 @@
 #include "pch.h"
 #include "CalcManager.h"
 
+#include <memory>
+
+
 namespace CalcLib {
 
 	CalcManager::CalcManager()
@@ -52,15 +55,17 @@ namespace CalcLib {
 	int CalcManager::getMagneticLine(float* buffer)
 	{
 		// 磁力線の頂点を取得
-		std::vector<std::vector<Vector3Dd>>* p_vec_vec_v3d(new std::vector<std::vector<Vector3Dd>>);
-		p_pulsar_->getLCFLVertices(*p_vec_vec_v3d);
+		std::vector<std::vector<Vector3Dd>> vec_vec_v3d;
+		p_pulsar_->getLCFLVertices(vec_vec_v3d);
 
 		// 頂点数
 		int counter(0);
 
+		auto size(vec_vec_v3d.size());
+
 		// float配列に格納
-		for (unsigned int i = 0; i < p_vec_vec_v3d->size(); i++) {
-			std::vector<Vector3Dd> vec_v3d((*p_vec_vec_v3d)[i]);
+		for (unsigned int i = 0; i < size; i++) {
+			std::vector<Vector3Dd> vec_v3d((vec_vec_v3d)[i]);
 
 			if (buffer) {
 				for (unsigned int j = 0; j < vec_v3d.size(); j++) {
@@ -124,15 +129,17 @@ namespace CalcLib {
 	int CalcManager::getSkyMap(float* buffer)
 	{
 		// スカイマップの頂点を取得
-		std::vector<std::vector<Vector2Dd>>* p_vec_vec_v2d(new std::vector<std::vector<Vector2Dd>>);
-		p_pulsar_->getSkyMapVertex(*p_vec_vec_v2d);
+		std::vector<std::vector<Vector2Dd>> vec_vec_v2d;
+		p_pulsar_->getSkyMapVertex(vec_vec_v2d);
 
 		// 頂点数
 		int counter(0);
 
+		auto size(vec_vec_v2d.size());
+
 		// float配列に格納
-		for (unsigned int i = 0; i < p_vec_vec_v2d->size(); i++) {
-			std::vector<Vector2Dd> vec_v2d((*p_vec_vec_v2d)[i]);
+		for (unsigned int i = 0; i < size; i++) {
+			std::vector<Vector2Dd> vec_v2d((vec_vec_v2d)[i]);
 
 			if (buffer) {
 				for (unsigned int j = 0; j < vec_v2d.size(); j++) {
@@ -157,15 +164,17 @@ namespace CalcLib {
 		}
 
 		// パルスプロファイルの頂点を取得
-		std::vector<std::vector<Vector2Dd>>* p_vec_vec_v2d(new std::vector<std::vector<Vector2Dd>>);
-		p_pulsar_->getPulseVertex(*p_vec_vec_v2d);
+		std::vector<std::vector<Vector2Dd>> vec_vec_v2d;
+		p_pulsar_->getPulseVertex(vec_vec_v2d);
 
 		// 頂点数
 		int counter(0);
 
+		auto size(vec_vec_v2d.size());
+
 		// float配列に格納
-		for (unsigned int i = 0; i < p_vec_vec_v2d->size(); i++) {
-			std::vector<Vector2Dd> vec_v2d((*p_vec_vec_v2d)[i]);
+		for (unsigned int i = 0; i < size; i++) {
+			std::vector<Vector2Dd> vec_v2d((vec_vec_v2d)[i]);
 
 			if (buffer) {
 				for (unsigned int j = 0; j < vec_v2d.size(); j++) {
