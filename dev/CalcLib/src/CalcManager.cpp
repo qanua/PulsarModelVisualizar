@@ -12,11 +12,6 @@ namespace CalcLib {
 		// クリティカルセクションの初期化
 		::InitializeCriticalSection(p_critical_section_);
 
-		// 初期値の設定
-		p_pulsar_->inclination_angle_ = 57;
-		//p_pulsar_->viewing_angle_ = 90;
-		//p_pulsar_->m_MagneticLineCount = 60;
-
 		// パルサーモデルの計算
 		calculatePulsarModel();
 	}

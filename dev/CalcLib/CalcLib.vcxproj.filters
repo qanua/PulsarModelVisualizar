@@ -27,9 +27,6 @@
     <ClInclude Include="include\PulsarAsset.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>
-    <ClInclude Include="include\Math\RungeKutta.h">
-      <Filter>ヘッダー ファイル</Filter>
-    </ClInclude>
     <ClInclude Include="include\Math\Vector3D.h">
       <Filter>ヘッダー ファイル</Filter>
     </ClInclude>

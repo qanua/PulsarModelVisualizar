@@ -8,27 +8,27 @@
 
 
 /** @brief パルサークラス */
-struct PulsarAsset
-{
+struct PulsarAsset {
+
 public:
 
 	/** @class LCFL（LastClosedFieldLine）
 	 *
 	 *  @brief 光円柱に接するようにして閉じる磁力線
 	 */
-	struct LCFL
-	{
+	struct LCFL {
+
 	public:
 		/** @brief LCFLの点群（3次元 double） */
 		std::vector<Vector3Dd> vec_3dd_;
 
 
 		/** @brief コンストラクタ */
-		LCFL() {};
+		LCFL() {}
 
 
 		/** @brief デストラクタ */
-		~LCFL() {};
+		~LCFL() {}
 	};
 
 
@@ -36,8 +36,8 @@ public:
 	 *
 	 *  @brief OuterGapから放射される光子の観測結果
 	 */
-	struct Pulse
-	{
+	struct Pulse {
+
 	public:
 		/** @brief 視線方向の傾き [degree] */
 		int viewing_angle_;
@@ -50,11 +50,11 @@ public:
 		Pulse() :viewing_angle_(0) {
 
 			vec_2dd_.reserve(360);
-		};
+		}
 
 
 		/** @brief デストラクタ */
-		~Pulse() {};
+		~Pulse() {}
 	};
 
 
@@ -63,19 +63,19 @@ public:
 	 *  @brief 磁力線上から放射された光子が観測される位相をマッピングしたもの
 	 * 　　　　このときの磁力線はOuterGapの外側（UpperBoundary）を採用している
 	 */
-	struct SkyMap
-	{
+	struct SkyMap {
+
 	public:
 		/** @brief スカイマップの点群（2次元 double） */
 		std::vector<Vector2Dd> vec_2dd_;
 
 
 		/** @brief コンストラクタ */
-		SkyMap() {};
+		SkyMap() {}
 
 
 		/** @brief デストラクタ */
-		~SkyMap() {};
+		~SkyMap() {}
 	};
 
 
@@ -108,8 +108,8 @@ public:
 
 
 	/** @brief コンストラクタ */
-	PulsarAsset() :inclination_angle_(0.0), max_photon_count_(0.0) {
-
+	PulsarAsset() :inclination_angle_(57.0), max_photon_count_(0.0)
+	{
 		// 両極の点群を格納するためのメモリ確保
 		vec_lcfls_.reserve(MAGNETIC_LINE_COUNT * 2);
 		vec_skymaps_.reserve(MAGNETIC_LINE_COUNT * 2);
@@ -172,8 +172,8 @@ public:
 	 *
 	 *  @return			ポーラーキャップの点群
 	 */
-	inline std::vector<Vector3Dd>& getPolarCapNorthStartVertices() {
-
+	inline std::vector<Vector3Dd>& getPolarCapNorthStartVertices()
+	{
 		return vec_polarcap_n_start_.vec_3dd_;
 	}
 
@@ -182,8 +182,8 @@ public:
 	 *
 	 *  @return			ポーラーキャップの点群
 	 */
-	inline std::vector<Vector3Dd>& getPolarCapSouthEndVertices() {
-
+	inline std::vector<Vector3Dd>& getPolarCapSouthEndVertices()
+	{
 		return vec_polarcap_s_end_.vec_3dd_;
 	}
 
@@ -192,8 +192,8 @@ public:
 	 *
 	 *  @return			ポーラーキャップの点群
 	 */
-	inline std::vector<Vector3Dd>& getPolarCapNorthEndVertices() {
-
+	inline std::vector<Vector3Dd>& getPolarCapNorthEndVertices()
+	{
 		return vec_polarcap_n_end_.vec_3dd_;
 	}
 
@@ -202,8 +202,8 @@ public:
 	 *
 	 *  @return			ポーラーキャップの点群
 	 */
-	inline std::vector<Vector3Dd>& getPolarCapSouthStartVertices() {
-
+	inline std::vector<Vector3Dd>& getPolarCapSouthStartVertices()
+	{
 		return vec_polarcap_s_start_.vec_3dd_;
 	}
 

@@ -2,7 +2,6 @@
 
 #include "pch.h"
 #include "ModelCalculator.h"
-#include "Math/RungeKutta.h"
 
 #include <iostream>
 #include <iterator>
@@ -107,16 +106,26 @@ namespace CalcLib {
 					assets.lcfl_.vec_3dd_.clear();
 
 					// OuterGapからのパルスを格納
-					for (int k = 0; k < OUTER_GAP_LAYER_COUNT; k++) {
+					// 10:  OuterGapの層の数
+					for (int k = 0; k < 10; k++) {
 
-						close_angle -= OUTER_GAP_LAYER_THICKNESS;
-						getPulse(close_angle * RADIAN, assets);
+						// 0.02: OuterGapの層の厚さ
+						close_angle -= 0.02;
+
+						if (k != 9) {
+
+							getSkymapAndPulse(false, true, close_angle * RADIAN, assets);
+						}
+						else {
+
+							// UpperBoundaryのスカイマップを格納
+							getSkymapAndPulse(true, true, close_angle * RADIAN, assets);
+							pulsar.vec_skymaps_.emplace_back(assets.skymap_);
+
+						}
+						// パルス波形の格納
 						pulsar.addPulse(assets.vec_pulse_);
 					}
-
-					// UpperBoundaryのスカイマップを格納
-					getSkyMap(close_angle * RADIAN, assets);
-					pulsar.vec_skymaps_.emplace_back(assets.skymap_);
 				}
 			}
 		}
@@ -138,7 +147,7 @@ namespace CalcLib {
 			if (assets.magnetic_line_state_ == MagneticLineState::CLOSE) {
 
 				result = true;
-			}			
+			}
 		}
 
 		return result;
@@ -147,54 +156,34 @@ namespace CalcLib {
 
 	void ModelCalculator::getMagneticLineState(double polar_angle, CalculationAssets& assets) const
 	{
-		getCartesianPosition(
-			assets.azimuthal_angle_,
-			assets.polar_angle_ = polar_angle,
-			assets.inclination_angle_,
-			assets.magnetic_field_pos_
-		);
-
-		double t(0.0);
-		Vector3Dd pos(assets.magnetic_field_pos_);
-		Vector3Dd tmp;
-
-		const auto fn([&](double t, Vector3Dd v, Vector3Dd& Bv) { calculateMagneticField(t, v, Bv); });
+		// パラメータの設定
+		MagneticIntegrationParams p_par(polar_angle, assets);
 
 		// 磁場方向に積分
 		for (int i = 0; i < MAX_LINE_LENGTH; i++) {
 
 			// 磁力線が星に戻って来る
-			if (0 < i && pos.Length() <= STAR_RADIUS) {
+			if (0 < i && p_par.pos_.Length() <= STAR_RADIUS) {
 
 				assets.magnetic_line_state_ = MagneticLineState::CLOSE;
 				break;
 			}
 			// 磁力線が光円柱を越える
-			else if (0 < i && LIGHT_CYRINDER_RADIUS < std::hypot(pos.x, pos.y)) {
+			else if (0 < i && LIGHT_CYRINDER_RADIUS < std::hypot(p_par.pos_.x, p_par.pos_.y)) {
 
 				assets.magnetic_line_state_ = MagneticLineState::OPEN;
 				break;
 			}
 
-			RungeKutta(pos, t, STAR_RADIUS, tmp, fn);
+			RungeKutta(p_par.t_, STAR_RADIUS, p_par.pos_, p_par.cur_Bv_);
 		}
 	}
 
 
 	void ModelCalculator::getLCFL(double close_angle, CalculationAssets& assets) const
 	{
-		getCartesianPosition(
-			assets.azimuthal_angle_,
-			assets.polar_angle_ = close_angle,
-			assets.inclination_angle_,
-			assets.magnetic_field_pos_
-		);
-
-		double t(0.0);
-		Vector3Dd pos(assets.magnetic_field_pos_);
-		Vector3Dd tmp;
-
-		const auto fn([&](double t, Vector3Dd v, Vector3Dd& bv) { calculateMagneticField(t, v, bv); });
+		// パラメータの設定
+		MagneticIntegrationParams p_par(close_angle, assets);
 
 		// LCFLのメモリ確保
 		assets.lcfl_.vec_3dd_.reserve(MAX_LINE_LENGTH);
@@ -203,180 +192,120 @@ namespace CalcLib {
 		for (int i = 0; i < MAX_LINE_LENGTH; i++) {
 
 			// LCFLの格納
-			assets.lcfl_.vec_3dd_.emplace_back(pos);
+			assets.lcfl_.vec_3dd_.emplace_back(p_par.pos_);
 
-			if (0 < i && pos.Length() <= STAR_RADIUS) {
-
-				break;
-			}
-
-			RungeKutta(pos, t, STAR_RADIUS, tmp, fn);
-		}
-	}
-
-
-	void ModelCalculator::getPulse(double polar_angle, CalculationAssets& assets) const
-	{
-		getCartesianPosition(
-			assets.azimuthal_angle_,
-			assets.polar_angle_ = polar_angle,
-			assets.inclination_angle_,
-			assets.magnetic_field_pos_
-		);
-
-		double t(0.0);
-		Vector3Dd pos(assets.magnetic_field_pos_);
-		Vector3Dd cur_Bv;
-		Vector3Dd pre_Bv;
-		double cur_Bphi(0.0);
-		double pre_Bphi(0.0);
-		bool is_outer_gap(false);
-
-		const auto fn([&](double t, Vector3Dd v, Vector3Dd& bv) { calculateMagneticField(t, v, bv); });
-
-		// パルス波形のメモリ確保
-		assets.vec_pulse_.reserve(180);
-
-		// 磁場方向に積分
-		for (int i = 0; i < MAX_LINE_LENGTH; i++) {
-
-			// 磁場の初期値
-			if (i == 0) {
-
-				calculateMagneticField(0, pos, cur_Bv);
-			}
-
-			cur_Bphi = (pos.x * cur_Bv.x + pos.y * cur_Bv.y) / std::hypot(pos.x, pos.y);
-
-			const bool is_null((pre_Bv.z * cur_Bv.z) < 0.0);
-			const bool is_return((pre_Bphi * cur_Bphi) < 0.0);
-
-			if (!is_outer_gap && is_null) {
-
-				is_outer_gap = true;
-			}
-			else if (is_outer_gap && is_return) {
-
-				is_outer_gap = false;
-			}
-
-			// 放射領域（OuterGap）からの光子のみ採用する
-			if (is_outer_gap)
-			{
-				calculatePulse(pos, pre_Bv, cur_Bv, assets);
-			}
-
-			pre_Bv = cur_Bv;
-			pre_Bphi = cur_Bphi;
-
-			if (0 < i &&
-				(pos.Length() <= STAR_RADIUS || LIGHT_CYRINDER_RADIUS < std::hypot(pos.x, pos.y))) {
+			if (0 < i && p_par.pos_.Length() <= STAR_RADIUS) {
 
 				break;
 			}
 
-			RungeKutta(pos, t, STAR_RADIUS, cur_Bv, fn);
+			RungeKutta(p_par.t_, STAR_RADIUS, p_par.pos_, p_par.cur_Bv_);
 		}
 	}
 
 
-	void ModelCalculator::getSkyMap(double polar_angle, CalculationAssets& assets) const
+	void ModelCalculator::getSkymapAndPulse(bool get_skymap, bool get_pulse, double polar_angle, CalculationAssets& assets) const
 	{
-		getCartesianPosition(
-			assets.azimuthal_angle_,
-			assets.polar_angle_ = polar_angle,
-			assets.inclination_angle_,
-			assets.magnetic_field_pos_
-		);
+		if (get_skymap || get_pulse) {
 
-		double t(0.0);
-		Vector3Dd pos(assets.magnetic_field_pos_);
-		Vector3Dd cur_Bv;
-		Vector3Dd pre_Bv;
-		double cur_Bphi(0.0);
-		double pre_Bphi(0.0);
-		bool is_outer_gap(false);
+			// パラメータの設定
+			MagneticIntegrationParams p_par(polar_angle, assets);
 
-		const auto fn([&](double t, Vector3Dd v, Vector3Dd& bv) { calculateMagneticField(t, v, bv); });
+			if (get_skymap) {
 
-		// スカイマップのメモリ確保
-		assets.skymap_.vec_2dd_.reserve(MAX_LINE_LENGTH);
+				// パルス波形のメモリ確保
+				assets.vec_pulse_.reserve(180);
+			}
+			if (get_pulse) {
 
-		// 磁場方向に積分
-		for (int i = 0; i < MAX_LINE_LENGTH; i++) {
-
-			// 磁場の初期値
-			if (i == 0) {
-
-				calculateMagneticField(0, pos, cur_Bv);
+				// スカイマップのメモリ確保
+				assets.skymap_.vec_2dd_.reserve(MAX_LINE_LENGTH);
 			}
 
-			cur_Bphi = (pos.x * cur_Bv.x + pos.y * cur_Bv.y) / std::hypot(pos.x, pos.y);
+			// 磁場方向に積分
+			for (int i = 0; i < MAX_LINE_LENGTH; i++) {
 
-			const bool is_null((pre_Bv.z * cur_Bv.z) < 0);
-			const bool is_return((pre_Bphi * cur_Bphi) < 0);
+				// 磁場の初期値
+				if (i == 0) {
 
-			if (!is_outer_gap && is_null) {
+					calculateMagneticField(0, p_par.pos_, p_par.cur_Bv_);
+				}
 
-				is_outer_gap = true;
+				p_par.cur_Bphi_ = (p_par.pos_.x * p_par.cur_Bv_.x +
+								   p_par.pos_.y * p_par.cur_Bv_.y) /
+								   std::hypot(p_par.pos_.x, p_par.pos_.y);
+
+				const bool is_null((p_par.pre_Bv_.z * p_par.cur_Bv_.z) < 0.0);
+				const bool is_return((p_par.pre_Bphi_ * p_par.cur_Bphi_) < 0.0);
+
+				if (!p_par.is_outer_gap_ && is_null) {
+
+					p_par.is_outer_gap_ = true;
+				}
+				else if (p_par.is_outer_gap_ && is_return) {
+
+					p_par.is_outer_gap_ = false;
+				}
+
+				// 放射領域（OuterGap）からの光子のみ採用する
+				if (p_par.is_outer_gap_)
+				{
+					calculateSkymapAndPulse(get_skymap, get_pulse, p_par.pos_, p_par.pre_Bv_, p_par.cur_Bv_,
+											assets.skymap_.vec_2dd_, assets.vec_pulse_);
+				}
+
+				p_par.pre_Bv_ = p_par.cur_Bv_;
+				p_par.pre_Bphi_ = p_par.cur_Bphi_;
+
+				if (0 < i &&
+					(p_par.pos_.Length() <= STAR_RADIUS ||
+					 LIGHT_CYRINDER_RADIUS < std::hypot(p_par.pos_.x, p_par.pos_.y))) {
+
+					break;
+				}
+
+				RungeKutta(p_par.t_, STAR_RADIUS, p_par.pos_, p_par.cur_Bv_);
 			}
-			else if (is_outer_gap && is_return) {
-
-				is_outer_gap = false;
-			}
-
-			// 放射領域（OuterGap）からの光子のみ採用する
-			if (is_outer_gap) {
-
-				calculateSkyMap(pos, cur_Bv, assets.skymap_.vec_2dd_);
-			}
-
-			pre_Bv = cur_Bv;
-			pre_Bphi = cur_Bphi;
-
-			if (0 < i &&
-				(pos.Length() <= STAR_RADIUS || LIGHT_CYRINDER_RADIUS < std::hypot(pos.x, pos.y))) {
-
-				break;
-			}
-
-			RungeKutta(pos, t, STAR_RADIUS, cur_Bv, fn);
 		}
 	}
 
 
-	void ModelCalculator::calculateMagneticField(double /*t*/, Vector3Dd v, Vector3Dd& bv) const
+	void ModelCalculator::calculateSkymapAndPulse(
+		bool get_skymap, bool get_pulse, const Vector3Dd& pos,
+		const Vector3Dd& pre_Bv, const Vector3Dd& cur_Bv,
+		std::vector<Vector2Dd>& vec_skymap, std::vector<Pulse>& vec_pulse) const
 	{
-		const double r(v.Length());
+		if (get_skymap && get_pulse) {
 
-		if (r != 0) {
-			const double t(STAR_RADIUS - r);
-			const double sint(sin(t));
-			const double cost(cos(t));
-			const double R2(r * r);
-			const double R3(R2 * r);
+			// スカイマップの格納
+			calculateSkyMap(pos, cur_Bv, vec_skymap);
 
-			bv.x = magnetic_moment_.x * (cost * (1.0 / R3 - 1.0 / r) - sint / R2);
-			bv.y = magnetic_moment_.x * (sint * (1.0 / R3 - 1.0 / r) + cost / R2);
-			bv.z = magnetic_moment_.z / R3;
+			// パルス波形の格納
+			calculatePulse(pos, pre_Bv, cur_Bv, vec_skymap, vec_pulse);
+		}
+		else if (!get_skymap && get_pulse) {
 
-			const double A((bv.Dot(v)) * 3.0 / r + 2.0 * magnetic_moment_.x * (sint * v.y + cost * v.x) / R2);
+			// スカイマップの一時保持
+			SkyMap skymap;
+			skymap.vec_2dd_.reserve(MAX_LINE_LENGTH);
+			calculateSkyMap(pos, cur_Bv, skymap.vec_2dd_);
 
-			bv = ((A * v) / v.Length() - bv) / bv.Length();
+			// パルス波形の格納
+			calculatePulse(pos, pre_Bv, cur_Bv, skymap.vec_2dd_, vec_pulse);
 		}
 	}
 
 
-	void ModelCalculator::calculatePulse(const Vector3Dd& pos, const Vector3Dd& pre_Bv, const Vector3Dd& cur_Bv, CalculationAssets& assets) const
+	void ModelCalculator::calculatePulse(
+		const Vector3Dd& pos, const Vector3Dd& pre_Bv, const Vector3Dd& cur_Bv,
+		std::vector<Vector2Dd>& vec_skymap, std::vector<Pulse>& vec_pulse) const
 	{
-		// スカイマップの算出
-		SkyMap skymap;
-		skymap.vec_2dd_.reserve(MAX_LINE_LENGTH);
-		calculateSkyMap(pos, cur_Bv, skymap.vec_2dd_);
-
 		// パルス波形の算出
 		double photon_count(0.0);
 		double length(pre_Bv.Length() * cur_Bv.Length());
+
+		// パルサーから地球までの距離
+		const double distance = 1.0;
 
 		if (0 < length) {
 
@@ -387,15 +316,15 @@ namespace CalcLib {
 				double curv_radius(STAR_RADIUS / radi_angle);
 				double radi_solid_angle(PI * radi_angle * radi_angle);
 
-				photon_count = 1.0 / (DISTANCE_PULSAR_TO_EARTH * DISTANCE_PULSAR_TO_EARTH * radi_solid_angle) * (STAR_RADIUS / curv_radius);
+				photon_count = 1.0 / (distance * distance * radi_solid_angle) * (STAR_RADIUS / curv_radius);
 			}
 		}
 
 		Pulse pulse;
-		Vector2Dd vec_pulse_temp(skymap.vec_2dd_.back().x, photon_count);
+		Vector2Dd vec_pulse_temp(vec_skymap.back().x, photon_count);
 		pulse.vec_2dd_.emplace_back(vec_pulse_temp);
-		pulse.viewing_angle_ = skymap.vec_2dd_.back().y;
-		assets.vec_pulse_.emplace_back(pulse);
+		pulse.viewing_angle_ = vec_skymap.back().y;
+		vec_pulse.emplace_back(pulse);
 	}
 
 
@@ -416,27 +345,5 @@ namespace CalcLib {
 
 		Vector2Dd vec_temp(phase / RADIAN, acos(Vcorot.z) / RADIAN);
 		vec_skymap.emplace_back(vec_temp);
-	}
-
-
-	void ModelCalculator::getCartesianPosition(double azimuth, double polar, double inclination, Vector3Dd& pos) const
-	{
-		// 極座標の取得
-		Vector3Dd ppos;
-		getPolarPosition(azimuth, polar, ppos);
-
-		// 直交座標の取得
-		pos.x = ppos.z * sin(inclination) + ppos.x * cos(inclination);
-		pos.y = ppos.y;
-		pos.z = ppos.z * cos(inclination) - ppos.x * sin(inclination);
-	}
-
-
-	void ModelCalculator::getPolarPosition(double azimuth, double polar, Vector3Dd& pos) const
-	{
-		// 磁化軸を中心とした極座標
-		pos.x = STAR_RADIUS * sin(polar) * cos(azimuth);
-		pos.y = STAR_RADIUS * sin(polar) * sin(azimuth);
-		pos.z = STAR_RADIUS * cos(polar);
 	}
 }
