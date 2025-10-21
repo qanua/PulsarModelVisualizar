@@ -1,8 +1,5 @@
 # Build results
-[Bb]in/
 [Oo]bj/
-[Dd]ebug/
-[Rr]elease/
 x64/
 x86/
 out/
@@ -19,7 +16,7 @@ packages/
 # Others
 *.log
 *.tmp
-*.exe
-*.dll
+PulseProfileSimulator.exe
+*.exe.metagen
 *.pdb
 /doc

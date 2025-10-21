@@ -103,6 +103,15 @@
       <EntryPointSymbol>main</EntryPointSymbol>
       <TargetMachine>MachineX86</TargetMachine>
     </Link>
+    <PostBuildEvent>
+      <Message>xcopy /Y /D "$(SolutionDir)..\ext\lib\$(Configuration)\freeglut.lib" "$(OutDir)"</Message>
+    </PostBuildEvent>
+    <PreLinkEvent>
+      <Message>xcopy /Y /D "$(SolutionDir)..\ext\lib\$(Configuration)\freeglut.lib" "$(OutDir)"</Message>
+    </PreLinkEvent>
+    <PreBuildEvent>
+      <Message>xcopy /Y /D "$(SolutionDir)..\ext\lib\$(Configuration)\freeglut.lib" "$(OutDir)"</Message>
+    </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
@@ -129,6 +138,15 @@
       <EntryPointSymbol>main</EntryPointSymbol>
       <TargetMachine>MachineX86</TargetMachine>
     </Link>
+    <PostBuildEvent>
+      <Message>xcopy /Y /D "$(SolutionDir)..\ext\lib\$(Configuration)\freeglut.lib" "$(OutDir)"</Message>
+    </PostBuildEvent>
+    <PreLinkEvent>
+      <Message>xcopy /Y /D "$(SolutionDir)..\ext\lib\$(Configuration)\freeglut.lib" "$(OutDir)"</Message>
+    </PreLinkEvent>
+    <PreBuildEvent>
+      <Message>xcopy /Y /D "$(SolutionDir)..\ext\lib\$(Configuration)\freeglut.lib" "$(OutDir)"</Message>
+    </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
