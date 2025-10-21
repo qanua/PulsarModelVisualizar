@@ -20,3 +20,5 @@ PulseProfileSimulator.exe
 *.exe.metagen
 *.pdb
 /doc
+/dev/build/PulseProfileSimulator/Debug/
+dev/build/PulseProfileSimulator/Release/
