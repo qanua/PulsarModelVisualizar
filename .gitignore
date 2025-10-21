@@ -1,5 +1,25 @@
-bin/
-dev/build/
-dev/ext/
-dev/img/
-doc/
+# Build results
+[Bb]in/
+[Oo]bj/
+[Dd]ebug/
+[Rr]elease/
+x64/
+x86/
+out/
+
+# VS settings
+.vs/
+*.user
+*.suo
+
+# NuGet
+packages/
+*.nupkg
+
+# Others
+*.log
+*.tmp
+*.exe
+*.dll
+*.pdb
+/doc

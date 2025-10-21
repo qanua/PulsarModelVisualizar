@@ -1,0 +1,134 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="ソース ファイル">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="ヘッダー ファイル">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="ヘッダー ファイル\Scene">
+      <UniqueIdentifier>{09ba07ba-3b71-4b4b-8b2a-2f163eee0d7b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ヘッダー ファイル\Math">
+      <UniqueIdentifier>{d923ce5c-92c7-4207-824b-9d24d6a6acb6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ソース ファイル\Rendering">
+      <UniqueIdentifier>{9231a483-849c-4dad-910b-50ba22a0c98d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ヘッダー ファイル\Rendering">
+      <UniqueIdentifier>{3769b89e-4550-4284-8ff6-643bbd732182}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ヘッダー ファイル\Primitive">
+      <UniqueIdentifier>{d8cb488e-2de1-4351-aef4-c1ee7bb9995b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="リソース ファイル">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="ヘッダー ファイル\Data">
+      <UniqueIdentifier>{30640ca0-597a-4c91-95f2-6c516c495b6d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ヘッダー ファイル\Material">
+      <UniqueIdentifier>{0007bdbf-10f9-43d3-a8bb-4b99e8550a9a}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="PulseProfileSimulator.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\Rendering\Renderer.cpp">
+      <Filter>ソース ファイル\Rendering</Filter>
+    </ClCompile>
+    <ClCompile Include="MainWindow.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\PulseCalculator.cpp">
+      <Filter>ソース ファイル</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\include\Rendering\Handle.h">
+      <Filter>ヘッダー ファイル\Rendering</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\Rendering\Renderer.h">
+      <Filter>ヘッダー ファイル\Rendering</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\Primitive\Arrow.h">
+      <Filter>ヘッダー ファイル\Primitive</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\Primitive\Camera.h">
+      <Filter>ヘッダー ファイル\Primitive</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\Primitive\Cone.h">
+      <Filter>ヘッダー ファイル\Primitive</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\Primitive\Cylinder.h">
+      <Filter>ヘッダー ファイル\Primitive</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\Primitive\Handle.h">
+      <Filter>ヘッダー ファイル\Primitive</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\Primitive\Light.h">
+      <Filter>ヘッダー ファイル\Primitive</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\Primitive\Shape.h">
+      <Filter>ヘッダー ファイル\Primitive</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\Primitive\Sphere.h">
+      <Filter>ヘッダー ファイル\Primitive</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\Scene\Scene.h">
+      <Filter>ヘッダー ファイル\Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\Math\Quaternion.h">
+      <Filter>ヘッダー ファイル\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="MainWindow.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\Math\Matrix4x4.h">
+      <Filter>ヘッダー ファイル\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\Math\Vector3D.h">
+      <Filter>ヘッダー ファイル\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\Material\Colors.h">
+      <Filter>ヘッダー ファイル\Material</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\Math\RungeKutta.h">
+      <Filter>ヘッダー ファイル\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\Data\Pulsar.h">
+      <Filter>ヘッダー ファイル\Data</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\Math\Vector2D.h">
+      <Filter>ヘッダー ファイル\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\Math\Constants.h">
+      <Filter>ヘッダー ファイル\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\PulseCalculator.h">
+      <Filter>ヘッダー ファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\Data\MagneticLine.h">
+      <Filter>ヘッダー ファイル\Data</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\Data\Pulse.h">
+      <Filter>ヘッダー ファイル\Data</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\Data\SkyMap.h">
+      <Filter>ヘッダー ファイル\Data</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\Primitive\Vertex.h">
+      <Filter>ヘッダー ファイル\Primitive</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="MainWindow.resx">
+      <Filter>リソース ファイル</Filter>
+    </EmbeddedResource>
+  </ItemGroup>
+</Project>
