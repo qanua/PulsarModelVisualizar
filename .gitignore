@@ -1,7 +1,11 @@
 # Build results
+[Bb]in/
 [Oo]bj/
+[Dd]ebug/
+[Rr]elease/
 x64/
 x86/
+build/
 out/
 
 # VS settings
@@ -16,9 +20,6 @@ packages/
 # Others
 *.log
 *.tmp
-PulseProfileSimulator.exe
-*.exe.metagen
+*.exe
+*.dll
 *.pdb
-/doc
-/dev/build/PulseProfileSimulator/Debug/
-dev/build/PulseProfileSimulator/Release/
