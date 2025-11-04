@@ -122,9 +122,9 @@
                     </ControlTemplate>
                 </Setter.Value>
             </Setter>
-            <EventSetter Event="Click" Handler="PolarCapArrowButton_Click"/>
-            <EventSetter Event="MouseEnter" Handler="PolarCapArrowButton_MouseEnter"/>
-            <EventSetter Event="MouseLeave" Handler="PolarCapArrowButton_MouseLeave"/>
+            <EventSetter Event="Click" Handler="PolarCapButton_Click"/>
+            <EventSetter Event="MouseEnter" Handler="PolarCapButton_MouseEnter"/>
+            <EventSetter Event="MouseLeave" Handler="PolarCapButton_MouseLeave"/>
         </Style>
     </Window.Resources>
 
@@ -191,13 +191,13 @@
             </Path.Data>
         </Path>
         <!--InclinationAngleスライダー-->
-        <Slider x:Name="MagneticLineSlider"
+        <Slider x:Name="MagneticLineInclinationAngleSlider"
                 Width="100" Height="360"
                 HorizontalAlignment="Left" VerticalAlignment="Top" Margin="780,170,0,0"
-                Maximum="180" Minimum="0" IsDirectionReversed="True" Value="57"
+                Maximum="180" Minimum="0" IsDirectionReversed="True" Value="0"
                 TickFrequency="10" IsSnapToTickEnabled="False" Orientation="Vertical"
                 Loaded="Slider_Loaded"
-                ValueChanged="ArrowSlider_ValueChanged">
+                ValueChanged="Slider_ValueChanged">
             <Slider.Template>
                 <ControlTemplate TargetType="Slider">
                     <Grid>
@@ -474,7 +474,7 @@
                 Maximum="180" Minimum="0" IsDirectionReversed="True" Value="90"
                 TickFrequency="10" IsSnapToTickEnabled="False" Orientation="Vertical"
                 Loaded="Slider_Loaded"
-                ValueChanged="ArrowSlider_ValueChanged">
+                ValueChanged="Slider_ValueChanged">
             <Slider.Template>
                 <ControlTemplate TargetType="Slider">
                     <Grid>
@@ -539,7 +539,7 @@
                 Maximum="360" Minimum="0" IsDirectionReversed="False" Value="90"
                 TickFrequency="10" IsSnapToTickEnabled="False" Orientation="Horizontal"
                 Loaded="Slider_Loaded"
-                ValueChanged="ArrowSlider_ValueChanged">
+                ValueChanged="Slider_ValueChanged">
             <Slider.Template>
                 <ControlTemplate TargetType="Slider">
                     <Grid>

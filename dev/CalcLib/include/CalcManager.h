@@ -44,7 +44,7 @@ namespace CalcLib {
 
 		/** @brief 磁力線の頂点を取得
 		 *
-		 *  @param[in]      buffer      値を格納するfloat配列
+		 *  @param[out]		buffer      値を格納するfloat配列
 		 *
 		 *  @return         格納するデータ数
 		 */
@@ -53,7 +53,7 @@ namespace CalcLib {
 
 		/** @brief ポーラーキャップ北極側の開磁力線の頂点を取得
 		 *
-		 *  @param[in]      buffer      値を格納するfloat配列
+		 *  @param[out]		buffer      値を格納するfloat配列
 		 *
 		 *  @return         格納するデータ数
 		 */
@@ -62,7 +62,7 @@ namespace CalcLib {
 
 		/** @brief ポーラーキャップ南極側の閉磁力線の頂点を取得
 		 *
-		 *  @param[in]      buffer      値を格納するfloat配列
+		 *  @param[out]		buffer      値を格納するfloat配列
 		 *
 		 *  @return         格納するデータ数
 		 */
@@ -71,7 +71,7 @@ namespace CalcLib {
 
 		/** @brief ポーラーキャップ北極側の閉磁力線の頂点を取得
 		 *
-		 *  @param[in]      buffer      値を格納するfloat配列
+		 *  @param[out]		buffer      値を格納するfloat配列
 		 *
 		 *  @return         格納するデータ数
 		 */
@@ -80,7 +80,7 @@ namespace CalcLib {
 
 		/** @brief ポーラーキャップ南極側の開磁力線の頂点を取得
 		 *
-		 *  @param[in]      buffer      値を格納するfloat配列
+		 *  @param[out]		buffer      値を格納するfloat配列
 		 *
 		 *  @return         格納するデータ数
 		 */
@@ -89,7 +89,7 @@ namespace CalcLib {
 
 		/** @brief スカイマップの頂点を取得
 		 *
-		 *  @param[in]      buffer      値を格納するfloat配列
+		 *  @param[out]		buffer      値を格納するfloat配列
 		 *
 		 *  @return         格納するデータ数
 		 */
@@ -98,12 +98,12 @@ namespace CalcLib {
 
 		/** @brief パルスプロファイルの頂点を取得
 		 *
-		 *  @param[in]      buffer      値を格納するfloat配列
 		 *  @param[in]      normalize   正規化の有無
+		 *  @param[out]		buffer      値を格納するfloat配列
 		 *
 		 *  @return         格納するデータ数
 		 */
-		int getPulseProfile(float* buffer, bool normalize);
+		int getPulseProfile(bool normalize, float* buffer);
 
 
 	private:
@@ -121,7 +121,7 @@ namespace CalcLib {
 		/** @brief 頂点の3次元座標を配列で取得
 		 *
 		 *  @param[in]      vertices	3次元座標の可変長配列
-		 *  @param[in/out]	buffer      値を格納するfloat配列
+		 *  @param[out]		buffer      値を格納するfloat配列
 		 *
 		 *  @return         頂点数
 		 */

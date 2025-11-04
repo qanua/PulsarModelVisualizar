@@ -73,9 +73,9 @@ int getSkyMap(float* buffer)
 }
 
 
-int getPulseProfile(float* buffer, bool normalize)
+int getPulseProfile(bool normalize, float* buffer)
 {
     return CalcLib::CalcManager::getInstance()
-        .getPulseProfile(buffer, normalize);
+        .getPulseProfile(normalize, buffer);
 }
 

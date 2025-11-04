@@ -37,7 +37,7 @@ namespace WpfApp
         private static extern int getSkyMap([Out] float[]? buffer);
 
         [DllImport("CalcLib.dll")]
-        private static extern int getPulseProfile([Out] float[]? buffer, bool normalize);
+        private static extern int getPulseProfile(bool normalize, [Out] float[]? buffer);
         #endregion
 
 
@@ -53,7 +53,7 @@ namespace WpfApp
          * 
          *  @details        パルサーの回転軸と磁化軸のなす角 [度]
          */
-        private int _inclinationAngle = 0;
+        private int _inclinationAngle = 57;
 
         /** @brief ViewingAngle
          * 
@@ -169,12 +169,12 @@ namespace WpfApp
             GLControlSkyMap.Render += delta => glControlRender(GLControlSkyMap);
             GLControlPulseProfile.Render += delta => glControlRender(GLControlPulseProfile);
 
-            // GLコントロールの設定
+            // GLWpfControlのコンテキスト設定
             var settings = new GLWpfControlSettings()
             {
-                MajorVersion = 3,
-                MinorVersion = 1,
-                RenderContinuously = true,
+                MajorVersion = 3,           // OpenGLのバージョン: OpenGL 3.x系
+                MinorVersion = 1,           // OpenGLのマイナーバージョン: OpenGL 3.1
+                RenderContinuously = true,  // 毎フレーム自動的に再描画
             };
 
             // 描画開始
@@ -203,6 +203,9 @@ namespace WpfApp
 
             // シェーダーの生成
             setupShader();
+
+            // InclinationAngleの設定（頂点の取得前に行う）
+            setInclinationAngle(_inclinationAngle);
 
             // 頂点の取得
             getVertices(control);
@@ -265,7 +268,10 @@ namespace WpfApp
             {
                 if (_objsByControl.ContainsKey(control))
                 {
-                    _objsByControl[control].Camera = camera;
+                    _objsByControl[control].Camera.Yaw = camera.Yaw;
+                    _objsByControl[control].Camera.Pitch = camera.Pitch;
+                    _objsByControl[control].Camera.Distance = camera.Distance;
+                    _objsByControl[control].Camera.Target = camera.Target;
                 }
                 else
                 {
@@ -379,8 +385,8 @@ namespace WpfApp
             else if (control == GLControlPulseProfile)
             {
                 // パルスプロファイル
-                float[] vertices2d = new float[getPulseProfile(null, false)];
-                getPulseProfile(vertices2d, true);
+                float[] vertices2d = new float[getPulseProfile(false, null)];
+                getPulseProfile(true, vertices2d);
 
                 int count = (int)(vertices2d.Length * 0.5);
                 vertices = new float[count * 3];
@@ -656,19 +662,18 @@ namespace WpfApp
         {
             var slider = (Slider)sender;
 
-            if (slider == MagneticLineSlider)
+            if (slider == MagneticLineInclinationAngleSlider)
             {
-                _inclinationAngle = (int)MagneticLineSlider.Value;
-                setInclinationAngle(_inclinationAngle);
+                MagneticLineInclinationAngleSlider.Value = _inclinationAngle;
             }
             else if (slider == SkyMapViewingAngleSlider)
             {
-                _viewingAngle = (int)SkyMapViewingAngleSlider.Value;
+                SkyMapViewingAngleSlider.Value = _viewingAngle;
                 updateSkyMapGuideLine(slider);
             }
             else if (slider == SkyMapPhaseSlider)
             {
-                _phase = (int)SkyMapPhaseSlider.Value;
+                SkyMapPhaseSlider.Value = _phase;
                 updateSkyMapGuideLine(slider);
             }
         }
@@ -698,7 +703,7 @@ namespace WpfApp
                 setupVerticesVAO(control);
 
                 // 磁力線のスライダーを有効化
-                var thumb = (MagneticLineSlider.Template.FindName("PART_Thumb", MagneticLineSlider) as Thumb);
+                var thumb = (MagneticLineInclinationAngleSlider.Template.FindName("PART_Thumb", MagneticLineInclinationAngleSlider) as Thumb);
                 if (thumb != null)
                 {
                     thumb.IsHitTestVisible = true;
@@ -989,11 +994,11 @@ namespace WpfApp
          *  @param[in]      sender      スライダー
          *  @param[in]      e           変更前後の値などを含むイベントデータ
          */
-        private void ArrowSlider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
+        private void Slider_ValueChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
         {
             var slider = (Slider)sender;
 
-            if (slider == MagneticLineSlider)
+            if (slider == MagneticLineInclinationAngleSlider)
             {
                 slider.Value = _inclinationAngle = (int)e.NewValue;
 
@@ -1090,7 +1095,7 @@ namespace WpfApp
             {
                 int degree = (int)slider.Value;
 
-                if (slider == MagneticLineSlider)
+                if (slider == MagneticLineInclinationAngleSlider)
                 {
                     // 磁力線のスライダーを無効化
                     thumb.IsHitTestVisible = false;
@@ -1146,7 +1151,7 @@ namespace WpfApp
          *  @param[in]      sender      PolarCap...Button
          *  @param[in]      e           子から親要素へ伝わるルーティングイベント
          */
-        private void PolarCapArrowButton_Click(object sender, RoutedEventArgs e)
+        private void PolarCapButton_Click(object sender, RoutedEventArgs e)
         {
             if (_selectedPolarCapButton != null)
             {
@@ -1167,7 +1172,7 @@ namespace WpfApp
          *  @param[in]      sender      PolarCap...Button
          *  @param[in]      e           子から親要素へ伝わるルーティングイベント
          */
-        private void PolarCapArrowButton_MouseEnter(object sender, RoutedEventArgs e)
+        private void PolarCapButton_MouseEnter(object sender, RoutedEventArgs e)
         {
             var overed = (Button)sender;
 
@@ -1183,7 +1188,7 @@ namespace WpfApp
          *  @param[in]      sender      PolarCap...Button
          *  @param[in]      e           子から親要素へ伝わるルーティングイベント
          */
-        private void PolarCapArrowButton_MouseLeave(object sender, RoutedEventArgs e)
+        private void PolarCapButton_MouseLeave(object sender, RoutedEventArgs e)
         {
             var overed = (Button)sender;
 
@@ -1286,16 +1291,14 @@ namespace WpfApp
 
         /** @brief 入力オブジェクトからの値の取得
          * 
-         *  @tparam         TObject     対象のオブジェクト型
+         *  @tparam         T           対象のテンプレートパラメータ
          *  @param[in]      obj         入力オブジェクト
          *  @param[out]     value       出力値
          *  
          *  @return         true:   objがnullでなはい
          *                  false:  objがnullである
          */
-        public bool TryGetValue<TObject>(
-            TObject obj,
-            out TObject value)
+        public bool TryGetValue<T>(T obj, out T value)
         {
             if (obj != null)
             {

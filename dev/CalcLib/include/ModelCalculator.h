@@ -68,7 +68,7 @@ namespace CalcLib {
 		 *
 		 *  @brief 計算に必要な情報
 		 */
-		class CalculationAssets {
+		struct CalculationAssets {
 
 		public:
 
@@ -146,7 +146,7 @@ namespace CalcLib {
 		 *
 		 *  @brief 磁場の積分計算に必要なパラメータ
 		 */
-		class MagneticIntegrationParams {
+		struct MagneticIntegrationParams {
 
 		public:
 
@@ -192,6 +192,8 @@ namespace CalcLib {
 			/** @brief デストラクタ */
 			~MagneticIntegrationParams() {}
 
+
+		private:
 
 			/** @brief 直交座標の取得
 			 *
@@ -293,7 +295,8 @@ namespace CalcLib {
 		 *  @param[in]		pos				計算地点
 		 *  @param[in]		pre_Bv			磁場の前回値
 		 *  @param[in]		cur_Bv			磁場の現在値
-		 *  @param[out]		assets			計算に必要な情報
+		 *  @param[out]		vec_skymap		スカイマップの点群データ
+		 *  @param[out]		vec_pulse		パルス波形
 		 */
 		void calculateSkymapAndPulse(
 			bool get_skymap, bool get_pulse, const Vector3Dd& pos,
@@ -306,7 +309,7 @@ namespace CalcLib {
 		 *  @param[in]		pos				計算地点
 		 *  @param[in]		pre_Bv			磁場の前回値
 		 *  @param[in]		cur_Bv			磁場の現在値
-		 *  @param[in]		vec_skymap		スカイマップの点群データ
+		 *  @param[out]		vec_skymap		スカイマップの点群データ
 		 *  @param[out]		vec_pulse		パルス波形
 		 */
 		void calculatePulse(
@@ -330,7 +333,7 @@ namespace CalcLib {
 		 *  @param[in/out]	f				微分関数
 		 *  @param[in/out]	df				微分
 		 */
-		 inline void RungeKutta(double& t, const double dt, Vector3Dd& f, Vector3Dd& df) const
+		 inline void RungeKutta(double t, const double dt, Vector3Dd& f, Vector3Dd& df) const
 		 {
 			 Vector3Dd df1, df2, df3;
 			 Vector3Dd g;
@@ -358,7 +361,7 @@ namespace CalcLib {
 		 *
 		 *  @param[in]		t				時間（依存している場合に使用）
 		 *  @param[in]		v				位置ベクトル
-		 *  @param[in]		Bv				磁場ベクトル
+		 *  @param[in/out]	Bv				磁場ベクトル
 		 */
 		 inline void calculateMagneticField(double /*t*/, Vector3Dd v, Vector3Dd& bv) const
 		 {

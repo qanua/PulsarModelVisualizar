@@ -17,7 +17,7 @@ extern "C" {
 
     /** @brief 磁力線の頂点を取得
      *
-     *  @param[in]      buffer          値を格納するfloat配列
+     *  @param[out]     buffer          値を格納するfloat配列
      * 
      *  @return         格納するデータ数
      */
@@ -26,7 +26,7 @@ extern "C" {
 
     /** @brief ポーラーキャップ北極側の開磁力線の頂点を取得
      *
-     *  @param[in]      buffer          値を格納するfloat配列
+     *  @param[out]     buffer          値を格納するfloat配列
      *
      *  @return         格納するデータ数
      */
@@ -35,7 +35,7 @@ extern "C" {
 
     /** @brief ポーラーキャップ北極側の閉磁力線の頂点を取得
      *
-     *  @param[in]      buffer          値を格納するfloat配列
+     *  @param[out]     buffer          値を格納するfloat配列
      *
      *  @return         格納するデータ数
      */
@@ -44,7 +44,7 @@ extern "C" {
 
     /** @brief ポーラーキャップ南極側の開磁力線の頂点を取得
      *
-     *  @param[in]      buffer          値を格納するfloat配列
+     *  @param[out]     buffer          値を格納するfloat配列
      *
      *  @return         格納するデータ数
      */
@@ -53,7 +53,7 @@ extern "C" {
 
     /** @brief ポーラーキャップ南極側の閉磁力線の頂点を取得
      *
-     *  @param[in]      buffer          値を格納するfloat配列
+     *  @param[out]     buffer          値を格納するfloat配列
      *
      *  @return         格納するデータ数
      */
@@ -62,7 +62,7 @@ extern "C" {
 
     /** @brief スカイマップの頂点を取得
      *
-     *  @param[in]      buffer          値を格納するfloat配列
+     *  @param[out]     buffer          値を格納するfloat配列
      *
      *  @return         格納するデータ数
      */
@@ -71,10 +71,10 @@ extern "C" {
 
     /** @brief パルスプロファイルの頂点を取得
      *
-     *  @param[in]      buffer          値を格納するfloat配列
      *  @param[in]      normalize       正規化の有無
+     *  @param[out]     buffer          値を格納するfloat配列
      *
      *  @return         格納するデータ数
      */
-    CALCLIB_API int getPulseProfile(float* buffer, bool normalize);
+    CALCLIB_API int getPulseProfile(bool normalize, float* buffer);
 }

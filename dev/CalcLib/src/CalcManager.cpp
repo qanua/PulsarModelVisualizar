@@ -12,9 +12,6 @@ namespace CalcLib {
 	{
 		// クリティカルセクションの初期化
 		::InitializeCriticalSection(p_critical_section_);
-
-		// パルサーモデルの計算
-		calculatePulsarModel();
 	}
 
 
@@ -153,7 +150,7 @@ namespace CalcLib {
 	}
 
 
-	int CalcManager::getPulseProfile(float* buffer, bool normalize)
+	int CalcManager::getPulseProfile(bool normalize, float* buffer)
 	{
 		// 正規化
 		if (normalize)

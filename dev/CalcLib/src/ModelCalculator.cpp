@@ -112,17 +112,16 @@ namespace CalcLib {
 						// 0.02: OuterGapの層の厚さ
 						close_angle -= 0.02;
 
-						if (k != 9) {
-
-							getSkymapAndPulse(false, true, close_angle * RADIAN, assets);
-						}
-						else {
-
+						if (k == 9) {
 							// UpperBoundaryのスカイマップを格納
 							getSkymapAndPulse(true, true, close_angle * RADIAN, assets);
 							pulsar.vec_skymaps_.emplace_back(assets.skymap_);
-
 						}
+						else {
+
+							getSkymapAndPulse(false, true, close_angle * RADIAN, assets);
+						}
+
 						// パルス波形の格納
 						pulsar.addPulse(assets.vec_pulse_);
 					}
@@ -213,13 +212,13 @@ namespace CalcLib {
 
 			if (get_skymap) {
 
-				// パルス波形のメモリ確保
-				assets.vec_pulse_.reserve(180);
+				// スカイマップのメモリ確保
+				assets.skymap_.vec_2dd_.reserve(MAX_LINE_LENGTH);
 			}
 			if (get_pulse) {
 
-				// スカイマップのメモリ確保
-				assets.skymap_.vec_2dd_.reserve(MAX_LINE_LENGTH);
+				// パルス波形のメモリ確保
+				assets.vec_pulse_.reserve(180);
 			}
 
 			// 磁場方向に積分
