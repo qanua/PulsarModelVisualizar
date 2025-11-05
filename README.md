@@ -57,7 +57,13 @@ PulsarModelVisualizar/
 ```
 
 ## 基本設計
+<img alt="01_クラス図_基本設計" src="doc/images/class_diagram_01.png" width=60%>
 
+* WpfApp : 表示部のモジュール（C#）
+  * MainWindow : WPF を用いたGUI構築、OpenTK による3D描画を行うクラス
+* CalcLib : 計算部のモジュール（C++）
+  * CalcManager : 計算結果を返すなど、計算処理を管理するクラス
+  * ModelCalculator : モデル計算を行うクラス
 
 ## クラス構成
 
@@ -72,4 +78,5 @@ PulsarModelVisualizar/
 
 
 ## 今後の展望
+
 
