@@ -9,7 +9,10 @@
 
 namespace CalcLib {
 
-	/** @brief パルサークラス */
+	/** @class PulsarAsset
+	 *
+	 *  @brief LCFL, パルス波形, スカイマップを管理する
+	 */
 	struct PulsarAsset {
 
 	public:

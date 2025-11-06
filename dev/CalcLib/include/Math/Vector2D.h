@@ -3,7 +3,10 @@
 #include <cmath>
 
 
-/** @brief 2次元ベクトルクラス */
+/** @class Vector2D
+ *
+ *  @brief 2次元ベクトルのクラステンプレート
+ */
 template <class T>
 class Vector2D {
 

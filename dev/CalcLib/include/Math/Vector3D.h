@@ -3,7 +3,10 @@
 #include <cmath>
 
 
-/** @brief 3次元ベクトルクラス */
+/** @class Vector3D
+ *
+ *  @brief 3次元ベクトルのクラステンプレート
+ */
 template <class T>
 class Vector3D {
 
