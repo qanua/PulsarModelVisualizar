@@ -1198,8 +1198,33 @@ namespace WpfApp
             }
         }
         #endregion
+
+        #region タイトルバー操作
+        /** @brief タイトルバー上でのマウス左ボタン押下イベント
+         * 
+         *  @param[in]      sender      タイトルバーの Grid
+         *  @param[in]      e           マウス状態などを含むイベントデータ
+         */
+        private void TitleBar_MouseLeftButtonDown(object sender, MouseButtonEventArgs e)
+        {
+            if (e.ButtonState == MouseButtonState.Pressed)
+                DragMove();
+        }
+
+
+        /** @brief タイトルバーの閉じるボタンクリックイベント
+         * 
+         *  @param[in]      sender      Button
+         *  @param[in]      e           子から親要素へ伝わるルーティングイベント
+         */
+        private void CloseButton_Click(object sender, RoutedEventArgs e)
+        {
+            Close();
+        }
+        #endregion
         #endregion
     }
+
 
     #region クラス
     #region Camera

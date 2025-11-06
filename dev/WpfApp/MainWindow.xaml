@@ -7,7 +7,7 @@
         xmlns:gl="clr-namespace:OpenTK.Wpf;assembly=GLWpfControl"
         mc:Ignorable="d"
         Title="Pulsar Model Visualizar" Height="1350" Width="1080" ResizeMode="NoResize"
-        HorizontalAlignment="Left" VerticalAlignment="Top">
+        WindowStyle="None" HorizontalAlignment="Left" VerticalAlignment="Top">
 
     <!--スタイル-->
     <Window.Resources>
@@ -128,18 +128,9 @@
         </Style>
     </Window.Resources>
 
-    <!--レイアウト-->
-    <Grid Background="#f5f5f5">
-        <!--タイトル-->
-        <TextBlock Text="Pulsar Model Visualizar"
-                   Foreground="Gray" FontSize="15"
-                   TextAlignment="Center" FontFamily="Century Gothic" FontWeight="Bold"
-                   HorizontalAlignment="Left" VerticalAlignment="Top" Margin="20,325,0,0"/>
-        <TextBlock Text="Outer Gap Model"
-                   Foreground="Gray" FontSize="9"
-                   TextAlignment="Center" FontFamily="Century Gothic"
-                   HorizontalAlignment="Left" VerticalAlignment="Top" Margin="20,358,0,0"/>
-
+    
+    <Grid Background="#f5f5f5" Margin="0,18,0,0">
+        <!--コンテンツ-->
         <!--/////////////////// MagneticLine ///////////////////-->
         <!--MagneticLineコントロール-->
         <gl:GLWpfControl x:Name="GLControlMagneticLine"
@@ -148,7 +139,8 @@
                          MouseMove="MagneticLine_MouseMove"
                          MouseUp="MagneticLine_MouseUp"
                          MouseLeave="MagneticLine_MouseLeave"
-                         MouseLeftButtonDown="MagneticLine_MouseLeftButtonDown"/>
+                         MouseLeftButtonDown="MagneticLine_MouseLeftButtonDown"
+                         Cursor="SizeAll"/>
         <!--円のマスク-->
         <Path Fill="#f5f5f5" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="240,50,0,0">
             <Path.Data>
@@ -260,10 +252,10 @@
         </TextBlock>
         <!--MagneticLineラベル-->
         <TextBlock Text="Magnetic Line"
-                   Foreground="Gray" FontSize="12"
+                   Foreground="Gray" FontSize="13"
                    TextAlignment="Center" FontFamily="Century Gothic" FontWeight="Bold"
-                   Background="#f5f5f5" Width="100" Height="16"
-                   HorizontalAlignment="Left" VerticalAlignment="Top" Margin="490,50,0,0"/>
+                   Background="#f5f5f5" Width="110" Height="19"
+                   HorizontalAlignment="Left" VerticalAlignment="Top" Margin="485,52,0,0"/>
 
         <!--/////////////////// PolarCap ///////////////////-->
         <!--破線-->
@@ -277,31 +269,35 @@
         </Path>
         <!--PolarCapラベル-->
         <TextBlock Text="Polar Cap"
-                   Foreground="Gray" FontSize="12"
+                   Foreground="Gray" FontSize="13"
                    TextAlignment="Center" FontFamily="Century Gothic" FontWeight="Bold"
                    Background="#f5f5f5" Width="80"
-                   HorizontalAlignment="Left" VerticalAlignment="Top" Margin="890,602,0,0"/>
+                   HorizontalAlignment="Left" VerticalAlignment="Top" Margin="880,602,0,0"/>
         <!--PolarCapコントロール-->
         <!--SouthClosed-->
         <gl:GLWpfControl x:Name="GLControlPolarCapSouthClosed"
                          Width="100" Height="100" Margin="760,560,0,0"
                          HorizontalAlignment="Left" VerticalAlignment="Top"
-                         MouseWheel="GLControl_MouseWheel"/>
+                         MouseWheel="GLControl_MouseWheel"
+                         Cursor="ScrollNS"/>
         <!--SouthOpened-->
         <gl:GLWpfControl x:Name="GLControlPolarCapSouthOpened"
                          Width="100" Height="100" Margin="760,560,0,0"
                          HorizontalAlignment="Left" VerticalAlignment="Top"
-                         MouseWheel="GLControl_MouseWheel"/>
+                         MouseWheel="GLControl_MouseWheel"
+                         Cursor="ScrollNS"/>
         <!--NorthClosed-->
         <gl:GLWpfControl x:Name="GLControlPolarCapNorthClosed"
                          Width="100" Height="100" Margin="760,560,0,0"
                          HorizontalAlignment="Left" VerticalAlignment="Top"
-                         MouseWheel="GLControl_MouseWheel"/>
+                         MouseWheel="GLControl_MouseWheel"
+                         Cursor="ScrollNS"/>
         <!--CapNorthOpened-->
         <gl:GLWpfControl x:Name="GLControlPolarCapNorthOpened"
                          Width="100" Height="100" Margin="760,560,0,0"
                          HorizontalAlignment="Left" VerticalAlignment="Top"
-                         MouseWheel="GLControl_MouseWheel"/>
+                         MouseWheel="GLControl_MouseWheel"
+                         Cursor="ScrollNS"/>
         <!--円のマスク-->
         <Path Fill="#f5f5f5" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="760,560,0,0">
             <Path.Data>
@@ -415,10 +411,10 @@
         </Path>
         <!--SkyMapラベル-->
         <TextBlock Text="Sky Map"
-                   Foreground="Gray" FontSize="12"
+                   Foreground="Gray" FontSize="13"
                    TextAlignment="Center" FontFamily="Century Gothic" FontWeight="Bold"
                    Background="#f5f5f5" Width="80"
-                   HorizontalAlignment="Left" VerticalAlignment="Top" Margin="135,682,0,0"/>
+                   HorizontalAlignment="Left" VerticalAlignment="Top" Margin="145,682,0,0"/>
         <!--Phaseラベル-->
         <TextBlock Text="Phase"
                    Foreground="Gray" FontSize="10"
@@ -438,7 +434,8 @@
         <gl:GLWpfControl x:Name="GLControlPulseProfile"
                          Width="540" Height="370"
                          HorizontalAlignment="Left" VerticalAlignment="Top" Margin="270,961,0,0"
-                         MouseWheel="GLControl_MouseWheel"/>
+                         MouseWheel="GLControl_MouseWheel"
+                         Cursor="ScrollNS"/>
         <!--破線-->
         <!--タテ-->
         <Path x:Name="PathDashPulseProfile" Stroke="#e6e6e6" StrokeThickness="0.5" StrokeDashArray="5.0"/>
@@ -455,10 +452,10 @@
         <Path x:Name="PathStrokePulseProfile" Stroke="Gray" StrokeThickness="1.0"/>
         <!--PulseProfileラベル-->
         <TextBlock Text="Pulse Profile"
-                   Foreground="Gray" FontSize="12"
+                   Foreground="Gray" FontSize="13"
                    TextAlignment="Center" FontFamily="Century Gothic" FontWeight="Bold"
                    Background="White" Width="100"
-                   HorizontalAlignment="Left" VerticalAlignment="Top" Margin="490,1222,0,0"/>
+                   HorizontalAlignment="Left" VerticalAlignment="Top" Margin="490,1220,0,0"/>
         <!--ViewingAngleガイド-->
         <Canvas x:Name="SkyMapViewingAngleCanvas"
                 Width="540" Height="270" Background="{x:Null}"
@@ -596,5 +593,41 @@
                 </ControlTemplate>
             </Slider.Template>
         </Slider>
+
+        <!--タイトル-->
+        <Border BorderBrush="Gray" BorderThickness="1"
+                HorizontalAlignment="Left" VerticalAlignment="Top"
+                Height="14" Width="79" Margin="20,354,0,0">
+            <TextBlock Text="Outer Gap Model"
+                       Foreground="Gray" FontSize="8" 
+                       TextAlignment="Center" FontFamily="Century Gothic" Margin="0,1,0,0"/>
+        </Border>
+        <Border BorderBrush="Gray" Background="White" BorderThickness="1"
+                HorizontalAlignment="Left" VerticalAlignment="Top" 
+                Width="181" Height="20" Margin="20,335,0,0">
+            <TextBlock Text="Pulsar Model Visualizar"
+                       Foreground="Gray" FontSize="16"
+                       TextAlignment="Center" FontFamily="Century Gothic" Margin="0,-1,0,0"/>
+        </Border>
+
+        <!--タイトルバー-->
+        <Grid Background="#FF2D2D30" Height="32" VerticalAlignment="Top"
+              Margin="0,-18,0,0" MouseLeftButtonDown="TitleBar_MouseLeftButtonDown">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+            <!--アイコン-->
+            <Image Grid.Column="0" Source="/icon.png" Width="16" Height="16" Margin="8,0,6,0"
+                   VerticalAlignment="Center"/>
+            <!--タイトル-->
+            <TextBlock Grid.Column="1" Text="Pulsar Model Visualizar" Foreground="White"
+                       VerticalAlignment="Center" Margin="10,0,0,0" FontFamily="Century Gothic" />
+            <!-- 閉じるボタン -->
+            <Button Grid.Column="2" Content="✕" Foreground="White" Background="#FF2D2D30"
+                    BorderThickness="0" Width="40" Height="32" HorizontalAlignment="Right"
+                    Click="CloseButton_Click"/>
+        </Grid>
     </Grid>
 </Window>

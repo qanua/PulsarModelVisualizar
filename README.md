@@ -63,7 +63,7 @@ PulsarModelVisualizar/
 ## 基本設計
 設計の詳細は [DESIGN.md](DESIGN.md) を参照ください。
 
-<img alt="01_クラス図_基本設計" src="doc/images/class_diagram_01.png" width=60%>
+<img alt="01_クラス図_基本設計" src="doc/images/class_diagram_01.png" width=70%>
 
 
 * WpfApp : 表示部分のモジュール（C#）
