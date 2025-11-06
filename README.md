@@ -65,7 +65,7 @@ PulsarModelVisualizar/
 
 <img alt="01_クラス図_基本設計" src="doc/images/class_diagram_01.png" width=60%>
 
-C#側からの入力をもとに、C++側では描画する頂点の計算を行う。
+
 * WpfApp : 表示部分のモジュール（C#）
 * CalcLib : 計算部分のモジュール（C++）
 
