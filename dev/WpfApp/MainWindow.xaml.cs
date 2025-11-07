@@ -677,6 +677,33 @@ namespace WpfApp
                 updateSkyMapGuideLine(slider);
             }
         }
+
+
+        /** @brief uウィンドウの読み込みイベント
+         * 
+         *  @param[in]      sender      イベント発生スライダー
+         *  @param[in]      e           イベントデータ
+         */
+        private void MainWindow_Loaded(object sender, RoutedEventArgs e)
+        {
+            double baseWidth = 1080;
+            double baseHeight = 1350;
+
+            // 現在の画面サイズ取得
+            double screenWidth = SystemParameters.PrimaryScreenWidth;
+            double screenHeight = SystemParameters.PrimaryScreenHeight;
+
+            // スケーリング係数を決める（画面の短辺に合わせる）
+            double scale = Math.Min(screenWidth / baseWidth, screenHeight / baseHeight);
+
+            // 新しいウィンドウサイズ
+            Width = baseWidth * scale;
+            Height = baseHeight * scale;
+
+            // 画面中央に配置
+            Left = (screenWidth - Width) * 0.5;
+            Top = (screenHeight - Height) * 0.5;
+        }
         #endregion
         #endregion
 
