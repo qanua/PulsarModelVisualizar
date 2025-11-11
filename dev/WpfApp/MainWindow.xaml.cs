@@ -679,7 +679,7 @@ namespace WpfApp
         }
 
 
-        /** @brief uウィンドウの読み込みイベント
+        /** @brief ウィンドウの読み込みイベント
          * 
          *  @param[in]      sender      イベント発生スライダー
          *  @param[in]      e           イベントデータ

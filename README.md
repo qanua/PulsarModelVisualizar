@@ -92,12 +92,38 @@ PulsarModelVisualizar/
 
 
 ## 画面仕様
+<img alt="MainWindow" src="doc/images/main_window_02.png" width=100%>
+
+| No. | 名称 | 機能 |
+|:---|:---|:---|
+| &#10102; | Magnetic Line ビュー | ・ 磁力線、磁化軸（赤）、回転軸（緑）を表示<br>・ マウスドラッグで視線方向の傾き、回転を変更<br>・ ダブルクリックで初期位置に戻る<br> | 
+| &#10103; | Inclination Angle スライダー | ・ 磁化軸の傾きを変更<br>・ 変更中は頂点描画がグレーアウト |
+| &#10104; | Polar Cap ビュー | ・ 磁力線の始点 / 終点を表示<br>・ スクロールでズームイン / アウト |
+| &#10105; | Polar Cap 表示切り替えボタン |　　　<img alt="MainWindow" src="doc/images/main_window_03.png" width=45%><br>( d )　北側の終点　　( a )　北側の始点<br>( c )　南側の始点　　( b )　南側の終点 |
+| &#10106; | Sky Map ビュー | ・ 放射の位相マッピングを表示 |
+| &#10107; | Viewing Angle スライダー | ・ 視線方向の傾きを変更 |
+| &#10108; | Pulse ビュー | ・ 視線方向から観測されるパルス波形を表示<br> ・ スクロールで視線方向の傾きを変更 |
+| &#10109; | Phase スライダー | ・ パルス波形の位相を変更<br>・ 視線方向の回転を変更 |
 
 
 ## 機能仕様
+| 機能 | 概要 | モジュール | 操作ビュー |
+|:---|:---|:---|:---|
+| 頂点の計算 | Inclination Angle の入力で頂点を計算 | CalcLib | - |
+| 頂点の描画 | 計算結果を取得して頂点を描画 | WpfApp | - |
+| カメラ操作 | マウス操作で視点を移動、回転 | WpfApp | Magnetic Line、Polar Cap、Pulse |
+| パラメータ変更 | スライダー操作で値を変更 | WpfApp | Magnetic Line、Polar Cap、Sky Map、Pulse |
+| 表示切り替え | ボタン操作で表示を切り替え | WpfApp | Polar Cap |
+
+### 処理の流れ
+1. 起動時に Inclination Angle を CalcLib に入力
+2. CalcLib で算出された頂点データを WpfApp が取得
+3. OpenTK による描画処理を実行
+4. ユーザ操作に応じて点群データを再計算、再描画
 
 
 ## 工夫した点
+
 
 
 ## 今後の展望
