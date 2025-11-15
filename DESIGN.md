@@ -39,8 +39,8 @@
 
 ## シーケンス図
 ### CalcLib
-#### setInclinationAngle
+#### Inclination Angle の設定
 <img alt="01_シーケンス図_CalcLib_setInclinationAngle" src="doc/images/sequence_diagram_01.png" width=100%>
 
-#### getResult
+#### 計算結果の取得
 <img alt="02_シーケンス図_CalcLib_getResult" src="doc/images/sequence_diagram_02.png" width=100%>
