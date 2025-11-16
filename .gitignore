@@ -1,11 +1,7 @@
 # Build results
 [Bb]in/
 [Oo]bj/
-[Dd]ebug/
-[Rr]elease/
-x64/
 x86/
-build/
 out/
 layout/
 
@@ -21,6 +17,3 @@ packages/
 # Others
 *.log
 *.tmp
-*.exe
-*.dll
-*.pdb

@@ -55,7 +55,7 @@ PulsarModelVisualizar/
  │   ├─ CalcLib/                      # DLL部ソースコード（C++）
  │   └─ PulsarModelVisualizar.sln
  ├─ doc/
- │   ├─ images/                       # UML図
+ │   ├─ images/                       # UML図など
  │   └─ PulsarModelVisualizar.asta    # 設計ファイル
  ├─ DESIGN.md                         # UML図一覧
  └─ README.md
