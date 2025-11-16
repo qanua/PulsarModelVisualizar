@@ -14,7 +14,7 @@
 
 
 ## アクティビティ図
-### 起動～描画
+### メイン画面起動～描画
 <img alt="01_アクティビティ図_起動～描画" src="doc/images/activity_diagram_01.png" width=100%>
 
 ### MagneticLine

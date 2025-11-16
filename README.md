@@ -75,7 +75,9 @@ PulsarModelVisualizar/
 <img alt="02_クラス図_全体" src="doc/images/class_diagram_02.png" width=100%>
 
 * WpfApp
-  * MainWindow : WPF を用いたGUI構築、OpenTK による3D描画を行う
+  * App : アプリケーションのエントリポイント
+  * SplashWindow : WPF を用いたスプラッシュ画面
+  * MainWindow : WPF を用いたメイン画面、OpenTK による3D描画を行う
     * Camera : カメラ設定を保持する
     * Object : 頂点データなど、描画情報を保持する
 * CalcLib
@@ -118,10 +120,12 @@ PulsarModelVisualizar/
 | 表示切り替え | ボタン操作で表示を切り替え | WpfApp | Polar Cap |
 
 ### 処理の流れ
-1. 起動時に Inclination Angle を CalcLib に入力
-2. CalcLib で算出された頂点データを WpfApp が取得
-3. OpenTK による描画処理を実行
-4. ユーザ操作に応じて点群データを再計算、再描画
+1. アプリケーションを起動し、スプラッシュ画面を表示
+2. メイン画面を表示し、スプラッシュ画面を閉じる
+3. メイン画面から CalcLib に Inclination Angle を入力
+4. CalcLib で算出された頂点データをメイン画面が取得
+5. OpenTK による描画処理を実行
+6. ユーザ操作に応じて点群データを再計算、再描画
 
 
 ## 工夫した点

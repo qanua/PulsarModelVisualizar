@@ -679,9 +679,9 @@ namespace WpfApp
         }
 
 
-        /** @brief ウィンドウの読み込みイベント
+        /** @brief メイン画面の読み込みイベント
          * 
-         *  @param[in]      sender      イベント発生スライダー
+         *  @param[in]      sender      イベント発生画面
          *  @param[in]      e           イベントデータ
          */
         private void MainWindow_Loaded(object sender, RoutedEventArgs e)
@@ -693,16 +693,12 @@ namespace WpfApp
             double screenWidth = SystemParameters.PrimaryScreenWidth;
             double screenHeight = SystemParameters.PrimaryScreenHeight;
 
-            // スケーリング係数を決める（画面の短辺に合わせる）
-            double scale = Math.Min(screenWidth / baseWidth, screenHeight / baseHeight);
+            // スケーリング係数の決定
+            double scale = Math.Min(screenWidth / 2560, screenHeight / 1440);
 
-            // 新しいウィンドウサイズ
+            // 新しい画面サイズ
             Width = baseWidth * scale;
             Height = baseHeight * scale;
-
-            // 画面中央に配置
-            Left = (screenWidth - Width) * 0.5;
-            Top = (screenHeight - Height) * 0.5;
         }
         #endregion
         #endregion

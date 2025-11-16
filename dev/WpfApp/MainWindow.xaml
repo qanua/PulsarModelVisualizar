@@ -7,7 +7,7 @@
         xmlns:gl="clr-namespace:OpenTK.Wpf;assembly=GLWpfControl"
         mc:Ignorable="d"
         Title="Pulsar Model Visualizar" Height="1350" Width="1080" ResizeMode="NoResize"
-        WindowStyle="None" HorizontalAlignment="Left" VerticalAlignment="Top"
+        WindowStyle="None" WindowStartupLocation="CenterScreen" Topmost="True"
         Loaded="MainWindow_Loaded">
 
     <!--スタイル-->
@@ -149,10 +149,10 @@
                 <Image Grid.Column="0" Source="/icon.png" Width="16" Height="16" Margin="8,0,6,0"
                        VerticalAlignment="Center"/>
                 <!--タイトル-->
-                <TextBlock Grid.Column="1" Text="Pulsar Model Visualizar" Foreground="White"
+                <TextBlock Grid.Column="1" Text="Pulsar Model Visualizar" Foreground="White" FontSize="12"
                            VerticalAlignment="Center" Margin="10,0,0,0" FontFamily="Century Gothic" />
                 <!-- 閉じるボタン -->
-                <Button Grid.Column="2" Content="✕" Foreground="White" Background="Transparent"
+                <Button Grid.Column="2" Content="✕" Foreground="White" Background="Transparent" FontSize="12"
                         BorderThickness="0" Width="40" HorizontalAlignment="Right"
                         Click="CloseButton_Click"/>
             </Grid>
