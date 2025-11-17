@@ -699,6 +699,10 @@ namespace WpfApp
             // 新しい画面サイズ
             Width = baseWidth * scale;
             Height = baseHeight * scale;
+
+            // 画面中央に配置
+            Left = (screenWidth - Width) * 0.5;
+            Top = (screenHeight - Height) * 0.5;
         }
         #endregion
         #endregion

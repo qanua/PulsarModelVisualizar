@@ -6,8 +6,8 @@
         xmlns:local="clr-namespace:WpfApp"
         mc:Ignorable="d"
         Title="SplashWindow" Height="135" Width="480" ResizeMode="NoResize"
-        WindowStyle="None" AllowsTransparency="True" Background="Transparent"
-        WindowStartupLocation="CenterScreen" Topmost="True"
+        AllowsTransparency="True" Background="Transparent"
+        WindowStyle="None" Topmost="True"
         Loaded="SplashWindow_Loaded">
     <Viewbox Stretch="Uniform">
         <Grid Background="#FF2D2D30" Height="135" Width="480">

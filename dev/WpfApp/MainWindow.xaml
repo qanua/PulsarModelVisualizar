@@ -7,7 +7,7 @@
         xmlns:gl="clr-namespace:OpenTK.Wpf;assembly=GLWpfControl"
         mc:Ignorable="d"
         Title="Pulsar Model Visualizar" Height="1350" Width="1080" ResizeMode="NoResize"
-        WindowStyle="None" WindowStartupLocation="CenterScreen" Topmost="True"
+        WindowStyle="None" Topmost="True"
         Loaded="MainWindow_Loaded">
 
     <!--スタイル-->
