@@ -898,13 +898,11 @@ namespace WpfApp
                     camera.Pitch = Math.Clamp(camera.Pitch, -89.9f, 89.9f);
 
                     // ViewingAngleスライダーの同期
-                    _viewingAngle = 90 + (int)camera.Pitch;
-                    SkyMapViewingAngleSlider.Value = _viewingAngle;
+                    SkyMapViewingAngleSlider.Value = 90 + (int)camera.Pitch;
 
                     // Phaseスライダーの同期
                     int delta = (90 + (int)camera.Yaw) % 360;
-                    _phase = (0 <= delta) ? delta : 360 + delta;
-                    SkyMapPhaseSlider.Value = _phase;
+                    SkyMapPhaseSlider.Value = (0 <= delta) ? delta : 360 + delta;
 
                     _lastMousePos = pos;
                 }
