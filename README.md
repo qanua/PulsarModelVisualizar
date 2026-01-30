@@ -22,8 +22,8 @@
     * OpenTK（3D描画）
   * C++ 
     * Native DLL（数値計算）
-* [IDE]　Visual Studio 2022
 * [OS]　Windows 11
+* [IDE]　Visual Studio 2022
 * [CPU]　Intel Core i9
 * [GPU]　NVIDIA GeForce RTX 4060 Ti
 * [RAM]　32GB
@@ -45,7 +45,9 @@ PulsarModelVisualizar/
  │   ├─ CalcLib/                      # DLL部ソースコード（C++）
  │   └─ PulsarModelVisualizar.sln     # Visual Studio ソリューションファイル
  ├─ doc/
- │   ├─ images/                       # UML図など
+ │   ├─ images/
+ │   │   ├─ uml/                      # UML図
+ │   │   └─ demo.gif                  # 操作デモ動画
  │   └─ PulsarModelVisualizar.asta    # 設計ファイル
  ├─ DESIGN.md                         # UML図一覧
  └─ README.md
