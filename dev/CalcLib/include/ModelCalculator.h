@@ -38,7 +38,7 @@ namespace CalcLib {
 		 *  光円柱の半径と中性子星の半径の比に依存する
 		 *  10: 1スケールあたりの分割数
 		 */
-		const int MAX_LINE_LENGTH = std::abs(LIGHT_CYRINDER_RADIUS) / std::abs(STAR_RADIUS) * 10;
+		const int MAX_LINE_LENGTH = static_cast<int>(std::abs(LIGHT_CYRINDER_RADIUS) / std::abs(STAR_RADIUS) * 10);
 
 
 		/** @brief コンストラクタ */

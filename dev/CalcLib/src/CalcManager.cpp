@@ -64,13 +64,13 @@ namespace CalcLib {
 
 			if (buffer) {
 				for (unsigned int j = 0; j < vec_v3d.size(); j++) {
-					buffer[counter++] = vec_v3d[j].y;
-					buffer[counter++] = vec_v3d[j].z;
-					buffer[counter++] = vec_v3d[j].x;
+					buffer[counter++] = static_cast<float>(vec_v3d[j].y);
+					buffer[counter++] = static_cast<float>(vec_v3d[j].z);
+					buffer[counter++] = static_cast<float>(vec_v3d[j].x);
 				}
 			}
 			else {
-				counter += vec_v3d.size() * 3;
+				counter += static_cast<int>(vec_v3d.size() * 3);
 			}
 		}
 		return counter;
@@ -109,13 +109,13 @@ namespace CalcLib {
 		// floatîzóÒÇ…äiî[
 		if (buffer) {
 			for (unsigned int i = 0; i < vertices.size(); i++) {
-				buffer[counter++] = vertices[i].x;
-				buffer[counter++] = vertices[i].y;
-				buffer[counter++] = vertices[i].z;
+				buffer[counter++] = static_cast<float>(vertices[i].x);
+				buffer[counter++] = static_cast<float>(vertices[i].y);
+				buffer[counter++] = static_cast<float>(vertices[i].z);
 			}
 		}
 		else {
-			counter = vertices.size() * 3;
+			counter = static_cast<int>(vertices.size() * 3);
 		}
 		return counter;
 	}
@@ -138,12 +138,12 @@ namespace CalcLib {
 
 			if (buffer) {
 				for (unsigned int j = 0; j < vec_v2d.size(); j++) {
-					buffer[counter++] = vec_v2d[j].x;
-					buffer[counter++] = std::abs(vec_v2d[j].y - 180);	// è„â∫ÇîΩì]
+					buffer[counter++] = static_cast<float>(vec_v2d[j].x);
+					buffer[counter++] = static_cast<float>(std::abs(vec_v2d[j].y - 180));	// è„â∫ÇîΩì]
 				}
 			}
 			else {
-				counter += vec_v2d.size() * 2;
+				counter += static_cast<int>(vec_v2d.size() * 2);
 			}
 		}
 		return counter;
@@ -173,12 +173,12 @@ namespace CalcLib {
 
 			if (buffer) {
 				for (unsigned int j = 0; j < vec_v2d.size(); j++) {
-					buffer[counter++] = vec_v2d[j].x;	// Phase
-					buffer[counter++] = vec_v2d[j].y;	// Intensity(Relative)
+					buffer[counter++] = static_cast<float>(vec_v2d[j].x);	// Phase
+					buffer[counter++] = static_cast<float>(vec_v2d[j].y);	// Intensity(Relative)
 				}
 			}
 			else {
-				counter += vec_v2d.size() * 2;
+				counter += static_cast<int>(vec_v2d.size() * 2);
 			}
 		}
 		return counter;

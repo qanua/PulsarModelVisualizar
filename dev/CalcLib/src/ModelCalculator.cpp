@@ -322,7 +322,7 @@ namespace CalcLib {
 		Pulse pulse;
 		Vector2Dd vec_pulse_temp(vec_skymap.back().x, photon_count);
 		pulse.vec_2dd_.emplace_back(vec_pulse_temp);
-		pulse.viewing_angle_ = vec_skymap.back().y;
+		pulse.viewing_angle_ = static_cast<int>(vec_skymap.back().y);
 		vec_pulse.emplace_back(pulse);
 	}
 

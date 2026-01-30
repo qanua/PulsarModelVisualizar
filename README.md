@@ -23,8 +23,10 @@
   * C++ 
     * Native DLL（数値計算）
 * [IDE]　Visual Studio 2022
-* [OS]　Windows 11 Home 24H2
+* [OS]　Windows 11
+* [CPU]　Intel Core i9
 * [GPU]　NVIDIA GeForce RTX 4060 Ti
+* [RAM]　32GB
 * [OpenGL]　4.6
 
 
@@ -66,14 +68,14 @@ PulsarModelVisualizar/
 ## 基本設計
 設計の詳細は [DESIGN.md](DESIGN.md) を参照ください。
 
-<img alt="01_クラス図_基本設計" src="doc/images/class_diagram_01.png" width=70%>
+<img alt="01_クラス図_基本設計" src="doc/images/uml/class_diagram_01.png" width=70%>
 
 
 * WpfApp : 表示部分のモジュール（C#）
 * CalcLib : 計算部分のモジュール（C++）
 
 ### クラス構成
-<img alt="02_クラス図_全体" src="doc/images/class_diagram_02.png" width=100%>
+<img alt="02_クラス図_全体" src="doc/images/uml/class_diagram_02.png" width=100%>
 
 * WpfApp
   * App : アプリケーションのエントリポイント
@@ -101,10 +103,10 @@ PulsarModelVisualizar/
 
 | No. | 名称 | 機能 |
 |:---|:---|:---|
-| &#10102; | Magnetic Line ビュー | ・ 磁力線、磁化軸（赤）、回転軸（緑）を表示<br>・ マウスドラッグで視線方向の傾き、回転を変更<br>・ ダブルクリックで初期位置に戻る<br> | 
+| &#10102; | Magnetic Line ビュー | ・ 磁力線、磁化軸（赤）、回転軸（緑）を表示<br>・ マウスドラッグで視線方向の傾き、視線方向の回転を変更<br>・ ダブルクリックで初期位置に戻る<br> | 
 | &#10103; | Inclination Angle スライダー | ・ 磁化軸の傾きを変更<br>・ 変更中は頂点描画がグレーアウト |
 | &#10104; | Polar Cap ビュー | ・ 磁力線の始点 / 終点を表示<br>・ 縦スクロールでズームイン / アウト |
-| &#10105; | Polar Cap 表示切り替えボタン | ・ 表示（赤）/ 非表示（灰）を切り替える<br>　 <img alt="MainWindow" src="doc/images/main_window_03.png" style="transform:rotate(270deg)" width=20>　Ｎ極側の始点<br>　 <img alt="MainWindow" src="doc/images/main_window_03.png" style="transform:rotate(90deg)" width=20>　Ｓ極側の始点<br>　 <img alt="MainWindow" src="doc/images/main_window_03.png" width=20>　Ｎ極側の終点<br>　 <img alt="MainWindow" src="doc/images/main_window_03.png" style="transform:rotate(180deg)" width=20>　Ｓ極側の終点<br> |
+| &#10105; | Polar Cap 表示切り替えボタン | ・ 表示（赤）/ 非表示（灰）を切り替える<br>　 <img alt="MainWindow" src="doc/images/main_window_03.png" width=20>　Ｎ極側の始点<br>　 <img alt="MainWindow" src="doc/images/main_window_04.png" width=20>　Ｓ極側の始点<br>　 <img alt="MainWindow" src="doc/images/main_window_05.png" width=20>　Ｎ極側の終点<br>　 <img alt="MainWindow" src="doc/images/main_window_06.png" width=20>　Ｓ極側の終点<br> |
 | &#10106; | Sky Map ビュー | ・ 放射の位相マッピングを表示 |
 | &#10107; | Viewing Angle スライダー | ・ 視線方向の傾きを変更 |
 | &#10108; | Pulse Profile ビュー | ・ 視線方向から観測されるパルス波形を表示<br> ・ 縦スクロールで視線方向の傾きを変更 |
@@ -118,15 +120,16 @@ PulsarModelVisualizar/
 | 頂点の描画 | 計算結果を取得して頂点を描画 | WpfApp | - |
 | カメラ操作 | マウス操作で視点を移動、回転 | WpfApp | Magnetic Line<br>Polar Cap<br>Pulse Profile |
 | パラメータ変更 | スライダー操作で値を変更 | WpfApp | Magnetic Line<br>Polar Cap<br>Sky Map<br>Pulse Profile |
-| 表示切り替え | ボタン操作で表示を切り替え | WpfApp | Polar Cap |
+| 表示切り替え | ボタン操作で表示 / 非表示を切り替え | WpfApp | Polar Cap |
 
 ### 処理の流れ
 1. アプリケーション起動とともに、スプラッシュ画面を表示
-2. メイン画面を表示し、スプラッシュ画面を閉じる
-3. メイン画面から CalcLib に Inclination Angle を入力
-4. CalcLib で算出された点群データをメイン画面が取得
-5. OpenTK による描画処理を実行
-6. ユーザ操作に応じて点群データを再計算、再描画
+2. メイン画面で頂点を計算して描画処理を実行<br>
+・メイン画面から CalcLib に Inclination Angle を入力<br>
+・CalcLib で算出された点群データをメイン画面が取得<br>
+・OpenTK による描画処理を実行<br>
+3. メイン画面を表示し、スプラッシュ画面を閉じる
+4. ユーザ操作に応じて点群データを再計算、再描画
 
 
 ## 工夫した点
@@ -139,7 +142,7 @@ PulsarModelVisualizar/
 
 ## 今後の展望
 1. **開発環境に依存しないアーキテクチャへ展開**<br>
-現在は Visual Studio で開発をしていますが、CMake への移行を考えています。今後のローカル環境の変化を考慮し、開発継続のための環境への移行を考えています。
+継続して開発を行うためめに、開発環境の依存を減らしたいと考えています。そのため、Visual Studio を用いた開発から CMake への移行を検討しています。
 
 2. **観測データとの比較機能の追加**<br>
-パルス波形を実際の観測結果と比較できる機能を追加することで、採用した放射モデルの再現性を検証し、モデルを改善を図りたい考えています。
+採用した放射モデルの再現性を検証するために、計算したパルス波形を実際の観測結果と比較できる機能の追加を検討しています。

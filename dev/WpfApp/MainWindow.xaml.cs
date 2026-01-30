@@ -53,7 +53,7 @@ namespace WpfApp
          * 
          *  @details        パルサーの回転軸と磁化軸のなす角 [度]
          */
-        private int _inclinationAngle = 57;
+        private int _inclinationAngle = -1;
 
         /** @brief ViewingAngle
          * 
@@ -204,8 +204,12 @@ namespace WpfApp
             // シェーダーの生成
             setupShader();
 
-            // InclinationAngleの設定（頂点の取得前に行う）
-            setInclinationAngle(_inclinationAngle);
+            // InclinationAngleの初期設定（頂点の取得前に行う）
+            if (_inclinationAngle == -1)
+            {
+                _inclinationAngle = 57;
+                setInclinationAngle(_inclinationAngle);
+            }
 
             // 頂点の取得
             getVertices(control);
