@@ -73,7 +73,8 @@
   <!-- 発行時に zip ファイルを生成 -->
   <Target Name="CreateZipPackage" AfterTargets="Publish">
     <Delete Files="$(MSBuildProjectDirectory)\..\..\PulsarModelVisualizar.zip" />
-    <Exec Command='tar -a -c -f "$(MSBuildProjectDirectory)\..\..\PulsarModelVisualizar.zip" -C "$(PublishDir.TrimEnd(`\`))" .' />
+    <!--<Exec Command='tar -a -c -f "$(MSBuildProjectDirectory)\..\..\PulsarModelVisualizar.zip" -C "$(PublishDir.TrimEnd(\))" .' />-->
+    <Exec Command='powershell -Command "Compress-Archive -Path &quot;$(PublishDir)*&quot; -DestinationPath &quot;$(MSBuildProjectDirectory)\..\..\PulsarModelVisualizar.zip&quot; -Force"' />
   </Target>
 
 </Project>
