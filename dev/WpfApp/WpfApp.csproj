@@ -62,14 +62,18 @@
     </None>
   </ItemGroup>
 
-  <!-- Release ビルド後に実行フォルダ一式を作成 -->
-  <Target Name="CreatePackage" AfterTargets="Build" Condition="'$(Configuration)' == 'Release'">
+  <!--配布用の設定-->
+  <!-- 発行時に CalcLib.dll を実行フォルダ一式にコピーする -->
+  <Target Name="CopyNativeDlls" AfterTargets="Publish">
     <ItemGroup>
-      <BuildOutput Include="$(TargetDir)**\*.*" />
+      <NativeDlls Include="$(MSBuildProjectDirectory)\..\build\$(Platform)\$(Configuration)\CalcLib.dll" />
     </ItemGroup>
-    <RemoveDir Directories="$(SolutionDir)..\build" Condition="Exists('$(SolutionDir)..\build')" />
-    <MakeDir Directories="$(SolutionDir)..\build" />
-    <Copy SourceFiles="@(BuildOutput)" DestinationFiles="@(BuildOutput->'$(SolutionDir)..\build\%(RecursiveDir)%(Filename)%(Extension)')" />
+    <Copy SourceFiles="@(NativeDlls)" DestinationFolder="$(PublishDir)" SkipUnchangedFiles="true" />
+  </Target>
+  <!-- 発行時に zip ファイルを生成 -->
+  <Target Name="CreateZipPackage" AfterTargets="Publish">
+    <Delete Files="$(MSBuildProjectDirectory)\..\..\PulsarModelVisualizar.zip" />
+    <Exec Command='tar -a -c -f "$(MSBuildProjectDirectory)\..\..\PulsarModelVisualizar.zip" -C "$(PublishDir.TrimEnd(`\`))" .' />
   </Target>
 
 </Project>
