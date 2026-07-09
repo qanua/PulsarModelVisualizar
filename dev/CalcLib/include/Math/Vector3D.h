@@ -3,6 +3,7 @@
 #include <cmath>
 
 
+// TODO: FlyingLetterとの比較
 /** @class Vector3D
  *
  *  @brief 3次元ベクトルのクラステンプレート
@@ -113,16 +114,16 @@ public:
 };
 
 
-template<class T> Vector3D<T> operator+( const Vector3D<T>& v ) { return Vector3D<T>( v ); }
+template<class T> Vector3D<T> operator+(const Vector3D<T>& v) { return Vector3D<T>(v); }
+template<class T> Vector3D<T> operator-(const Vector3D<T>& v) { return Vector3D<T>(v) *= -1; }
 
-template<class T> Vector3D<T> operator+( const Vector3D<T>& v1, const Vector3D<T>& v2 ) { return Vector3D<T>( v1 ) += v2; }
-template<class T> Vector3D<T> operator-( const Vector3D<T>& v1, const Vector3D<T>& v2 ) { return Vector3D<T>( v1 ) -= v2; }
-template<class T> Vector3D<T> operator*( const Vector3D<T>& v1, const Vector3D<T>& v2 ) { return Vector3D<T>( v1 ) *= v2; }
+template<class T> Vector3D<T> operator+(const Vector3D<T>& v1, const Vector3D<T>& v2) { return Vector3D<T>(v1) += v2; }
+template<class T> Vector3D<T> operator-(const Vector3D<T>& v1, const Vector3D<T>& v2) { return Vector3D<T>(v1) -= v2; }
+template<class T> Vector3D<T> operator*(const Vector3D<T>& v1, const Vector3D<T>& v2) { return Vector3D<T>(v1) *= v2; }
+template<class T> Vector3D<T> operator/(const Vector3D<T>& v, const T& n) { return Vector3D<T>(v) /= n; }
 
-template<class T> Vector3D<T> operator/( const Vector3D<T>& v, const T& n ) { return Vector3D<T>( v ) /= n; }
-template<class T> Vector3D<T> operator*( const Vector3D<T>& v, const T& n ) { return Vector3D<T>( v ) *= n; }
-
-template<class T> Vector3D<T> operator*( const T& n, const Vector3D<T>& v ) { return Vector3D<T>( n ) *= v; }
+template<class T> Vector3D<T> operator*(const Vector3D<T>& v, const T& n) { return Vector3D<T>(v) *= n; }
+template<class T> Vector3D<T> operator*(const T& n, const Vector3D<T>& v) { return Vector3D<T>(v) *= n; }
 
 typedef Vector3D<	int> Vector3Di;
 typedef Vector3D< float> Vector3Df;

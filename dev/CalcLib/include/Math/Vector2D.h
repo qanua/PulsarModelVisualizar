@@ -3,6 +3,7 @@
 #include <cmath>
 
 
+// TODO: FlyingLetterとの比較
 /** @class Vector2D
  *
  *  @brief 2次元ベクトルのクラステンプレート
@@ -110,15 +111,15 @@ public:
 
 
 template<class T> Vector2D<T> operator+(const Vector2D<T>& v) { return Vector2D<T>(v); }
+template<class T> Vector2D<T> operator-(const Vector2D<T>& v) { return Vector2D<T>(v) *= -1; }
 
 template<class T> Vector2D<T> operator+(const Vector2D<T>& v1, const Vector2D<T>& v2) { return Vector2D<T>(v1) += v2; }
 template<class T> Vector2D<T> operator-(const Vector2D<T>& v1, const Vector2D<T>& v2) { return Vector2D<T>(v1) -= v2; }
 template<class T> Vector2D<T> operator*(const Vector2D<T>& v1, const Vector2D<T>& v2) { return Vector2D<T>(v1) *= v2; }
-
 template<class T> Vector2D<T> operator/(const Vector2D<T>& v, const T& n) { return Vector2D<T>(v) /= n; }
-template<class T> Vector2D<T> operator*(const Vector2D<T>& v, const T& n) { return Vector2D<T>(v) *= n; }
 
-template<class T> Vector2D<T> operator*(const T& n, const Vector2D<T>& v) { return Vector2D<T>(n) *= v; }
+template<class T> Vector2D<T> operator*(const Vector2D<T>& v, const T& n) { return Vector2D<T>(v) *= n; }
+template<class T> Vector2D<T> operator*(const T& n, const Vector2D<T>& v) { return Vector2D<T>(v) *= n; }
 
 typedef Vector2D<   int> Vector2Di;
 typedef Vector2D< float> Vector2Df;
