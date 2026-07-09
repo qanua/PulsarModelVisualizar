@@ -8,8 +8,9 @@
     <UseWPF>true</UseWPF>
     <PlatformTarget>x64</PlatformTarget>
     <Platforms>AnyCPU;x64</Platforms>
-    <BaseOutputPath>$(SolutionDir)\build\</BaseOutputPath>
+    <BaseOutputPath>$(SolutionDir)build\</BaseOutputPath>
     <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+    <AssemblyName>PulsarModelVisualizar</AssemblyName>
   </PropertyGroup>
 
   <ItemGroup>
@@ -60,5 +61,15 @@
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
     </None>
   </ItemGroup>
+
+  <!-- Release ビルド後に実行フォルダ一式を作成 -->
+  <Target Name="CreatePackage" AfterTargets="Build" Condition="'$(Configuration)' == 'Release'">
+    <ItemGroup>
+      <BuildOutput Include="$(TargetDir)**\*.*" />
+    </ItemGroup>
+    <RemoveDir Directories="$(SolutionDir)..\build" Condition="Exists('$(SolutionDir)..\build')" />
+    <MakeDir Directories="$(SolutionDir)..\build" />
+    <Copy SourceFiles="@(BuildOutput)" DestinationFiles="@(BuildOutput->'$(SolutionDir)..\build\%(RecursiveDir)%(Filename)%(Extension)')" />
+  </Target>
 
 </Project>
