@@ -41,7 +41,7 @@ PulsarModelVisualizar/
  │   │   ├─ material/                   # 画像素材
  │   │   └─ uml/                        # 各種UML図
  │   ├─ videos/
- │   │   └─  PulsarModelVisualizar.mp4  # デモ動画
+ │   │   └─ PulsarModelVisualizar.mp4   # デモ動画
  │   ├─ DESIGN.md                       # UML図一覧
  │   └─ PulsarModelVisualizar.asta      # astah 設計ファイル
  ├─ PulsarModelVisualizar.zip           # 実行ファイル一式
